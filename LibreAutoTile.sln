@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwaitumin.LibreAutoTile", "LibreAutoTile\Qwaitumin.LibreAutoTile.csproj", "{A1F44E6C-78D6-4412-906B-CE8681DABB27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwaitumin.LibreAutoTile.Tests", "LibreAutoTile.Tests\Qwaitumin.LibreAutoTile.Tests.csproj", "{876A9DF4-DEE7-4C4F-81B3-A326B7A63642}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwaitumin.LibreAutoTile.Benchmark", "LibreAutoTile.Benchmarks\Qwaitumin.LibreAutoTile.Benchmark.csproj", "{446F4C50-0E7A-4447-B2B3-6832AB15B9D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwaitumin.LibreAutoTile.GodotBindings", "LibreAutoTile.GodotBindings\Qwaitumin.LibreAutoTile.GodotBindings.csproj", "{6294D1BC-3450-41AE-9F8D-0E1897F0D320}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwaitumin.LibreAutoTile.GodotExample", "LibreAutoTile.GodotExample\Qwaitumin.LibreAutoTile.GodotExample.csproj", "{D6A8C40F-4881-4267-BCA6-CF853AEE67CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwaitumin.LibreAutoTile.GUI", "LibreAutoTile.GUI\Qwaitumin.LibreAutoTile.GUI.csproj", "{AC33B3F4-11F7-466E-942C-214A7DD093A5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1F44E6C-78D6-4412-906B-CE8681DABB27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1F44E6C-78D6-4412-906B-CE8681DABB27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1F44E6C-78D6-4412-906B-CE8681DABB27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1F44E6C-78D6-4412-906B-CE8681DABB27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{876A9DF4-DEE7-4C4F-81B3-A326B7A63642}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{876A9DF4-DEE7-4C4F-81B3-A326B7A63642}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{876A9DF4-DEE7-4C4F-81B3-A326B7A63642}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{876A9DF4-DEE7-4C4F-81B3-A326B7A63642}.Release|Any CPU.Build.0 = Release|Any CPU
+		{446F4C50-0E7A-4447-B2B3-6832AB15B9D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{446F4C50-0E7A-4447-B2B3-6832AB15B9D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{446F4C50-0E7A-4447-B2B3-6832AB15B9D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{446F4C50-0E7A-4447-B2B3-6832AB15B9D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6294D1BC-3450-41AE-9F8D-0E1897F0D320}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6294D1BC-3450-41AE-9F8D-0E1897F0D320}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6294D1BC-3450-41AE-9F8D-0E1897F0D320}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6294D1BC-3450-41AE-9F8D-0E1897F0D320}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6A8C40F-4881-4267-BCA6-CF853AEE67CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6A8C40F-4881-4267-BCA6-CF853AEE67CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6A8C40F-4881-4267-BCA6-CF853AEE67CE}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6A8C40F-4881-4267-BCA6-CF853AEE67CE}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{AC33B3F4-11F7-466E-942C-214A7DD093A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC33B3F4-11F7-466E-942C-214A7DD093A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC33B3F4-11F7-466E-942C-214A7DD093A5}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC33B3F4-11F7-466E-942C-214A7DD093A5}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+EndGlobal

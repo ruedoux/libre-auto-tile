@@ -1,0 +1,328 @@
+[gd_scene load_steps=9 format=3 uid="uid://bwtlxe3l1rsh1"]
+
+[ext_resource type="Script" uid="uid://bksen8in7ky54" path="res://Scenes/Editor/Editor.cs" id="1_fov24"]
+[ext_resource type="FontFile" uid="uid://da3uql1vplvrw" path="res://resources/SpaceMono-Regular.ttf" id="2_3uwva"]
+[ext_resource type="Script" uid="uid://brul1rr1v7a23" path="res://Scenes/Editor/Options/EditorOptions.cs" id="2_lixid"]
+[ext_resource type="Script" uid="uid://dn0j51c1qgmp4" path="res://Scenes/Editor/Settings/EditorSettings.cs" id="2_qcnmo"]
+[ext_resource type="Script" uid="uid://cfe53ulh582jj" path="res://Scenes/Editor/Tiles/EditorTiles.cs" id="5_alqnb"]
+[ext_resource type="Script" uid="uid://be0o6smnlbhxg" path="res://Scenes/Editor/Utils/MessageDisplay.cs" id="6_u75kh"]
+[ext_resource type="Script" uid="uid://ctptsawr0h1q1" path="res://Scenes/Editor/Preview/EditorPreview.cs" id="6_wwjnl"]
+[ext_resource type="Script" uid="uid://dveudakq5ooli" path="res://Scenes/Editor/EditorLayer.cs" id="7_ghgdu"]
+
+[node name="Editor" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_fov24")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Window" type="HSplitContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Tools" type="Panel" parent="CanvasLayer/Window"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.35
+
+[node name="V" type="VBoxContainer" parent="CanvasLayer/Window/Tools"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 13
+
+[node name="EditorOptions" type="MarginContainer" parent="CanvasLayer/Window/Tools/V"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.08
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("2_lixid")
+
+[node name="V" type="VBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorOptions"]
+layout_mode = 2
+
+[node name="OptionButton" type="OptionButton" parent="CanvasLayer/Window/Tools/V/EditorOptions/V"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_3uwva")
+alignment = 1
+item_count = 2
+popup/item_0/text = "Mock1"
+popup/item_0/id = 0
+popup/item_1/text = "Mock2"
+popup/item_1/id = 1
+
+[node name="Image" type="VBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorOptions/V"]
+layout_mode = 2
+
+[node name="SelectImage" type="Button" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Image"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Select Image"
+
+[node name="ImageDialog" type="FileDialog" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Image"]
+title = "Open a File"
+initial_position = 2
+size = Vector2i(606, 360)
+always_on_top = true
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.jpg", "*.png")
+
+[node name="Configuration" type="HBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorOptions/V"]
+layout_mode = 2
+
+[node name="SaveConfiguration" type="Button" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Configuration"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Save"
+
+[node name="LoadConfiguration" type="Button" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Configuration"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Load
+"
+
+[node name="ClearConfiguration" type="Button" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Configuration"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Clear"
+
+[node name="SaveConfigurationDialog" type="FileDialog" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Configuration"]
+title = "Save Configutation"
+initial_position = 2
+access = 2
+filters = PackedStringArray("*.json")
+option_count = 1
+
+[node name="LoadConfigurationDialog" type="FileDialog" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Configuration"]
+auto_translate_mode = 1
+title = "Open a File"
+initial_position = 2
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.json")
+option_count = 1
+
+[node name="EditorSettings" type="MarginContainer" parent="CanvasLayer/Window/Tools/V"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("2_qcnmo")
+
+[node name="V" type="VBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorSettings"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TileSize" type="HBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorSettings/V"]
+layout_mode = 2
+
+[node name="TileSize" type="Label" parent="CanvasLayer/Window/Tools/V/EditorSettings/V/TileSize"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.6
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Tile Size"
+
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/Window/Tools/V/EditorSettings/V/TileSize"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+
+[node name="SelectionColor" type="HBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorSettings/V"]
+layout_mode = 2
+
+[node name="RichTextLabel" type="Label" parent="CanvasLayer/Window/Tools/V/EditorSettings/V/SelectionColor"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.6
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Selection color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="CanvasLayer/Window/Tools/V/EditorSettings/V/SelectionColor"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+focus_mode = 0
+color = Color(0.754825, 0.754825, 0.754825, 1)
+
+[node name="GridColor" type="HBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorSettings/V"]
+layout_mode = 2
+
+[node name="RichTextLabel" type="Label" parent="CanvasLayer/Window/Tools/V/EditorSettings/V/GridColor"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.6
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Grid color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="CanvasLayer/Window/Tools/V/EditorSettings/V/GridColor"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+focus_mode = 0
+color = Color(0.754825, 0.754825, 0.754825, 1)
+
+[node name="BackgroundColor" type="HBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorSettings/V"]
+layout_mode = 2
+
+[node name="RichTextLabel" type="Label" parent="CanvasLayer/Window/Tools/V/EditorSettings/V/BackgroundColor"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.6
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Background color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="CanvasLayer/Window/Tools/V/EditorSettings/V/BackgroundColor"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+focus_mode = 0
+color = Color(0.754825, 0.754825, 0.754825, 1)
+
+[node name="EditorTiles" type="MarginContainer" parent="CanvasLayer/Window/Tools/V"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("5_alqnb")
+
+[node name="V" type="VBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorTiles"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Add" type="Button" parent="CanvasLayer/Window/Tools/V/EditorTiles/V"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = "Add new tile"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/Window/Tools/V/EditorTiles/V"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorTiles/V/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EditorPreview" type="MarginContainer" parent="CanvasLayer/Window/Tools/V"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("6_wwjnl")
+
+[node name="V" type="VBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorPreview"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/Window/Tools/V/EditorPreview/V"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="CanvasLayer/Window/Tools/V/EditorPreview/V/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Workspace" type="VBoxContainer" parent="CanvasLayer/Window"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MessageDisplay" type="MarginContainer" parent="CanvasLayer/Window/Workspace"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.05
+script = ExtResource("6_u75kh")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/Window/Workspace/MessageDisplay"]
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("2_3uwva")
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "[color=red]Test Message: Blah Blah[/color]"
+fit_content = true
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="V" type="VBoxContainer" parent="CanvasLayer/Window/Workspace"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Null" type="BoxContainer" parent="CanvasLayer/Window/Workspace/V"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="H" type="HBoxContainer" parent="CanvasLayer/Window/Workspace/V"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.05
+
+[node name="Null" type="BoxContainer" parent="CanvasLayer/Window/Workspace/V/H"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Window/Workspace/V/H"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="EditorLayer" type="HBoxContainer" parent="CanvasLayer/Window/Workspace/V/H/MarginContainer"]
+layout_mode = 2
+script = ExtResource("7_ghgdu")
+
+[node name="Add" type="Button" parent="CanvasLayer/Window/Workspace/V/H/MarginContainer/EditorLayer"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = " + "
+
+[node name="Sub" type="Button" parent="CanvasLayer/Window/Workspace/V/H/MarginContainer/EditorLayer"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_3uwva")
+text = " - "
+
+[node name="P" type="PanelContainer" parent="CanvasLayer/Window/Workspace/V/H/MarginContainer/EditorLayer"]
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/Window/Workspace/V/H/MarginContainer/EditorLayer/P"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/normal_font = ExtResource("2_3uwva")
+theme_override_font_sizes/normal_font_size = 20
+text = " Layer 11 "
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1

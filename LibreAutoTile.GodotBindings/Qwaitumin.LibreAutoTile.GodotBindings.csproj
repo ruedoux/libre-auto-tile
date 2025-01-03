@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>IDE0130;NU1605</NoWarn>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LibreAutoTile\Qwaitumin.LibreAutoTile.csproj" />
+    <PackageReference Include="GodotSharp" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>Qwaitumin.LibreAutoTile.GodotBindings</PackageId>
+    <Version>1.0.0-alpha.1</Version>
+    <Authors>ruedoux</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>Autotile algorithm implementation bindings for godot</Description>
+    <RepositoryUrl>https://github.com/ruedoux/libre-auto-tile/tree/main</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>auto tile libreautotile autotile libre godot bindings</PackageTags>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbb4jshyysk6f"]
+
+[ext_resource type="Script" uid="uid://c5l4hj1b3xn8a" path="res://Scenes/Utils/MouseLabel.cs" id="1_f6wrf"]
+[ext_resource type="FontFile" uid="uid://da3uql1vplvrw" path="res://resources/SpaceMono-Regular.ttf" id="2_7yknh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exv8m"]
+bg_color = Color(0.137551, 0.137551, 0.137551, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.137255, 0.137255, 0.137255, 1)
+
+[node name="MouseLabel" type="CanvasLayer"]
+script = ExtResource("1_f6wrf")
+
+[node name="Margin" type="MarginContainer" parent="."]
+offset_right = 20.0
+offset_bottom = 34.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Margin"]
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_fonts/normal_font = ExtResource("2_7yknh")
+theme_override_styles/normal = SubResource("StyleBoxFlat_exv8m")
+text = "1"
+fit_content = true
+autowrap_mode = 0

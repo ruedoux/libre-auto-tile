@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dv6680ywtrj1x"]
+
+[ext_resource type="Script" uid="uid://01bw5jnwi4ip" path="res://Scenes/Comparasion/BuiltInCompare.cs" id="1_t5j0q"]
+
+[node name="BuiltInCompare" type="Node2D"]
+script = ExtResource("1_t5j0q")

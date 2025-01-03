@@ -1,0 +1,50 @@
+[gd_scene load_steps=3 format=3 uid="uid://bagpwruhxb7ka"]
+
+[ext_resource type="FontFile" uid="uid://da3uql1vplvrw" path="res://resources/SpaceMono-Regular.ttf" id="1_i1lex"]
+[ext_resource type="Script" uid="uid://bt7i3jyoojp1a" path="res://Scenes/Editor/Preview/TileMapTile.cs" id="1_u018q"]
+
+[node name="TileMapTile" type="PanelContainer"]
+offset_right = 186.0
+offset_bottom = 136.0
+script = ExtResource("1_u018q")
+
+[node name="Panel" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="H" type="HBoxContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="Select" type="Button" parent="Panel/H"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("1_i1lex")
+text = "✓"
+
+[node name="Fields" type="HBoxContainer" parent="Panel/H"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Name" type="MarginContainer" parent="Panel/H/Fields"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Panel/H/Fields/Name"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("1_i1lex")
+text = "TileName"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Texture" type="MarginContainer" parent="Panel/H/Fields"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorRect" type="ColorRect" parent="Panel/H/Fields/Texture"]
+layout_mode = 2

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://xl8bisy477h8"]
+
+[ext_resource type="Script" uid="uid://5d5eqb0xml0j" path="res://Scenes/Comparasion/LibreAutoTileCompare.cs" id="1_3c167"]
+
+[node name="LibreAutoTileCompare" type="Node2D"]
+script = ExtResource("1_3c167")

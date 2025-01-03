@@ -1,0 +1,98 @@
+[gd_scene load_steps=3 format=3 uid="uid://1pokk3kl6wjp"]
+
+[ext_resource type="Script" uid="uid://dhajh1hvwyb34" path="res://Scenes/Editor/Tiles/GuiTile.cs" id="1_3gfk8"]
+[ext_resource type="FontFile" uid="uid://da3uql1vplvrw" path="res://resources/SpaceMono-Regular.ttf" id="2_w5ugi"]
+
+[node name="Tile" type="PanelContainer"]
+offset_right = 164.0
+offset_bottom = 98.0
+script = ExtResource("1_3gfk8")
+
+[node name="Panel" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="H" type="HBoxContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="Remove" type="Button" parent="Panel/H"]
+modulate = Color(2, 0, 0, 1)
+layout_mode = 2
+focus_mode = 0
+text = "x"
+
+[node name="Move" type="VBoxContainer" parent="Panel/H"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.2
+
+[node name="UpButton" type="Button" parent="Panel/H/Move"]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_w5ugi")
+text = "↑"
+
+[node name="DownButton" type="Button" parent="Panel/H/Move"]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_w5ugi")
+text = "↓"
+
+[node name="Select" type="Button" parent="Panel/H"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_w5ugi")
+text = "✓"
+
+[node name="Fields" type="VBoxContainer" parent="Panel/H"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Color" type="HBoxContainer" parent="Panel/H/Fields"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="Panel/H/Fields/Color"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("2_w5ugi")
+text = "Color
+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ColorPicker" type="ColorPickerButton" parent="Panel/H/Fields/Color"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 0
+
+[node name="Name" type="HBoxContainer" parent="Panel/H/Fields"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="Panel/H/Fields/Name"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("2_w5ugi")
+text = "Name
+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="Panel/H/Fields/Name"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_w5ugi")
+text = "NOT SET"
