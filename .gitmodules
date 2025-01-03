@@ -1,0 +1,3 @@
+[submodule "modules/simple-test"]
+	path = modules/simple-test
+	url = https://github.com/ruedoux/simple-test.git

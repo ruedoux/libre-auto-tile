@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>11.0</LangVersion>
+    <NoWarn>NU1605</NoWarn>
+    <NoWarn>IDE0130</NoWarn>
+    <IsAotCompatible>true</IsAotCompatible>
+    <PublishAOT>true</PublishAOT>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Qwaitumin.AutoTile</PackageId>
+    <Version>1.0.0-alpha1</Version>
+    <Authors>Ruedoux</Authors>
+    <PackageReadmeFile>../README.md</PackageReadmeFile>
+    <PackageLicenseFile>../LICENSE.txt</PackageLicenseFile>
+    <Description>Autotile algorithm implementation</Description>
+    <RepositoryUrl>https://github.com/ruedoux/autotile</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Auto Tile AutoTile</PackageTags>
+  </PropertyGroup>
+
+</Project>

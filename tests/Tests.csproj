@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\lib\AutoTile.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>11.0</LangVersion>
+    <NoWarn>NU1605</NoWarn>
+    <NoWarn>IDE0130</NoWarn>
+    <IsAotCompatible>true</IsAotCompatible>
+    <PublishAOT>true</PublishAOT>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+  <!-- Ensure nothing is trimmed by compiler -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="$(TargetName)" />
+  </ItemGroup>
+
+</Project>

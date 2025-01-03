@@ -1,0 +1,14 @@
+{
+  "TileSize": 16,
+  "TileDefinitions": {
+    "0": {
+      "ImageFileNameToTileMaskDefinition": {
+        "GrassHillsWater.png": {
+          "AtlasPositionToTileMasks": { "(0,0)": [[0, -1, 0, 0, 0, 0, 0, 0]] }
+        }
+      },
+      "Name": "Tile",
+      "Color": "(255,255,255,255)"
+    }
+  }
+}
