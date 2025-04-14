@@ -59,6 +59,12 @@ public readonly struct Vector2(int x, int y)
   public static bool operator !=(Vector2 left, Vector2 right)
     => !left.Equals(right);
 
+  public static Vector2 From(Vector3 v)
+   => new(v.X, v.Y);
+
+  public Vector3 ToVector3(int z)
+   => new(X, Y, z);
+
   public override readonly bool Equals(object? obj)
   {
     if (obj is not Vector2 other)

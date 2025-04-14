@@ -23,7 +23,7 @@ public class AutoTilerComposer(string imageDirectoryPath, AutoTileConfiguration 
         foreach (var (position, tileMaskArrays) in tileMaskDefinition.AtlasPositionToTileMasks)
           foreach (var tileMaskArray in tileMaskArrays)
             tileMaskSearcherItems.Add(
-              new(TileMask.FromArray([.. tileMaskArray]), new(position, imageFileName)));
+              new(TileMask.FromArray([.. tileMaskArray]), new(position.ToVector2(), imageFileName)));
       autoTileIndexToTileDatas.Add((int)tileId, new(tileMaskSearcherItems));
     }
 

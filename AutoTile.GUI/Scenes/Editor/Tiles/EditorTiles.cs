@@ -33,6 +33,7 @@ public partial class EditorTiles : MarginContainer, IState
     addTileButton.Pressed += AddTile;
 
     AddTile();
+    ActiveTile = CreatedTiles.First();
     ChangeActiveTile(CreatedTiles.First());
   }
 
@@ -109,9 +110,9 @@ public partial class EditorTiles : MarginContainer, IState
 
   private void ChangeActiveTile(GuiTile tile)
   {
-    ActiveTile = tile;
     ActiveTile.SelectButton.Modulate = Colors.White;
     tile.SelectButton.Modulate = new(r: 0, g: 2, b: 0);
+    ActiveTile = tile;
     ActiveTileChangedNotifier.NotifyObservers(tile);
     Editor.Logger.Log($"Changed active tile: {tile.TileName}");
   }

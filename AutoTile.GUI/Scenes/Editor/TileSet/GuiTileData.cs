@@ -42,32 +42,30 @@ public class GuiTileData
     LayerFullTileMask[layer] = new(tileMask, fullTileMask.CentreTileId);
   }
 
-  public void AddBitmask(int layer, int tileId, Vector2 worldPosition, int tileSize)
+  public void AddBitmask(int layer, int tileId, Vector2I bitmaskPosition)
   {
-    var newBitmaskPosition = BitmaskCalculator.DetermineBitmask(worldPosition, tileSize);
-    if (newBitmaskPosition == BitmaskCalculator.MIDDLE)
+    if (bitmaskPosition == BitmaskCalculator.MIDDLE)
     {
       SetCentreTileId(layer, tileId);
       return;
     }
 
-    var direction = BitmaskCalculator.PositionToDirection(newBitmaskPosition);
+    var direction = BitmaskCalculator.PositionToDirection(bitmaskPosition);
     var tileMask = GetTileMask(layer);
     tileMask = TileMask.ConstructModified(tileMask, direction, tileId);
     SetTileMask(layer, tileMask);
   }
 
-  public void RemoveBitmask(int layer, Vector2 worldPosition, int tileSize)
+  public void RemoveBitmask(int layer, Vector2I bitmaskPosition)
   {
-    var newBitmaskPosition = BitmaskCalculator.DetermineBitmask(worldPosition, tileSize);
-    if (newBitmaskPosition == BitmaskCalculator.MIDDLE)
+    if (bitmaskPosition == BitmaskCalculator.MIDDLE)
     {
       SetCentreTileId(layer, -1);
       RemoveLayerIfEmpty(layer);
       return;
     }
 
-    var direction = BitmaskCalculator.PositionToDirection(newBitmaskPosition);
+    var direction = BitmaskCalculator.PositionToDirection(bitmaskPosition);
     var tileMask = GetTileMask(layer);
     tileMask = TileMask.ConstructModified(tileMask, direction, -1);
     SetTileMask(layer, tileMask);

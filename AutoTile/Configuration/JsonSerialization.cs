@@ -42,6 +42,43 @@ public class Vector2ImmutableDictionaryConverter<TValue> : JsonConverter<Immutab
     => JsonSerialization.Write(writer, value, options, (k) => k.ToString());
 }
 
+public class Vector3Converter : JsonConverter<Vector3>
+{
+  public override Vector3 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+  {
+    if (reader.TokenType != JsonTokenType.String)
+      throw new JsonException("Expected string token");
+
+    var stringValue = reader!.GetString()
+      ?? throw new JsonException("Token is null");
+
+    return Vector3.FromString(stringValue);
+  }
+
+  public override void Write(Utf8JsonWriter writer, Vector3 value, JsonSerializerOptions options)
+    => writer.WriteStringValue(value.ToString());
+}
+
+public class Vector3DictionaryConverter<TValue> : JsonConverter<Dictionary<Vector3, TValue>>
+{
+  public override Dictionary<Vector3, TValue> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+  => JsonSerialization.ReadDictionary<Vector3, TValue>(
+      ref reader, options, Vector3.FromString);
+
+  public override void Write(Utf8JsonWriter writer, Dictionary<Vector3, TValue> value, JsonSerializerOptions options)
+    => JsonSerialization.Write(writer, value, options, (k) => k.ToString());
+}
+
+public class Vector3ImmutableDictionaryConverter<TValue> : JsonConverter<ImmutableDictionary<Vector3, TValue>>
+{
+  public override ImmutableDictionary<Vector3, TValue> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+  => JsonSerialization.ReadImmutableDictionary<Vector3, TValue>(
+      ref reader, options, Vector3.FromString);
+
+  public override void Write(Utf8JsonWriter writer, ImmutableDictionary<Vector3, TValue> value, JsonSerializerOptions options)
+    => JsonSerialization.Write(writer, value, options, (k) => k.ToString());
+}
+
 public class TileColorConverter : JsonConverter<TileColor>
 {
   public override TileColor Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -63,8 +100,9 @@ public class TileColorConverter : JsonConverter<TileColor>
 [JsonSourceGenerationOptions(
   Converters = [
     typeof(Vector2Converter),
-    typeof(Vector2ImmutableDictionaryConverter<ImmutableArray<ImmutableArray<int>>>),
+    typeof(Vector3ImmutableDictionaryConverter<ImmutableArray<ImmutableArray<int>>>),
     typeof(TileColorConverter),
+    typeof(Vector3Converter),
   ],
   DefaultIgnoreCondition = JsonIgnoreCondition.Never,
   IncludeFields = true)]

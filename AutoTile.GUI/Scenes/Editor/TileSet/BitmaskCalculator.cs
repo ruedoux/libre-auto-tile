@@ -20,16 +20,6 @@ public static class BitmaskCalculator
     TOP_LEFT, TOP, TOP_RIGHT, LEFT, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT, MIDDLE
   ];
 
-  public static int[] BitmaskToTileMask(byte bitmask, int tileId)
-  {
-    if (tileId < 0)
-      throw new ArgumentException($"Tile id cannot be less than 0, was given '{tileId}'");
-    int[] tileMask = new int[8];
-    for (int i = 0; i < 8; i++)
-      tileMask[i] = (bitmask & (1 << i)) != 0 ? tileId : -1;
-    return tileMask;
-  }
-
   public static TileMask.SurroundingDirection PositionToDirection(Vector2I position)
   {
     int index = Array.FindIndex(BITMASK_POSITIONS, x => x == position);

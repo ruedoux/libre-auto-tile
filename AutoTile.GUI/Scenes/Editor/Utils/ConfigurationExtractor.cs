@@ -35,18 +35,27 @@ public static class ConfigurationExtractor
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
       editorTiles.AddTile((int)tileId, tileDefinition.Name, GodotTypeMapper.Map(tileDefinition.Color));
 
+    Dictionary<Configuration.Vector2, GuiTileData> positionToTileData = [];
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {
       foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
       {
         foreach (var (position, tileMask) in tileMaskDefinition.AtlasPositionToTileMasks)
         {
-          //bitmaskContainer.TileDatabase.SetPackedTileData(
-          //  imageFileName
-          //);
+          // if (!positionToTileData.TryGetValue(position, out var guiTileData))
+          // {
+          //   guiTileData = new();
+          //   positionToTileData[position] = guiTileData;
+          // }
+
+          //guiTileData.AddBitmask(layer, tileId);
         }
       }
     }
+
+    //bitmaskContainer.TileDatabase.SetPackedTileData(
+    //imageFileName, GodotTypeMapper.Map(position), new()
+    //      );
   }
 
   public static AutoTileConfiguration GetAsAutoTileConfiguration(EditorContext editorContext)
@@ -74,20 +83,24 @@ public static class ConfigurationExtractor
     Dictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition = [];
     foreach (var (fileName, positionToTileData) in editorContext.TileDatabase.GetAll())
     {
-      Dictionary<Configuration.Vector2, List<int[]>> positionsToTileMaskDefinitions = [];
+      Dictionary<Configuration.Vector3, List<int[]>> positionsToTileMaskDefinitions = [];
       foreach (var (position, tileData) in positionToTileData)
       {
-        List<int[]> tileMasks = [];
-        foreach (var (_, fullTileMask) in tileData.LayerFullTileMask)
+        foreach (var (layer, fullTileMask) in tileData.LayerFullTileMask)
         {
           var centreTileId = fullTileMask.CentreTileId;
           var tileMask = fullTileMask.TileMask;
-          if (centreTileId == tileId)
-            tileMasks.Add(tileMask.ToArray());
-        }
+          if (centreTileId != tileId) continue;
 
-        if (tileMasks.Count > 0)
-          positionsToTileMaskDefinitions[GodotTypeMapper.Map(position)] = tileMasks;
+          var positionWithLayer = Configuration.Vector3.From(
+            GodotTypeMapper.Map(position), layer);
+          if (!positionsToTileMaskDefinitions.TryGetValue(positionWithLayer, out var tileMasks))
+          {
+            tileMasks = [];
+            positionsToTileMaskDefinitions[positionWithLayer] = tileMasks;
+          }
+          tileMasks.Add(tileMask.ToArray());
+        }
       }
 
       imageFileNameToTileMaskDefinition[Path.GetFileName(fileName)] = TileMaskDefinition.Construct(

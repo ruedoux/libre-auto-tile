@@ -5,10 +5,10 @@ namespace Qwaitumin.AutoTile.Configuration;
 
 public sealed class TileMaskDefinition
 {
-  public readonly ImmutableDictionary<Vector2, ImmutableArray<ImmutableArray<int>>> AtlasPositionToTileMasks;
+  public readonly ImmutableDictionary<Vector3, ImmutableArray<ImmutableArray<int>>> AtlasPositionToTileMasks;
 
   public TileMaskDefinition(
-    ImmutableDictionary<Vector2, ImmutableArray<ImmutableArray<int>>> atlasPositionToTileMasks)
+    ImmutableDictionary<Vector3, ImmutableArray<ImmutableArray<int>>> atlasPositionToTileMasks)
   {
     AtlasPositionToTileMasks = atlasPositionToTileMasks;
     foreach (var (_, tileMasks) in atlasPositionToTileMasks)
@@ -18,7 +18,7 @@ public sealed class TileMaskDefinition
   }
 
   public static TileMaskDefinition Construct(
-    Dictionary<Vector2, int[][]> atlasPositionToTileMasks)
+    Dictionary<Vector3, int[][]> atlasPositionToTileMasks)
   {
     var immutableAtlasPositionToTileMasks = atlasPositionToTileMasks.ToImmutableDictionary(
       kvp => kvp.Key,

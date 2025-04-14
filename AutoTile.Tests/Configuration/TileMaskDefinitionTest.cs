@@ -12,13 +12,13 @@ public class TileMaskDefinitionTest
   public void VerifyEquality()
   {
     SimpleEqualsVerifier.Verify(
-      TileMaskDefinition.Construct(new() { { Vector2.Zero, DEFAULT_TILEMASK } }),
-      TileMaskDefinition.Construct(new() { { Vector2.Zero, DEFAULT_TILEMASK } }),
-      TileMaskDefinition.Construct(new() { { Vector2.One, DEFAULT_TILEMASK } }));
+      TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }),
+      TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }),
+      TileMaskDefinition.Construct(new() { { Vector3.One, DEFAULT_TILEMASK } }));
     SimpleEqualsVerifier.Verify(
-      TileMaskDefinition.Construct(new() { { Vector2.Zero, DEFAULT_TILEMASK } }),
-      TileMaskDefinition.Construct(new() { { Vector2.Zero, DEFAULT_TILEMASK } }),
-      TileMaskDefinition.Construct(new() { { Vector2.Zero, [[0, 0, 0, 0, 0, 0, 0, 1]] } }));
+      TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }),
+      TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }),
+      TileMaskDefinition.Construct(new() { { Vector3.Zero, [[0, 0, 0, 0, 0, 0, 0, 1]] } }));
   }
 
   [SimpleTestMethod]
@@ -26,7 +26,7 @@ public class TileMaskDefinitionTest
   {
     // Given
     TileMaskDefinition tileMaskDefinition = TileMaskDefinition.Construct(
-      new() { { Vector2.Zero, DEFAULT_TILEMASK } });
+      new() { { Vector3.Zero, DEFAULT_TILEMASK } });
 
     // When
     var jsonString = tileMaskDefinition.ToJsonString();

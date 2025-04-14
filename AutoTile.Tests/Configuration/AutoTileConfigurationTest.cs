@@ -16,7 +16,7 @@ public class AutoTileConfigurationTest
   public AutoTileConfigurationTest()
   {
     DEFAULT_TILE_DEFINITION = TileDefinition.Construct(
-      new() { { "", TileMaskDefinition.Construct(new() { { Vector2.Zero, DEFAULT_TILEMASK } }) } });
+      new() { { "", TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }) } });
   }
 
   [SimpleTestMethod]

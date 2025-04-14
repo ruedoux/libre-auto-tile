@@ -89,14 +89,17 @@ public partial class BitmaskContainer : Node2D
   {
     var scaledTilePosition = TileSetMath.ScaleDownTilePosition(worldPosition, tileSize);
     var packedTileData = TileDatabase.GetPackedTileData(fileName, scaledTilePosition);
-    packedTileData.AddBitmask(layer, tileId, worldPosition, tileSize);
+    var bitmaskPosition = BitmaskCalculator.DetermineBitmask(worldPosition, tileSize);
+
+    packedTileData.AddBitmask(layer, tileId, bitmaskPosition);
   }
 
   public void RemoveBitmask(int layer, string fileName, Vector2 worldPosition, int tileSize)
   {
     var scaledTilePosition = TileSetMath.ScaleDownTilePosition(worldPosition, tileSize);
     var packedTileData = TileDatabase.GetPackedTileData(fileName, scaledTilePosition);
-    packedTileData.RemoveBitmask(layer, worldPosition, tileSize);
+    var bitmaskPosition = BitmaskCalculator.DetermineBitmask(worldPosition, tileSize);
+    packedTileData.RemoveBitmask(layer, bitmaskPosition);
 
     if (packedTileData.LayerFullTileMask.Count == 0)
       TileDatabase.GetAllByFileName(fileName).Remove(scaledTilePosition);

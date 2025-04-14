@@ -4,7 +4,7 @@
     "0": {
       "ImageFileNameToTileMaskDefinition": {
         "GrassHillsWater.png": {
-          "AtlasPositionToTileMasks": { "(0,0)": [[0, -1, 0, 0, 0, 0, 0, 0]] }
+          "AtlasPositionToTileMasks": { "(0,0,0)": [[0, -1, 0, 0, 0, 0, 0, 0]] }
         }
       },
       "Name": "Tile",
