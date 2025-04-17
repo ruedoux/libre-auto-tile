@@ -35,27 +35,35 @@ public static class ConfigurationExtractor
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
       editorTiles.AddTile((int)tileId, tileDefinition.Name, GodotTypeMapper.Map(tileDefinition.Color));
 
-    Dictionary<Configuration.Vector2, GuiTileData> positionToTileData = [];
+    Dictionary<string, Dictionary<Configuration.Vector3, GuiTileData>> imageFileNameToMappedTileData = [];
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {
       foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
       {
-        foreach (var (position, tileMask) in tileMaskDefinition.AtlasPositionToTileMasks)
+        if (!imageFileNameToMappedTileData.TryGetValue(imageFileName, out var positionToTileData))
         {
-          // if (!positionToTileData.TryGetValue(position, out var guiTileData))
-          // {
-          //   guiTileData = new();
-          //   positionToTileData[position] = guiTileData;
-          // }
+          positionToTileData = [];
+          imageFileNameToMappedTileData[imageFileName] = positionToTileData;
+        }
 
-          //guiTileData.AddBitmask(layer, tileId);
+        foreach (var (position, tileMasks) in tileMaskDefinition.AtlasPositionToTileMasks)
+        {
+          if (!positionToTileData.TryGetValue(position, out var guiTileData))
+          {
+            guiTileData = new();
+            positionToTileData[position] = guiTileData;
+          }
+
+          foreach (var tileMask in tileMasks)
+            guiTileData.AddTileMask(position.Z, TileMask.FromArray([.. tileMask]));
         }
       }
     }
 
-    //bitmaskContainer.TileDatabase.SetPackedTileData(
-    //imageFileName, GodotTypeMapper.Map(position), new()
-    //      );
+    foreach (var (imageFileName, mappedTileData) in imageFileNameToMappedTileData)
+      foreach (var (position, guiTileData) in mappedTileData)
+        bitmaskContainer.TileDatabase.SetPackedTileData(
+          imageFileName, GodotTypeMapper.Map(position.ToVector2()), guiTileData);
   }
 
   public static AutoTileConfiguration GetAsAutoTileConfiguration(EditorContext editorContext)

@@ -2,7 +2,6 @@ using Godot;
 using Qwaitumin.AutoTile.GUI.Core;
 using Qwaitumin.AutoTile.GUI.Core.GodotBindings;
 using Qwaitumin.AutoTile.GUI.Core.Signals;
-using Qwaitumin.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;

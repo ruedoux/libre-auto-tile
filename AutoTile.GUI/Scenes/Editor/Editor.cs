@@ -83,7 +83,9 @@ public partial class Editor : Control
       (texture) => bitmaskContainer.TileSetTexture.Texture = texture]);
     editorOptions.ToolChangedNotifier.AddObserver(toolsStateMachine.SwitchStateTo);
     editorOptions.SaveConfigurationNotifier.AddObserver(SaveConfiguration);
-    editorOptions.ImageFileObservable.AddObserver((_) => ClearEditorState());
+    editorOptions.ImageFileObservable.AddObserver((_) => UpdateBitmask());
+    editorOptions.ClearConfigurationNotifier.AddObserver((_) => ClearEditorState());
+    editorOptions.LoadConfigurationNotifier.AddObserver(LoadConfiguration);
 
     editorSettings.GridColorObservable.NotifyObservers();
     editorSettings.TileSizeObservable.NotifyObservers();
@@ -164,6 +166,14 @@ public partial class Editor : Control
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
     messageDisplay.DisplayText($"[color=green]Saved configuration to: {filePath}[/color]");
+    Logger.Log($"Saved configuration to: {filePath}");
+  }
+
+  private void LoadConfiguration(string filePath)
+  {
+    ConfigurationExtractor.LoadConfiguration(filePath, editorTiles, bitmaskContainer);
+    messageDisplay.DisplayText($"[color=green]Loaded configuration from: {filePath}[/color]");
+    Logger.Log($"Loaded configuration from: {filePath}");
   }
 
   private void UpdateBitmask()

@@ -104,9 +104,19 @@ focus_mode = 0
 theme_override_fonts/font = ExtResource("2_3uwva")
 text = "Clear"
 
-[node name="ConfigurationDialog" type="FileDialog" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Configuration"]
+[node name="SaveConfigurationDialog" type="FileDialog" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Configuration"]
 title = "Save Configutation"
 initial_position = 2
+access = 2
+filters = PackedStringArray("*.json")
+option_count = 1
+
+[node name="LoadConfigurationDialog" type="FileDialog" parent="CanvasLayer/Window/Tools/V/EditorOptions/V/Configuration"]
+auto_translate_mode = 1
+title = "Load Configuration"
+initial_position = 2
+ok_button_text = "Load"
+file_mode = 0
 access = 2
 filters = PackedStringArray("*.json")
 option_count = 1

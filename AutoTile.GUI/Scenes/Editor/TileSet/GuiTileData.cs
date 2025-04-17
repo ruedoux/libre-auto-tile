@@ -14,6 +14,17 @@ public class GuiTileData
 {
   public readonly Dictionary<int, FullTileMask> LayerFullTileMask = [];
 
+  public void AddTileMask(int layer, TileMask tileMask)
+  {
+    var tileMaskArray = tileMask.ToArray();
+    for (int i = 0; i < tileMaskArray.Length; i++)
+    {
+      var bitmaskPosition = BitmaskCalculator.DirectionToPosition(
+        (TileMask.SurroundingDirection)i);
+      AddBitmask(layer, tileMaskArray[i], bitmaskPosition);
+    }
+  }
+
   public int GetCentreTileId(int layer)
   {
     if (!LayerFullTileMask.TryGetValue(layer, out var fullTileMask))
