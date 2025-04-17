@@ -27,5 +27,5 @@ public static class GodotTypeMapper
     => new((byte)color.R8, (byte)color.G8, (byte)color.B8, (byte)color.A8);
 
   public static Color Map(TileColor color)
-    => new(color.R, color.G, color.B, color.A);
+    => new(color.Rf, color.Gf, color.Bf, color.Af);
 }

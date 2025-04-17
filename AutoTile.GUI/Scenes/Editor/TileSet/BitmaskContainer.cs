@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Qwaitumin.AutoTile.GUI.Core.GodotBindings;
-using Qwaitumin.Logging;
 
 namespace Qwaitumin.AutoTile.GUI.Scenes.Editor.TileSet;
 
@@ -27,6 +26,7 @@ public partial class BitmaskContainer : Node2D
   public void Clear()
   {
     TileDatabase.Clear();
+    TileSetBitmaskDrawer.RedrawBitmask([]);
     Editor.Logger.Log("Cleared all Bitmasks");
   }
 

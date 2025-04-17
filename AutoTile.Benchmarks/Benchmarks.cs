@@ -9,9 +9,9 @@ static class TileMaskSearcherItemSetup
 {
   const int MAX_TILE_ID = 1000;
 
-  public static List<(TileMask TileMask, Vector2 AtlasPosition)> GetItems(int n)
+  public static List<(TileMask TileMask, TileAtlas tileAtlas)> GetItems(int n)
   {
-    List<(TileMask TileMask, Vector2 AtlasPosition)> items = [];
+    List<(TileMask TileMask, TileAtlas tileAtlas)> items = [];
     Random random = new();
     for (int i = 0; i < n; i++)
     {
@@ -26,7 +26,7 @@ static class TileMaskSearcherItemSetup
         random.Next(0, MAX_TILE_ID)
       );
       Vector2 atlasPosition = new(i, i);
-      items.Add(new(tileMask, atlasPosition));
+      items.Add(new(tileMask, new(atlasPosition, "")));
     }
 
     return items;
@@ -42,21 +42,21 @@ public class TileMaskSearcherBenchmark
   public int N;
 
   TileMaskSearcher tileMaskSearcher = null!;
-  (TileMask TileMask, Vector2 AtlasPosition) randomTileMask;
+  (TileMask TileMask, TileAtlas tileAtlas) randomTileMask;
 
   [GlobalSetup]
   public void GlobalSetup()
   {
-    List<(TileMask TileMask, Vector2 AtlasPosition)> items = TileMaskSearcherItemSetup.GetItems(N);
+    List<(TileMask TileMask, TileAtlas tileAtlas)> items = TileMaskSearcherItemSetup.GetItems(N);
     tileMaskSearcher = new(items);
     randomTileMask = items[new Random().Next(0, items.Count)];
   }
 
   [Benchmark]
-  public (TileMask TileMask, Vector2 AtlasPosition) LookupExisting()
+  public (TileMask TileMask, TileAtlas tileAtlas) LookupExisting()
     => tileMaskSearcher.FindBestMatch(randomTileMask.TileMask);
 
   [Benchmark]
-  public (TileMask TileMask, Vector2 AtlasPosition) LookupClosest()
+  public (TileMask TileMask, TileAtlas tileAtlas) LookupClosest()
     => tileMaskSearcher.FindBestMatch(new TileMask());
 }

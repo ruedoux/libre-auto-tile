@@ -17,7 +17,7 @@ public partial class MessageDisplay : MarginContainer
     RichTextLabel.Modulate = new Color(1, 1, 1, 0);
   }
 
-  public void DisplayText(string text, int holdMs = 2000, int fadeMs = 2000)
+  public void DisplayText(string text, int holdMs = 3000, int fadeMs = 2000)
   {
     RichTextLabel.Text = text;
 

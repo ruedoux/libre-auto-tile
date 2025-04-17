@@ -5,6 +5,7 @@ using Godot;
 using Qwaitumin.AutoTile.GUI.Core;
 using Qwaitumin.AutoTile.GUI.Core.GodotBindings;
 using Qwaitumin.AutoTile.GUI.Scenes.Editor.Options;
+using Qwaitumin.AutoTile.GUI.Scenes.Editor.Preview;
 using Qwaitumin.AutoTile.GUI.Scenes.Editor.Tiles;
 using Qwaitumin.AutoTile.GUI.Scenes.Editor.TileSet;
 using Qwaitumin.AutoTile.GUI.Scenes.Editor.Utils;
@@ -13,8 +14,7 @@ using Qwaitumin.Logging;
 
 namespace Qwaitumin.AutoTile.GUI.Scenes.Editor;
 
-public enum EditorTools { Tiles, Settings }
-public enum EditorModes { BitmaskDrawing, TestBitmask } // TODO built in editor to test bitmask
+public enum EditorTools { Tiles, Settings, Preview }
 
 public partial class Editor : Control
 {
@@ -33,9 +33,9 @@ public partial class Editor : Control
   private Settings.EditorSettings editorSettings = null!;
   private EditorOptions editorOptions = null!;
   private EditorTiles editorTiles = null!;
-  private Control toolsUi = null!;
   private MessageDisplay messageDisplay = null!;
   private EditorLayer editorLayer = null!;
+  private EditorPreview editorPreview = null!;
 
   public Editor()
   {
@@ -50,16 +50,17 @@ public partial class Editor : Control
     editorSettings = GetNode<Settings.EditorSettings>("CanvasLayer/Window/Tools/V/EditorSettings");
     editorOptions = GetNode<EditorOptions>("CanvasLayer/Window/Tools/V/EditorOptions");
     editorTiles = GetNode<EditorTiles>("CanvasLayer/Window/Tools/V/EditorTiles");
-    toolsUi = GetNode<Control>("CanvasLayer/Window/Tools");
     messageDisplay = GetNode<MessageDisplay>("CanvasLayer/Window/Workspace/MessageDisplay");
     editorLayer = GetNode<EditorLayer>("CanvasLayer/Window/Workspace/V/H/MarginContainer/EditorLayer");
-    UiElements.AddRange([toolsUi, editorLayer]);
+    editorPreview = GetNode<EditorPreview>("CanvasLayer/Window/Tools/V/EditorPreview");
+    UiElements.AddRange([GetNode<Control>("CanvasLayer/Window/Tools"), editorLayer]);
 
     toolsStateMachine = new(
       EditorTools.Tiles,
       new() {
         { EditorTools.Settings, editorSettings },
-        { EditorTools.Tiles, editorTiles }
+        { EditorTools.Tiles, editorTiles },
+        { EditorTools.Preview, editorPreview }
     });
     GodotApi.FillOptionButtonWithEnum(editorOptions.ToolsOptionsButton, EditorTools.Tiles);
 
@@ -84,7 +85,7 @@ public partial class Editor : Control
     editorOptions.ToolChangedNotifier.AddObserver(toolsStateMachine.SwitchStateTo);
     editorOptions.SaveConfigurationNotifier.AddObserver(SaveConfiguration);
     editorOptions.ImageFileObservable.AddObserver((_) => UpdateBitmask());
-    editorOptions.ClearConfigurationNotifier.AddObserver((_) => ClearEditorState());
+    editorOptions.ClearConfigurationNotifier.AddObserver((_) => ClearBitmasks());
     editorOptions.LoadConfigurationNotifier.AddObserver(LoadConfiguration);
 
     editorSettings.GridColorObservable.NotifyObservers();
@@ -120,10 +121,10 @@ public partial class Editor : Control
       inputListener.ListenToProcess();
   }
 
-  private void ClearEditorState()
+  private void ClearBitmasks()
   {
     Logger.Log("> Starting clearing editor state");
-    editorTiles.ClearAllExceptActiveTile();
+    editorTiles.ClearAll();
     bitmaskContainer.Clear();
     UpdateBitmask();
     Logger.Log("> Finished clearing editor state");
@@ -144,7 +145,7 @@ public partial class Editor : Control
         editorOptions.ImageFileObservable.Value,
         mousePositionInt,
         editorSettings.ScaledTileSizeObservable.Value);
-    if (mouseLeftClicked)
+    if (mouseLeftClicked && editorTiles.ActiveTile is not null)
       bitmaskContainer.PlaceBitmask(
         (int)editorLayer.LayerObservable.Value,
         editorTiles.ActiveTile.TileId,
@@ -172,6 +173,7 @@ public partial class Editor : Control
   private void LoadConfiguration(string filePath)
   {
     ConfigurationExtractor.LoadConfiguration(filePath, editorTiles, bitmaskContainer);
+    UpdateBitmask();
     messageDisplay.DisplayText($"[color=green]Loaded configuration from: {filePath}[/color]");
     Logger.Log($"Loaded configuration from: {filePath}");
   }

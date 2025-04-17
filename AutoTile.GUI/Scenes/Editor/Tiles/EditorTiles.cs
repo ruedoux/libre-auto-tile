@@ -17,7 +17,7 @@ public partial class EditorTiles : MarginContainer, IState
   public readonly ObserverNotifier<GuiTile> ActiveTileChangedNotifier = new();
   public readonly ObserverNotifier<GuiTile> TileDeletedNotifier = new();
   public readonly ObserverNotifier<Color> TileColorChangedNotifier = new();
-  public GuiTile ActiveTile { private set; get; } = null!;
+  public GuiTile? ActiveTile { private set; get; } = null;
   public readonly HashSet<GuiTile> CreatedTiles = [];
 
   private Control tileList = null!;
@@ -36,20 +36,12 @@ public partial class EditorTiles : MarginContainer, IState
     ChangeActiveTile(CreatedTiles.First());
   }
 
-  public void ClearAllExceptActiveTile()
-  {
-    Editor.Logger.Log("> Starting clearing tiles except active tile");
-    foreach (var guiTile in CreatedTiles)
-      if (guiTile != ActiveTile)
-        RemoveTile(guiTile.TileName);
-    Editor.Logger.Log("> Finished clearing tiles except active tile");
-  }
-
   public void ClearAll()
   {
     Editor.Logger.Log("> Starting clearing tiles");
     foreach (var guiTile in CreatedTiles)
       RemoveTile(guiTile.TileName);
+    ActiveTile = null;
     Editor.Logger.Log("> Finished clearing tiles");
   }
 
@@ -109,7 +101,8 @@ public partial class EditorTiles : MarginContainer, IState
 
   private void ChangeActiveTile(GuiTile tile)
   {
-    ActiveTile.SelectButton.Modulate = Colors.White;
+    if (ActiveTile is not null)
+      ActiveTile.SelectButton.Modulate = Colors.White;
     tile.SelectButton.Modulate = new(r: 0, g: 2, b: 0);
     ActiveTile = tile;
     ActiveTileChangedNotifier.NotifyObservers(tile);
@@ -143,9 +136,6 @@ public partial class EditorTiles : MarginContainer, IState
       Editor.Logger.Log($"Tile cannot be deleted, tile name not found: '{tileName}'");
       return;
     }
-
-    if (tileToDelete == ActiveTile)
-      return;
 
     tileList.RemoveChild(tileToDelete);
     TileDeletedNotifier.NotifyObservers(tileToDelete);

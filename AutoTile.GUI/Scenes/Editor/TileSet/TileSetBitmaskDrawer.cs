@@ -18,6 +18,12 @@ public partial class TileSetBitmaskDrawer : Node2D
     bitmaskGhostDrawNode = GodotApi.AddChild<DrawNode>(this, new());
   }
 
+  public void ClearAllDrawn()
+  {
+    bitmaskDrawNode.QueueRedraw();
+    bitmaskGhostDrawNode.QueueRedraw();
+  }
+
   public void RedrawBitmaskGhost(Vector2 worldPosition, int tileSize, Color color)
   {
     var bitmaskRectangle = GetBitmaskRectangle(worldPosition, tileSize);

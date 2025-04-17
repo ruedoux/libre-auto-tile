@@ -29,7 +29,10 @@ public static class ConfigurationExtractor
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException("Loading json file results in null");
 
-    editorTiles.ClearAllExceptActiveTile();
+    if (autoTileConfiguration.TileDefinitions.Count == 0)
+      throw new ArgumentException("To load you need at least one tile definition");
+
+    editorTiles.ClearAll();
     bitmaskContainer.TileDatabase.Clear();
 
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
@@ -54,6 +57,7 @@ public static class ConfigurationExtractor
             positionToTileData[position] = guiTileData;
           }
 
+          guiTileData.SetCentreTileId(position.Z, (int)tileId);
           foreach (var tileMask in tileMasks)
             guiTileData.AddTileMask(position.Z, TileMask.FromArray([.. tileMask]));
         }
