@@ -2,14 +2,9 @@ using Godot;
 
 namespace Qwaitumin.AutoTile.GodotBindings;
 
-internal class TileMapDrawer : ITileMapDrawer
+internal class TileMapDrawer(TileMapWrapper tileMapWrapper) : ITileMapDrawer
 {
-  private readonly TileMapWrapper tileMapWrapper;
-
-  public TileMapDrawer(TileMapWrapper tileMapWrapper)
-  {
-    this.tileMapWrapper = tileMapWrapper;
-  }
+  private readonly TileMapWrapper tileMapWrapper = tileMapWrapper;
 
   public void Clear()
     => Callable.From(tileMapWrapper.TileMapLayer.Clear).CallDeferred();

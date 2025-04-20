@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Godot;
 using Qwaitumin.AutoTile.Configuration;
-using Qwaitumin.AutoTile.GUI.Core.GodotBindings;
+using Qwaitumin.AutoTile.GodotBindings;
 using Qwaitumin.AutoTile.GUI.Scenes.Editor.Tiles;
 using Qwaitumin.AutoTile.GUI.Scenes.Editor.TileSet;
 

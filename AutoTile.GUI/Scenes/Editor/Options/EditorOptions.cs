@@ -17,10 +17,10 @@ public partial class EditorOptions : MarginContainer
 
   public readonly ObservableVariable<Rect2I> ImageRectangleObservable = new(new());
   public readonly ObservableVariable<Texture2D> ImageTextureObservable = new(new());
-  public readonly ObserverNotifier<EditorTools> ToolChangedNotifier = new();
-  public readonly ObserverNotifier<bool> ClearConfigurationNotifier = new();
-  public readonly ObserverNotifier<string> SaveConfigurationNotifier = new();
-  public readonly ObserverNotifier<string> LoadConfigurationNotifier = new();
+  public readonly EventNotifier<EditorTools> ToolHasChanged = new();
+  public readonly EventNotifier<bool> ConfigurationCleared = new();
+  public readonly EventNotifier<string> ConfigurationSaved = new();
+  public readonly EventNotifier<string> ConfigurationLoaded = new();
   public readonly ObservableVariable<string> ImageFileObservable = new("");
 
   public override void _Ready()
@@ -48,17 +48,17 @@ public partial class EditorOptions : MarginContainer
   {
     string toolEnumString = ToolsOptionsButton.GetItemText((int)index);
     var enumValue = InputSanitizer.SanitizeEnum<EditorTools>(toolEnumString);
-    ToolChangedNotifier.NotifyObservers(enumValue);
+    ToolHasChanged.NotifyObservers(enumValue);
   }
 
   private void ClearConfiguration()
-    => ClearConfigurationNotifier.NotifyObservers(true);
+    => ConfigurationCleared.NotifyObservers(true);
 
   private void SaveConfiguration(string filePath)
-    => SaveConfigurationNotifier.NotifyObservers(filePath);
+    => ConfigurationSaved.NotifyObservers(filePath);
 
   private void LoadConfiguration(string filePath)
-    => LoadConfigurationNotifier.NotifyObservers(filePath);
+    => ConfigurationLoaded.NotifyObservers(filePath);
 
   private void ShowImageDialog()
     => SelectImageDialog.Show();

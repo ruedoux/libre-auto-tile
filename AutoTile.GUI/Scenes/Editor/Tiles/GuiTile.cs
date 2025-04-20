@@ -12,9 +12,9 @@ public partial class GuiTile : PanelContainer
   public LineEdit TileNameEdit { private set; get; } = null!;
   public ColorPickerButton ColorPickerButton { private set; get; } = null!;
 
-  public readonly ObserverNotifier<string> TryDeleteNotifier = new();
-  public readonly ObserverNotifier<Tuple<GuiTile, string>> TryChangeTileNameNotifier = new();
-  public readonly ObserverNotifier<GuiTile> SelectActiveTileNotifier = new();
+  public readonly EventNotifier<string> TryDeleteNotifier = new();
+  public readonly EventNotifier<Tuple<GuiTile, string>> TryChangeTileNameNotifier = new();
+  public readonly EventNotifier<GuiTile> SelectActiveTileNotifier = new();
   public string TileName = "<DEFAULT>";
   public int TileId = -1;
 

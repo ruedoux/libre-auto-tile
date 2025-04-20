@@ -1,7 +1,7 @@
 using Godot;
-using Qwaitumin.AutoTile;
 using Qwaitumin.AutoTile.Configuration;
-using Qwaitumin.AutoTile.GodotBindings;
+
+namespace Qwaitumin.AutoTile.GodotBindings;
 
 public class AutoTileMap : Node2D
 {

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using Qwaitumin.AutoTile.GUI.Core;
 using Qwaitumin.AutoTile.GUI.Core.GodotBindings;
@@ -70,10 +72,10 @@ public partial class Editor : Control
       (_) => UpdateBitmask(),
       (_) => UpdateGrid()]);
 
-    editorTiles.ActiveTileChangedNotifier.AddObserver(
+    editorTiles.ChangedActiveTile.AddObserver(
       (_) => UpdateBitmask());
-    editorTiles.TileColorChangedNotifier.AddObserver((_) => UpdateBitmask());
-    editorTiles.TileDeletedNotifier.AddObservers([
+    editorTiles.TileColorChanged.AddObserver((_) => UpdateBitmask());
+    editorTiles.TileDeleted.AddObservers([
       (guiTile) => bitmaskContainer.RemoveTileId(guiTile.TileId),
       (_) => UpdateBitmask()]);
 
@@ -82,11 +84,11 @@ public partial class Editor : Control
       (_) => UpdateGrid()]);
     editorOptions.ImageTextureObservable.AddObservers([
       (texture) => bitmaskContainer.TileSetTexture.Texture = texture]);
-    editorOptions.ToolChangedNotifier.AddObserver(toolsStateMachine.SwitchStateTo);
-    editorOptions.SaveConfigurationNotifier.AddObserver(SaveConfiguration);
+    editorOptions.ToolHasChanged.AddObserver(toolsStateMachine.SwitchStateTo);
+    editorOptions.ConfigurationSaved.AddObserver(SaveConfiguration);
     editorOptions.ImageFileObservable.AddObserver((_) => UpdateBitmask());
-    editorOptions.ClearConfigurationNotifier.AddObserver((_) => ClearBitmasks());
-    editorOptions.LoadConfigurationNotifier.AddObserver(LoadConfiguration);
+    editorOptions.ConfigurationCleared.AddObserver((_) => ClearBitmasks());
+    editorOptions.ConfigurationLoaded.AddObserver(LoadConfiguration);
 
     editorSettings.GridColorObservable.NotifyObservers();
     editorSettings.TileSizeObservable.NotifyObservers();
@@ -166,8 +168,8 @@ public partial class Editor : Control
     var configuration = ConfigurationExtractor.GetAsAutoTileConfiguration(editorContext);
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
-    messageDisplay.DisplayText($"[color=green]Saved configuration to: {filePath}[/color]");
     Logger.Log($"Saved configuration to: {filePath}");
+    messageDisplay.DisplayText($"[color=green]Saved configuration to: {filePath}[/color]");
   }
 
   private void LoadConfiguration(string filePath)

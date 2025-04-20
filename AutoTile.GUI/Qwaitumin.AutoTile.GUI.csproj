@@ -1,6 +1,6 @@
 <Project Sdk="Godot.NET.Sdk/4.4.1">
   <ItemGroup>
-    <ProjectReference Include="..\AutoTile\Qwaitumin.AutoTile.csproj" />
+    <ProjectReference Include="..\AutoTile.GodotBindings\Qwaitumin.AutoTile.GodotBindings.csproj" />
     <ProjectReference Include="..\Logging\Qwaitumin.Logging.csproj" />
   </ItemGroup>
 

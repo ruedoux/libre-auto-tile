@@ -14,9 +14,9 @@ public partial class EditorTiles : MarginContainer, IState
     "res://Scenes/Editor/Tiles/GuiTile.tscn");
 
   public readonly GodotInputListener InputListener = new();
-  public readonly ObserverNotifier<GuiTile> ActiveTileChangedNotifier = new();
-  public readonly ObserverNotifier<GuiTile> TileDeletedNotifier = new();
-  public readonly ObserverNotifier<Color> TileColorChangedNotifier = new();
+  public readonly EventNotifier<GuiTile> ChangedActiveTile = new();
+  public readonly EventNotifier<GuiTile> TileDeleted = new();
+  public readonly EventNotifier<Color> TileColorChanged = new();
   public GuiTile? ActiveTile { private set; get; } = null;
   public readonly HashSet<GuiTile> CreatedTiles = [];
 
@@ -80,7 +80,7 @@ public partial class EditorTiles : MarginContainer, IState
     tileInstance.TryDeleteNotifier.AddObserver(RemoveTile);
     tileInstance.TryChangeTileNameNotifier.AddObserver(TryChangeTileName);
     tileInstance.SelectActiveTileNotifier.AddObserver(ChangeActiveTile);
-    tileInstance.ColorPickerButton.ColorChanged += TileColorChangedNotifier.NotifyObservers;
+    tileInstance.ColorPickerButton.ColorChanged += TileColorChanged.NotifyObservers;
 
     CreatedTiles.Add(tileInstance);
     Editor.Logger.Log($"Added new tile: {tileName}");
@@ -105,7 +105,7 @@ public partial class EditorTiles : MarginContainer, IState
       ActiveTile.SelectButton.Modulate = Colors.White;
     tile.SelectButton.Modulate = new(r: 0, g: 2, b: 0);
     ActiveTile = tile;
-    ActiveTileChangedNotifier.NotifyObservers(tile);
+    ChangedActiveTile.NotifyObservers(tile);
     Editor.Logger.Log($"Changed active tile: {tile.TileName}");
   }
 
@@ -138,9 +138,9 @@ public partial class EditorTiles : MarginContainer, IState
     }
 
     tileList.RemoveChild(tileToDelete);
-    TileDeletedNotifier.NotifyObservers(tileToDelete);
+    TileDeleted.NotifyObservers(tileToDelete);
     CreatedTiles.Remove(tileToDelete);
-    tileToDelete.ColorPickerButton.ColorChanged -= TileColorChangedNotifier.NotifyObservers;
+    tileToDelete.ColorPickerButton.ColorChanged -= TileColorChanged.NotifyObservers;
     tileToDelete.QueueFree();
     Editor.Logger.Log($"Removed tile {tileName}");
   }

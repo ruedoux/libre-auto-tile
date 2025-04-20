@@ -62,7 +62,7 @@ internal class TileMapWrapper
   private static Dictionary<string, HashSet<int>> AssignPathsToTileIds(
     string imageDirectoryPath, AutoTileConfiguration autoTileConfiguration)
   {
-    Dictionary<string, HashSet<int>> pathToTileIds = new();
+    Dictionary<string, HashSet<int>> pathToTileIds = [];
 
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {
