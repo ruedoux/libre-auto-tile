@@ -52,9 +52,9 @@ public class Logger(IEnumerable<Action<Message>> observers, LogSettings logSetti
 
   public void Log(object?[] messages, [CallerFilePath] string callerFilePath = "")
   {
-    foreach (var message in messages)
-      PushMessage(Message.GetInfo(
-        GetSourceClassName(callerFilePath), ParseAsString(message), logSettings));
+    var messageString = ParseAsString(messages);
+    PushMessage(Message.GetInfo(
+      GetSourceClassName(callerFilePath), messageString, logSettings));
   }
 
   public void LogError(string message, [CallerFilePath] string callerFilePath = "")

@@ -14,6 +14,8 @@ public partial class EditorOptions : MarginContainer
   public OptionButton ToolsOptionsButton { private set; get; } = null!;
   public Button ClearConfigurationButton { private set; get; } = null!;
   public Button LoadConfigurationButton { private set; get; } = null!;
+  public Control ImageUiContainer { private set; get; } = null!;
+  public Control ConfigurationUiContainer { private set; get; } = null!;
 
   public readonly ObservableVariable<Rect2I> ImageRectangleObservable = new(new());
   public readonly ObservableVariable<Texture2D> ImageTextureObservable = new(new());
@@ -33,6 +35,8 @@ public partial class EditorOptions : MarginContainer
     ClearConfigurationButton = GetNode<Button>("V/Configuration/ClearConfiguration");
     LoadConfigurationButton = GetNode<Button>("V/Configuration/LoadConfiguration");
     LoadConfigurationDialog = GetNode<FileDialog>("V/Configuration/LoadConfigurationDialog");
+    ImageUiContainer = GetNode<Control>("V/Image");
+    ConfigurationUiContainer = GetNode<Control>("V/Configuration");
 
     SelectImageDialog.FileSelected += LoadImageFromFile;
     SelectImageButton.Pressed += ShowImageDialog;

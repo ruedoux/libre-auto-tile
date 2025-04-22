@@ -142,6 +142,9 @@ public partial class EditorTiles : MarginContainer, IState
     CreatedTiles.Remove(tileToDelete);
     tileToDelete.ColorPickerButton.ColorChanged -= TileColorChanged.NotifyObservers;
     tileToDelete.QueueFree();
+
+    if (tileToDelete == ActiveTile)
+      ActiveTile = null;
     Editor.Logger.Log($"Removed tile {tileName}");
   }
 

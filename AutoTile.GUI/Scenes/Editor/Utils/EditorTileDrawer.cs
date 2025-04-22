@@ -8,33 +8,33 @@ namespace Qwaitumin.AutoTile.GUI.Scenes.Editor.Utils;
 
 public partial class EditorTileDrawer : Node2D
 {
-  private readonly DrawNode tileDrawNode;
-  private readonly DrawNode gridDrawNode;
-  private readonly DrawNode bitmaskOutlineDrawNode;
+  public readonly DrawNode TileDrawNode;
+  public readonly DrawNode GridDrawNode;
+  public readonly DrawNode BitmaskOutlineDrawNode;
 
   public EditorTileDrawer()
   {
-    gridDrawNode = GodotApi.AddChild<DrawNode>(this, new());
-    tileDrawNode = GodotApi.AddChild<DrawNode>(this, new());
-    bitmaskOutlineDrawNode = GodotApi.AddChild<DrawNode>(this, new());
+    GridDrawNode = GodotApi.AddChild<DrawNode>(this, new());
+    TileDrawNode = GodotApi.AddChild<DrawNode>(this, new());
+    BitmaskOutlineDrawNode = GodotApi.AddChild<DrawNode>(this, new());
   }
 
   public void ShowSelectedTile()
   {
-    tileDrawNode.Show();
-    bitmaskOutlineDrawNode.Show();
+    TileDrawNode.Show();
+    BitmaskOutlineDrawNode.Show();
   }
 
   public void HideSelectedTile()
   {
-    tileDrawNode.Hide();
-    bitmaskOutlineDrawNode.Hide();
+    TileDrawNode.Hide();
+    BitmaskOutlineDrawNode.Hide();
   }
 
   public void RedrawSelectedBitmaskOutline(Rect2I bitmaskRectangle, Color color)
   {
-    bitmaskOutlineDrawNode.DrawRectangle(bitmaskRectangle, color, filled: true);
-    bitmaskOutlineDrawNode.QueueRedraw();
+    BitmaskOutlineDrawNode.DrawRectangle(bitmaskRectangle, color, filled: true);
+    BitmaskOutlineDrawNode.QueueRedraw();
   }
 
   public void RedrawTile(Vector2 worldPosition, Color color, int tileSize, bool filled = false)
@@ -43,8 +43,8 @@ public partial class EditorTileDrawer : Node2D
     Rect2I tileRect = new(snappedTilePosition, new(tileSize, tileSize));
 
     var borderWidth = GetBorderWidth(tileSize);
-    tileDrawNode.DrawRectangle(tileRect, color, width: borderWidth, filled: filled);
-    tileDrawNode.QueueRedraw();
+    TileDrawNode.DrawRectangle(tileRect, color, width: borderWidth, filled: filled);
+    TileDrawNode.QueueRedraw();
   }
 
   public void RedrawGrid(Rect2I size, Color color, int tileSize)
@@ -56,12 +56,12 @@ public partial class EditorTileDrawer : Node2D
     var borderWidth = GetBorderWidth(tileSize);
 
     for (int x = startX; x <= endX; x += tileSize)
-      gridDrawNode.DrawSimpleLine(new Vector2I(x, startY), new Vector2I(x, endY), color, width: borderWidth);
+      GridDrawNode.DrawSimpleLine(new Vector2I(x, startY), new Vector2I(x, endY), color, width: borderWidth);
 
     for (int y = startY; y <= endY; y += tileSize)
-      gridDrawNode.DrawSimpleLine(new Vector2I(startX, y), new Vector2I(endX, y), color, width: borderWidth);
+      GridDrawNode.DrawSimpleLine(new Vector2I(startX, y), new Vector2I(endX, y), color, width: borderWidth);
 
-    gridDrawNode.QueueRedraw();
+    GridDrawNode.QueueRedraw();
   }
 
   private static int GetBorderWidth(int tileSize)

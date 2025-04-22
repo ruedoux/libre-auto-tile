@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Godot;
 using Qwaitumin.AutoTile.GUI.Core;
 using Qwaitumin.AutoTile.GUI.Core.GodotBindings;
@@ -94,6 +92,30 @@ public partial class Editor : Control
     editorSettings.TileSizeObservable.NotifyObservers();
 
     editorLayer.LayerObservable.AddObserver((_) => UpdateBitmask());
+
+    editorPreview.EnteredPreview.AddObserver((_) =>
+    {
+      editorPreview.AddCreatedTiles(editorTiles.CreatedTiles);
+      editorLayer.Hide();
+      bitmaskContainer.Hide();
+      tileDrawer.GridDrawNode.Hide();
+      editorOptions.ImageUiContainer.Hide();
+      editorOptions.ConfigurationUiContainer.Hide();
+      cameraControl.View = new(-int.MaxValue / 2, -int.MaxValue / 2, int.MaxValue, int.MaxValue);
+      cameraControl.Position = Vector2.Zero;
+    });
+    editorPreview.ExitedPreview.AddObserver((_) =>
+    {
+      editorLayer.Show();
+      bitmaskContainer.Show();
+      tileDrawer.GridDrawNode.Show();
+      editorOptions.ImageUiContainer.Show();
+      editorOptions.ConfigurationUiContainer.Show();
+      cameraControl.View = editorOptions.ImageRectangleObservable.Value;
+      cameraControl.Position = Vector2.Zero;
+      UpdateGrid();
+      UpdateBitmask();
+    });
 
     inputListener.AddInputMouseMotionAction((_) => UpdateSelectedTile(GetGlobalMousePosition()));
     inputListener.AddInputMouseButtonAction(BitmaskInput);

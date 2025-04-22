@@ -1,11 +1,12 @@
 [gd_scene load_steps=3 format=3 uid="uid://bagpwruhxb7ka"]
 
 [ext_resource type="FontFile" uid="uid://da3uql1vplvrw" path="res://resources/SpaceMono-Regular.ttf" id="1_i1lex"]
-[ext_resource type="Texture2D" uid="uid://b443m5w0buk2i" path="res://icon.svg" id="2_tf1ok"]
+[ext_resource type="Script" uid="uid://bt7i3jyoojp1a" path="res://Scenes/Editor/Preview/TileMapTile.cs" id="1_u018q"]
 
 [node name="TileMapTile" type="PanelContainer"]
 offset_right = 186.0
 offset_bottom = 136.0
+script = ExtResource("1_u018q")
 
 [node name="Panel" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -45,7 +46,5 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TextureRect" type="TextureRect" parent="Panel/H/Fields/Texture"]
+[node name="ColorRect" type="ColorRect" parent="Panel/H/Fields/Texture"]
 layout_mode = 2
-texture = ExtResource("2_tf1ok")
-expand_mode = 3
