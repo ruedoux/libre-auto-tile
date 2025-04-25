@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Godot;
+using Qwaitumin.AutoTile.Configuration;
 using Qwaitumin.AutoTile.GUI.Core;
 using Qwaitumin.AutoTile.GUI.Core.GodotBindings;
 using Qwaitumin.AutoTile.GUI.Scenes.Editor.Options;
@@ -93,33 +94,14 @@ public partial class Editor : Control
 
     editorLayer.LayerObservable.AddObserver((_) => UpdateBitmask());
 
-    editorPreview.EnteredPreview.AddObserver((_) =>
-    {
-      editorPreview.AddCreatedTiles(editorTiles.CreatedTiles);
-      editorLayer.Hide();
-      bitmaskContainer.Hide();
-      tileDrawer.GridDrawNode.Hide();
-      editorOptions.ImageUiContainer.Hide();
-      editorOptions.ConfigurationUiContainer.Hide();
-      cameraControl.View = new(-int.MaxValue / 2, -int.MaxValue / 2, int.MaxValue, int.MaxValue);
-      cameraControl.Position = Vector2.Zero;
-    });
-    editorPreview.ExitedPreview.AddObserver((_) =>
-    {
-      editorLayer.Show();
-      bitmaskContainer.Show();
-      tileDrawer.GridDrawNode.Show();
-      editorOptions.ImageUiContainer.Show();
-      editorOptions.ConfigurationUiContainer.Show();
-      cameraControl.View = editorOptions.ImageRectangleObservable.Value;
-      cameraControl.Position = Vector2.Zero;
-      UpdateGrid();
-      UpdateBitmask();
-    });
+    editorPreview.EnteredPreview.AddObserver((_) => EnterEditorPreview());
+    editorPreview.ExitedPreview.AddObserver((_) => ExitEditorPreview());
 
     inputListener.AddInputMouseMotionAction((_) => UpdateSelectedTile(GetGlobalMousePosition()));
     inputListener.AddInputMouseButtonAction(BitmaskInput);
     inputListener.AddInputMouseMotionAction(BitmaskInput);
+    inputListener.AddInputMouseButtonAction(AutoTileMapInput);
+    inputListener.AddInputMouseMotionAction(AutoTileMapInput);
   }
 
   public override void _Input(InputEvent @event)
@@ -154,8 +136,40 @@ public partial class Editor : Control
     Logger.Log("> Finished clearing editor state");
   }
 
+  private void AutoTileMapInput(InputEventMouse inputEventMouse)
+  {
+    if (toolsStateMachine.CurrentState != editorPreview)
+      return;
+
+    var mouseRightClicked = inputEventMouse.ButtonMask == MouseButtonMask.Right;
+    var mouseLeftClicked = inputEventMouse.ButtonMask == MouseButtonMask.Left;
+    var mousePosition = GetGlobalMousePosition();
+    if (editorPreview.AutoTileMap is null || editorPreview.ActiveTile is null)
+      return;
+
+    if (mouseLeftClicked)
+      editorPreview.AutoTileMap.DrawTiles(
+        0, [new(editorPreview.AutoTileMap.WorldToMap(mousePosition / IMAGE_SCALING), editorPreview.ActiveTile.TileId)]);
+    if (mouseRightClicked)
+      editorPreview.AutoTileMap.DrawTiles(
+        0, [new(editorPreview.AutoTileMap.WorldToMap(mousePosition / IMAGE_SCALING), -1)]);
+
+    if (mouseLeftClicked || mouseRightClicked)
+    {
+      List<Vector2I> surroundingPositions = [];
+      var scaledMousePosition = editorPreview.AutoTileMap.WorldToMap(mousePosition / IMAGE_SCALING);
+      for (int x = -1; x < 2; x++)
+        for (int y = -1; y < 2; y++)
+          surroundingPositions.Add(scaledMousePosition + new Vector2I(x, y));
+      editorPreview.AutoTileMap.UpdateTiles(0, [.. surroundingPositions]);
+    }
+  }
+
   private void BitmaskInput(InputEventMouse inputEventMouse)
   {
+    if (toolsStateMachine.CurrentState != editorTiles)
+      return;
+
     var mousePosition = GetGlobalMousePosition();
     var mousePositionInt = new Vector2I((int)mousePosition.X, (int)mousePosition.Y);
     if (!editorOptions.ImageRectangleObservable.Value.HasPoint(mousePositionInt))
@@ -182,12 +196,7 @@ public partial class Editor : Control
 
   private void SaveConfiguration(string filePath)
   {
-    EditorContext editorContext = new(
-      editorSettings.TileSizeObservable.Value,
-      editorTiles.CreatedTiles,
-      bitmaskContainer.TileDatabase);
-
-    var configuration = ConfigurationExtractor.GetAsAutoTileConfiguration(editorContext);
+    var configuration = ExtractAutoTileConfiguration();
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
     Logger.Log($"Saved configuration to: {filePath}");
@@ -200,6 +209,16 @@ public partial class Editor : Control
     UpdateBitmask();
     messageDisplay.DisplayText($"[color=green]Loaded configuration from: {filePath}[/color]");
     Logger.Log($"Loaded configuration from: {filePath}");
+  }
+
+  private AutoTileConfiguration ExtractAutoTileConfiguration()
+  {
+    EditorContext editorContext = new(
+      editorSettings.TileSizeObservable.Value,
+      editorTiles.CreatedTiles,
+      bitmaskContainer.TileDatabase);
+
+    return ConfigurationExtractor.GetAsAutoTileConfiguration(editorContext);
   }
 
   private void UpdateBitmask()
@@ -216,7 +235,7 @@ public partial class Editor : Control
       editorSettings.GridColorObservable.Value,
       editorSettings.ScaledTileSizeObservable.Value);
 
-  private void UpdateSelectedTile(Vector2 mousePosition)
+  private void UpdateSelectedTile(Godot.Vector2 mousePosition)
   {
     bitmaskContainer.RedrawBitmaskGhost(
       mousePosition,
@@ -229,5 +248,39 @@ public partial class Editor : Control
     var tilePosition = TileSetMath.ScaleDownTilePosition(mousePosition, editorSettings.ScaledTileSizeObservable.Value);
     mouseLabel.DisplayText(tilePosition.ToString());
     mouseLabel.MoveOnMousePosition();
+  }
+
+  private void EnterEditorPreview()
+  {
+    editorPreview.AddCreatedTiles(editorTiles.CreatedTiles);
+    editorLayer.Hide();
+    bitmaskContainer.Hide();
+    tileDrawer.GridDrawNode.Hide();
+    editorOptions.ImageUiContainer.Hide();
+    editorOptions.ConfigurationUiContainer.Hide();
+    cameraControl.View = new(-int.MaxValue / 2, -int.MaxValue / 2, int.MaxValue, int.MaxValue);
+    cameraControl.Position = Godot.Vector2.Zero;
+
+    editorPreview.InitializeTileMap(".", ExtractAutoTileConfiguration());
+    AddChild(editorPreview.AutoTileMap);
+    if (editorPreview.AutoTileMap is not null)
+      editorPreview.AutoTileMap.Scale = new(IMAGE_SCALING, IMAGE_SCALING);
+    Logger.Log($"Entered preview and loaded AutoTileMap");
+  }
+
+  private void ExitEditorPreview()
+  {
+    editorLayer.Show();
+    bitmaskContainer.Show();
+    tileDrawer.GridDrawNode.Show();
+    editorOptions.ImageUiContainer.Show();
+    editorOptions.ConfigurationUiContainer.Show();
+    cameraControl.View = editorOptions.ImageRectangleObservable.Value;
+    cameraControl.Position = Godot.Vector2.Zero;
+    UpdateGrid();
+    UpdateBitmask();
+
+    RemoveChild(editorPreview.AutoTileMap);
+    Logger.Log($"Exited preview and unloaded AutoTileMap");
   }
 }

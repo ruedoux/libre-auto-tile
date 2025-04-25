@@ -15,13 +15,17 @@ internal class TileMapDrawer(TileMapWrapper tileMapWrapper) : ITileMapDrawer
     Callable.From(() =>
     {
       foreach (var (position, tileData) in positionsToTileData)
-        if (tileData.CentreTileId < 0)
-          tileMapWrapper.TileMapLayer.SetCell(
-            GodotTypeMapper.Map(position),
-            tileMapWrapper.TileIdToSourceId[tileData.CentreTileId],
-            GodotTypeMapper.Map(tileData.TileAtlas.Position));
-        else
-          tileMapWrapper.TileMapLayer.SetCell(GodotTypeMapper.Map(position));
+      {
+        // Ignores tile ids that have no source, validity up to discussion
+        if (tileMapWrapper.TileIdToSourceId.TryGetValue(tileData.CentreTileId, out int sourceId))
+          if (tileData.CentreTileId >= 0)
+            tileMapWrapper.TileMapLayer.SetCell(
+              GodotTypeMapper.Map(position),
+              sourceId,
+              GodotTypeMapper.Map(tileData.TileAtlas.Position));
+          else
+            tileMapWrapper.TileMapLayer.SetCell(GodotTypeMapper.Map(position));
+      }
     }).CallDeferred();
   }
 }

@@ -7,6 +7,7 @@ public class AutoTileMap : Node2D
 {
   private readonly TileMapWrapper tileMapWrapper;
   private readonly AutoTileDrawer autoTileDrawer;
+  private readonly int tileSize;
 
   public AutoTileMap(
     uint layerCount,
@@ -18,8 +19,16 @@ public class AutoTileMap : Node2D
     autoTileDrawer = new(
       new TileMapDrawer(tileMapWrapper),
       autoTilerComposer.GetAutoTiler(layerCount));
+    tileSize = autoTileConfiguration.TileSize;
 
     AddChild(tileMapWrapper.TileMapLayer);
+  }
+
+  public Vector2I WorldToMap(Godot.Vector2 worldPosition)
+  {
+    int tileXScaledDown = (int)Math.Floor(worldPosition.X / tileSize);
+    int tileYScaledDown = (int)Math.Floor(worldPosition.Y / tileSize);
+    return new Vector2I(tileXScaledDown, tileYScaledDown);
   }
 
   public void Clear()
@@ -31,7 +40,7 @@ public class AutoTileMap : Node2D
   public void DrawTilesAsync(int layer, KeyValuePair<Vector2I, int>[] positionToTileIds)
   {
     var positionToTileIdsConverted = positionToTileIds
-      .Select(kvp => new KeyValuePair<Qwaitumin.AutoTile.Configuration.Vector2, int>(
+      .Select(kvp => new KeyValuePair<Configuration.Vector2, int>(
           GodotTypeMapper.Map(kvp.Key),
           kvp.Value))
       .ToArray();
@@ -41,7 +50,7 @@ public class AutoTileMap : Node2D
   public void DrawTiles(int layer, KeyValuePair<Vector2I, int>[] positionToTileIds)
   {
     var positionToTileIdsConverted = positionToTileIds
-      .Select(kvp => new KeyValuePair<Qwaitumin.AutoTile.Configuration.Vector2, int>(
+      .Select(kvp => new KeyValuePair<Configuration.Vector2, int>(
           GodotTypeMapper.Map(kvp.Key),
           kvp.Value))
       .ToArray();

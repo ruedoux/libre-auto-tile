@@ -10,8 +10,6 @@ public class TileDatabase
 
   public void SetPackedTileData(string fileName, Vector2I position, GuiTileData packedTileData)
   {
-    fileName = Path.GetFileName(fileName);
-
     if (!data.TryGetValue(fileName, out var positionToPackedTileData))
     {
       positionToPackedTileData = [];
@@ -23,8 +21,6 @@ public class TileDatabase
 
   public GuiTileData GetPackedTileData(string fileName, Vector2I position)
   {
-    fileName = Path.GetFileName(fileName);
-
     if (!data.TryGetValue(fileName, out var positionToPackedTileData))
     {
       positionToPackedTileData = [];
@@ -42,8 +38,6 @@ public class TileDatabase
 
   public Dictionary<Vector2I, GuiTileData> GetAllByFileName(string fileName)
   {
-    fileName = Path.GetFileName(fileName);
-
     if (!data.TryGetValue(fileName, out var positionToPackedTileData))
       return [];
 

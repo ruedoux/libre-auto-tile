@@ -24,7 +24,8 @@ internal class TileMapWrapper
       foreach (var tileId in kv.Value)
       {
         tileIdToSourceId[tileId] = sourceId;
-        AssignTilesToSource(tileSet, sourceId, tileIdtoAtlasPositions[tileId]);
+        if (tileIdtoAtlasPositions.TryGetValue(tileId, out var atlasPositions))
+          AssignTilesToSource(tileSet, sourceId, atlasPositions);
       }
     }
 

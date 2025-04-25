@@ -115,7 +115,7 @@ public static class ConfigurationExtractor
         }
       }
 
-      imageFileNameToTileMaskDefinition[Path.GetFileName(fileName)] = TileMaskDefinition.Construct(
+      imageFileNameToTileMaskDefinition[Path.GetRelativePath(".", fileName)] = TileMaskDefinition.Construct(
         positionsToTileMaskDefinitions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray()));
     }
 

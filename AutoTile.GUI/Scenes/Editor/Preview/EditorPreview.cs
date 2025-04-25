@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Qwaitumin.AutoTile.Configuration;
+using Qwaitumin.AutoTile.GodotBindings;
 using Qwaitumin.AutoTile.GUI.Core;
 using Qwaitumin.AutoTile.GUI.Core.Signals;
 using Qwaitumin.AutoTile.GUI.Scenes.Editor.Tiles;
@@ -15,8 +17,8 @@ public partial class EditorPreview : MarginContainer, IState
 
   public readonly EventNotifier<bool> EnteredPreview = new();
   public readonly EventNotifier<bool> ExitedPreview = new();
-  public readonly EditorTileMap EditorTileMap = new();
   public TileMapTile? ActiveTile { private set; get; } = null;
+  public AutoTileMap? AutoTileMap { private set; get; } = null;
 
   private Control tileList = null!;
 
@@ -41,11 +43,19 @@ public partial class EditorPreview : MarginContainer, IState
       tileList.AddChild(tileMapTile);
       tileMapTile.TileSelected.AddObserver(ChangeActiveTile);
       tileMapTile.NameLabel.Text = guiTile.TileName;
+      tileMapTile.TileId = guiTile.TileId;
       tileMapTile.ColorRectangle.Color = guiTile.ColorPickerButton.Color;
     }
 
     if (CreatedTiles.Count > 0)
       ChangeActiveTile((TileMapTile)tileList.GetChildren().First());
+  }
+
+  public void InitializeTileMap(
+    string imageDirectoryPath, AutoTileConfiguration autoTileConfiguration)
+  {
+    AutoTileMap?.QueueFree();
+    AutoTileMap = new(1, imageDirectoryPath, autoTileConfiguration);
   }
 
   public void InitializeState()

@@ -10,6 +10,7 @@ public partial class TileMapTile : PanelContainer
   public Label NameLabel { private set; get; } = null!;
   public ColorRect ColorRectangle { private set; get; } = null!;
   public Button SelectButton { private set; get; } = null!;
+  public int TileId;
 
   public override void _Ready()
   {

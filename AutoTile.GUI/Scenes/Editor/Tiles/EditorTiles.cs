@@ -11,7 +11,7 @@ namespace Qwaitumin.AutoTile.GUI.Scenes.Editor.Tiles;
 public partial class EditorTiles : MarginContainer, IState
 {
   private static readonly PackedScene tileScene = ResourceLoader.Load<PackedScene>(
-    "res://Scenes/Editor/Tiles/GuiTile.tscn");
+    "uid://1pokk3kl6wjp");
 
   public readonly GodotInputListener InputListener = new();
   public readonly EventNotifier<GuiTile> ChangedActiveTile = new();
