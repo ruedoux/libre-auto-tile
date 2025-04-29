@@ -5,12 +5,29 @@ using static Qwaitumin.AutoTile.TileMask;
 
 namespace Qwaitumin.AutoTile;
 
-public struct TileData(
-  int centreTileId = -1, TileMask tileMask = default, TileAtlas tileAtlas = default)
+public struct TileData
 {
-  public int CentreTileId { internal set; get; } = centreTileId;
-  public TileMask TileMask { internal set; get; } = tileMask;
-  public TileAtlas TileAtlas { internal set; get; } = tileAtlas;
+  public int CentreTileId { get; set; }
+  public TileMask TileMask { get; set; }
+  public TileAtlas TileAtlas { get; set; }
+
+  public TileData()
+  {
+    CentreTileId = -1;
+    TileMask = new TileMask();
+    TileAtlas = new TileAtlas();
+  }
+
+  public TileData(
+    int centreTileId = -1, TileMask tileMask = default, TileAtlas tileAtlas = default) : this()
+  {
+    CentreTileId = centreTileId;
+    TileMask = tileMask;
+    TileAtlas = tileAtlas;
+  }
+
+  public override readonly string ToString()
+    => $"\"CentreTileId\":{CentreTileId}, \"TileMask\":{TileMask}, \"TileAtlas\":{TileAtlas}";
 }
 
 public class AutoTiler
@@ -72,7 +89,7 @@ public class AutoTiler
 
       TileMask tileMask = FromArray(tileMaskArray);
       var tileAtlas = tileIdToTileMaskSearcher[tileId].FindBestMatch(tileMask).TileAtlas;
-      data[tileId][position] = new(
+      data[layer][position] = new(
         tileId, tileMask, tileAtlas);
     }
 
@@ -93,20 +110,23 @@ public class AutoTiler
       centerTileData.CentreTileId);
 
     tileDataToUpdate.TileMask = updatedTileMask;
-    tileDataToUpdate.TileAtlas = tileIdToTileMaskSearcher[tileDataToUpdate.CentreTileId]
-        .FindBestMatch(tileDataToUpdate.TileMask).TileAtlas;
+    if (tileDataToUpdate.CentreTileId >= 0)
+      tileDataToUpdate.TileAtlas = tileIdToTileMaskSearcher[tileDataToUpdate.CentreTileId]
+        .FindBestMatch(updatedTileMask).TileAtlas;
+
+    data[layer][updatePosition] = tileDataToUpdate;
   }
 
   private TileData GetTileDataAt(int layer, Vector2 position)
   {
-    if (data[layer].TryGetValue(position, out TileData TileData))
-      return TileData;
-    return default;
+    if (data[layer].TryGetValue(position, out var tileData))
+      return tileData;
+    return new();
   }
 
   private void ValidateTileId(int tileId)
   {
-    if (tileId < 0 && tileIdToTileMaskSearcher.ContainsKey(tileId))
+    if (!tileIdToTileMaskSearcher.ContainsKey(tileId) && tileId > -1)
       throw new ArgumentException($"Tile of id does not exist: {tileId}");
   }
 

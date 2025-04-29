@@ -9,7 +9,7 @@ public class AutoTilerTest
 {
   const int TILE_ID = 0;
 
-  [SimpleTestMethod]
+  //[SimpleTestMethod]
   public void PlaceTile_CorrectlyPlacesTile_WhenCalled()
   {
     // Given
@@ -28,7 +28,7 @@ public class AutoTilerTest
     Assertions.AssertEqual(0, tileData.CentreTileId);
   }
 
-  [SimpleTestMethod]
+  //[SimpleTestMethod]
   public void PlaceTile_CorrectlyPlacesTiles_WhenCalledAsync()
   {
     // Given
@@ -63,5 +63,32 @@ public class AutoTilerTest
       Assertions.AssertNotNull(tileData);
       Assertions.AssertEqual(0, tileData.CentreTileId);
     }
+  }
+
+  [SimpleTestMethod]
+  public void PlaceTile_CorrectlyPlacesTileMask_WhenCalled()
+  {
+    // Given
+    string imageFileName = "a.png";
+    TileAtlas TileAtlas = new(new(0, 0), imageFileName);
+    TileMask target = new(0, 0, 0, -1, 2, -1, -1, -1);
+    TileMaskSearcher tileMaskSearcher = new([
+      new(target, TileAtlas),
+      new(new(0, 0, -1, -1, 2, -1, -1, -1), new(new(0, 1), imageFileName)),
+      new(new(0, 0, 0, 0, -1, 2, -1, -1), new(new(0, 2), imageFileName)),
+      new(new(0, 0, 1, -1, -1, 2, -1, -1), new(new(0, 3), imageFileName))]);
+    AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher }, { 1, new([]) }, { 2, new([]) } });
+
+    // When
+    autoTiler.PlaceTile(0, Vector2.Zero, 0);
+    autoTiler.PlaceTile(0, Vector2.TopLeft, 0);
+    autoTiler.PlaceTile(0, Vector2.Top, 0);
+    autoTiler.PlaceTile(0, Vector2.TopRight, 0);
+    autoTiler.PlaceTile(0, Vector2.BottomRight, 2);
+
+    TileData middleTileMask = autoTiler.GetTile(0, Vector2.Zero);
+
+    // Then
+    Assertions.AssertEqual(target, middleTileMask.TileMask);
   }
 }

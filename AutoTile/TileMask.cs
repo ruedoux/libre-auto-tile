@@ -1,33 +1,19 @@
-using System.Collections.Immutable;
-
 namespace Qwaitumin.AutoTile;
 
 public readonly struct TileMask
 {
   public enum SurroundingDirection { TopLeft = 0, Top = 1, TopRight = 2, Right = 3, BottomRight = 4, Bottom = 5, BottomLeft = 6, Left = 7 }
 
-  public readonly int TopLeft;
-  public readonly int Top;
-  public readonly int TopRight;
-  public readonly int Right;
-  public readonly int BottomRight;
-  public readonly int Bottom;
-  public readonly int BottomLeft;
-  public readonly int Left;
-  public readonly ImmutableArray<int> Array;
+  public readonly int TopLeft { get; init; } = -1;
+  public readonly int Top { get; init; } = -1;
+  public readonly int TopRight { get; init; } = -1;
+  public readonly int Right { get; init; } = -1;
+  public readonly int BottomRight { get; init; } = -1;
+  public readonly int Bottom { get; init; } = -1;
+  public readonly int BottomLeft { get; init; } = -1;
+  public readonly int Left { get; init; } = -1;
 
-  public TileMask()
-  {
-    TopLeft = -1;
-    Top = -1;
-    TopRight = -1;
-    Right = -1;
-    BottomRight = -1;
-    Bottom = -1;
-    BottomLeft = -1;
-    Left = -1;
-    Array = [.. ToArray()];
-  }
+  public TileMask() { }
 
   public TileMask(
     int topLeft = -1,
@@ -37,7 +23,7 @@ public readonly struct TileMask
     int bottomRight = -1,
     int bottom = -1,
     int bottomLeft = -1,
-    int left = -1)
+    int left = -1) : this()
   {
     TopLeft = topLeft;
     Top = top;
@@ -47,8 +33,6 @@ public readonly struct TileMask
     Bottom = bottom;
     BottomLeft = bottomLeft;
     Left = left;
-
-    Array = [.. ToArray()];
   }
 
   public static TileMask FromArray(int[] arr)

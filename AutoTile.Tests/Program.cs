@@ -6,7 +6,7 @@ public static class Program
 {
   static void Main()
   {
-    if (!new SimpleTestPrinter(Console.WriteLine).Run())
+    if (!new SimpleTestPrinter(Console.WriteLine).RunAll())
       Environment.Exit(1);
   }
 }

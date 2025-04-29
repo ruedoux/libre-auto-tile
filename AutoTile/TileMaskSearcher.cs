@@ -3,12 +3,26 @@ using Qwaitumin.AutoTile.Configuration;
 
 namespace Qwaitumin.AutoTile;
 
-public readonly struct TileAtlas(Vector2 position, string imageFileName)
+public readonly struct TileAtlas
 {
-  public readonly Vector2 Position = position;
-  public readonly string ImageFileName = imageFileName;
+  public const string DEFAULT_FILE = "<NO FILE SPECIFIED>";
+  public readonly Vector2 Position { get; init; } = default;
+  public readonly string ImageFileName { get; init; } = DEFAULT_FILE;
+
+  public TileAtlas() { }
+
+  public TileAtlas(Vector2 position, string imageFileName) : this()
+  {
+    Position = position;
+    ImageFileName = imageFileName;
+  }
+
+  public override readonly string ToString()
+    => $"({Position}, {ImageFileName})";
 }
 
+
+// TODO this needs refactor
 public class TileMaskSearcher
 {
   private const int DIMENSION_COUNT = 8;
@@ -54,7 +68,7 @@ public class TileMaskSearcher
       if (bestMatchCount == DIMENSION_COUNT) return items[bestMatchIndex];
     }
 
-    return bestMatchIndex >= 0 ? items[bestMatchIndex] : default;
+    return bestMatchIndex >= 0 ? items[bestMatchIndex] : new(new(), new());
   }
 
   private static FrozenDictionary<int, List<int>>[] ConstructCornerDictionaries(

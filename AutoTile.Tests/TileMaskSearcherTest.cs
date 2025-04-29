@@ -7,7 +7,7 @@ namespace Qwaitumin.AutoTile.Tests;
 [SimpleTestClass]
 public class TileMaskSearcherTest
 {
-  const string IMAGE_FILE_NAME = "";
+  const string IMAGE_FILE_NAME = "a";
 
   [SimpleTestMethod]
   public void FindBestMatch_ShouldFindBestResult_WhenGivenExactTileMask()
@@ -63,6 +63,22 @@ public class TileMaskSearcherTest
     // Then
     Assertions.AssertEqual(TileAtlas, resultTileAtlas);
     Assertions.AssertEqual(resultTileMask, target);
+  }
+
+  [SimpleTestMethod]
+  public void FindBestMatch_ShouldReturnDefaultMask_WhenNoMatches()
+  {
+    // Given
+    TileAtlas tileAtlas = new(new(0, 0), IMAGE_FILE_NAME);
+    TileMask target = new(1, 2, 3, 4, 5, 6, 7, 8);
+    TileMaskSearcher tileMaskSearcher = new([new(target, tileAtlas)]);
+
+    // When
+    var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(new(0, 0, 0));
+
+    // Then
+    Assertions.AssertEqual(new(Vector2.Zero, TileAtlas.DEFAULT_FILE), resultTileAtlas);
+    Assertions.AssertEqual(new(-1, -1, -1, -1, -1, -1, -1, -1), resultTileMask);
   }
 
   [SimpleTestMethod]
