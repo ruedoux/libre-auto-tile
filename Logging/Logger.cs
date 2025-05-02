@@ -38,12 +38,6 @@ public class Logger(IEnumerable<Action<Message>> observers, LogSettings logSetti
     return builder.ToString();
   }
 
-  public void Log(string message, [CallerFilePath] string callerFilePath = "")
-  {
-    PushMessage(Message.GetInfo(
-      GetSourceClassName(callerFilePath), message, logSettings));
-  }
-
   public void Log(object message, [CallerFilePath] string callerFilePath = "")
   {
     PushMessage(Message.GetInfo(

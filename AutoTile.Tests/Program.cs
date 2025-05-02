@@ -8,5 +8,6 @@ public static class Program
   {
     if (!new SimpleTestPrinter(Console.WriteLine).RunAll())
       Environment.Exit(1);
+    //new SimpleTestPrinter(Console.WriteLine).RunForType(typeof(AutoTilerTest));
   }
 }

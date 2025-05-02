@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Qwaitumin.AutoTile.GUI.Core.GodotBindings;
+using Qwaitumin.Logging;
 
 namespace Qwaitumin.AutoTile.GUI.Scenes.Editor.TileSet;
 
@@ -31,7 +32,7 @@ public partial class BitmaskContainer : Node2D
   }
 
   public void RedrawBitmask(
-    string fileName,
+    string filePath,
     int layer,
     Dictionary<int, string> tileIdToTileNames,
     Dictionary<string, Color> existingTileNamesToColors,
@@ -40,7 +41,7 @@ public partial class BitmaskContainer : Node2D
     if (tileSize < 1) throw new ArgumentException("Tile size cannot be less than 1");
 
     Dictionary<Rect2I, Color> bitmaskRectanglesToColors = [];
-    foreach (var (scaledTilePosition, packedTileData) in TileDatabase.GetAllByFileName(fileName))
+    foreach (var (scaledTilePosition, packedTileData) in TileDatabase.GetAllByFileName(filePath))
     {
       var snappedTilePosition = scaledTilePosition * tileSize;
       var centreTileId = packedTileData.GetCentreTileId(layer);

@@ -7,19 +7,13 @@ namespace Qwaitumin.AutoTile;
 
 public struct TileData
 {
-  public int CentreTileId { get; set; }
-  public TileMask TileMask { get; set; }
-  public TileAtlas TileAtlas { get; set; }
+  public int CentreTileId { get; set; } = -1;
+  public TileMask TileMask { get; set; } = new();
+  public TileAtlas TileAtlas { get; set; } = new();
 
-  public TileData()
-  {
-    CentreTileId = -1;
-    TileMask = new TileMask();
-    TileAtlas = new TileAtlas();
-  }
+  public TileData() { }
 
-  public TileData(
-    int centreTileId = -1, TileMask tileMask = default, TileAtlas tileAtlas = default) : this()
+  public TileData(int centreTileId, TileMask tileMask, TileAtlas tileAtlas) : this()
   {
     CentreTileId = centreTileId;
     TileMask = tileMask;
@@ -110,10 +104,10 @@ public class AutoTiler
       centerTileData.CentreTileId);
 
     tileDataToUpdate.TileMask = updatedTileMask;
-    if (tileDataToUpdate.CentreTileId >= 0)
-      tileDataToUpdate.TileAtlas = tileIdToTileMaskSearcher[tileDataToUpdate.CentreTileId]
-        .FindBestMatch(updatedTileMask).TileAtlas;
-
+    if (tileIdToTileMaskSearcher.TryGetValue(tileDataToUpdate.CentreTileId, out var tileMaskSearcher))
+      tileDataToUpdate.TileAtlas = tileMaskSearcher.FindBestMatch(updatedTileMask).TileAtlas;
+    else
+      tileDataToUpdate.TileAtlas = new();
     data[layer][updatePosition] = tileDataToUpdate;
   }
 

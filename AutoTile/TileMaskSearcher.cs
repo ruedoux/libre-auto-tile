@@ -3,135 +3,136 @@ using Qwaitumin.AutoTile.Configuration;
 
 namespace Qwaitumin.AutoTile;
 
-public readonly struct TileAtlas
+public readonly struct TileAtlas(Vector2 position, string imageFileName)
 {
-  public const string DEFAULT_FILE = "<NO FILE SPECIFIED>";
-  public readonly Vector2 Position { get; init; } = default;
-  public readonly string ImageFileName { get; init; } = DEFAULT_FILE;
+  public readonly Vector2 Position { get; init; } = position;
+  public readonly string ImageFileName { get; init; } = imageFileName;
 
-  public TileAtlas() { }
+  public bool Equals(TileAtlas other)
+    => Position.Equals(other.Position)
+      && string.Equals(ImageFileName, other.ImageFileName, StringComparison.Ordinal);
 
-  public TileAtlas(Vector2 position, string imageFileName) : this()
-  {
-    Position = position;
-    ImageFileName = imageFileName;
-  }
+  public override bool Equals(object? obj)
+      => obj is TileAtlas other && Equals(other);
 
-  public override readonly string ToString()
-    => $"({Position}, {ImageFileName})";
+  public override int GetHashCode()
+      => HashCode.Combine(Position, ImageFileName);
+
+  public override string ToString() => $"({Position}, {ImageFileName})";
+
+  public static bool operator ==(TileAtlas left, TileAtlas right)
+    => left.Equals(right);
+
+  public static bool operator !=(TileAtlas left, TileAtlas right)
+    => !(left == right);
 }
 
 
-// TODO this needs refactor
 public class TileMaskSearcher
 {
-  private const int DIMENSION_COUNT = 8;
-  private readonly List<(TileMask TileMask, TileAtlas TileAtlas)> items;
   public readonly FrozenDictionary<TileMask, TileAtlas> ExistingMasks;
+  private readonly List<(TileMask TileMask, TileAtlas TileAtlas)> items;
+  private readonly FrozenDictionary<int, List<int>>[] tileIdToItemIndex;
 
-  private readonly FrozenDictionary<int, List<int>>[] CornerDictionaries;
+  private readonly int[] itemIndexToBestScore;
+  private readonly int[] itemIndexToSeenGeneration;
+  private uint currentGeneration;
 
-  public TileMaskSearcher(List<(TileMask TileMask, TileAtlas TileAtlas)> items)
+  public TileMaskSearcher(List<(TileMask TileMask, TileAtlas TileAtlas)> rawItems)
   {
-    Dictionary<TileMask, TileAtlas> existingMasks = [];
-    List<(TileMask TileMask, TileAtlas TileAtlas)> sanitizedPoints = [];
+    var existingMasksTemp = new Dictionary<TileMask, TileAtlas>();
+    var sanitizedItems = new List<(TileMask, TileAtlas)>();
+    foreach (var rawItem in rawItems)
+      if (existingMasksTemp.TryAdd(rawItem.TileMask, rawItem.TileAtlas))
+        sanitizedItems.Add(rawItem);
 
-    foreach (var item in items)
-      if (existingMasks.TryAdd(item.TileMask, item.TileAtlas))
-        sanitizedPoints.Add(item);
+    ExistingMasks = existingMasksTemp.ToFrozenDictionary();
+    items = sanitizedItems;
 
-    ExistingMasks = existingMasks.ToFrozenDictionary();
-    this.items = sanitizedPoints;
+    itemIndexToBestScore = new int[items.Count];
+    itemIndexToSeenGeneration = new int[items.Count];
+    currentGeneration = 1;
 
-    CornerDictionaries = ConstructCornerDictionaries(items);
-  }
+    Dictionary<int, List<int>>[] tileIdToItemIndexTemp = new Dictionary<int, List<int>>[8];
+    for (int field = 0; field < 8; field++)
+      tileIdToItemIndexTemp[field] = [];
 
-  public (TileMask TileMask, TileAtlas TileAtlas) FindBestMatch(TileMask target)
-  {
-    if (ExistingMasks.TryGetValue(target, out var fastLookup))
-      return (target, fastLookup);
-
-    int[] itemIndexToMatchCount = new int[items.Count];
-    int bestMatchCount = -1;
-    int bestMatchIndex = -1;
-
-    var tileMaskArray = target.ToArray();
-
-    for (int i = 0; i < tileMaskArray.Length; i++)
+    for (int itemIndex = 0; itemIndex < items.Count; itemIndex++)
     {
-      bestMatchIndex = ProcessDimension(
-        CornerDictionaries[i],
-        tileMaskArray[i],
-        itemIndexToMatchCount,
-        ref bestMatchCount,
-        bestMatchIndex);
-      if (bestMatchCount == DIMENSION_COUNT) return items[bestMatchIndex];
+      var m = items[itemIndex].TileMask;
+      AddIndex(tileIdToItemIndexTemp, 0, m.TopLeft, itemIndex);
+      AddIndex(tileIdToItemIndexTemp, 1, m.Top, itemIndex);
+      AddIndex(tileIdToItemIndexTemp, 2, m.TopRight, itemIndex);
+      AddIndex(tileIdToItemIndexTemp, 3, m.Right, itemIndex);
+      AddIndex(tileIdToItemIndexTemp, 4, m.BottomRight, itemIndex);
+      AddIndex(tileIdToItemIndexTemp, 5, m.Bottom, itemIndex);
+      AddIndex(tileIdToItemIndexTemp, 6, m.BottomLeft, itemIndex);
+      AddIndex(tileIdToItemIndexTemp, 7, m.Left, itemIndex);
     }
 
-    return bestMatchIndex >= 0 ? items[bestMatchIndex] : new(new(), new());
+    tileIdToItemIndex = tileIdToItemIndexTemp.Select(d => d.ToFrozenDictionary()).ToArray();
   }
 
-  private static FrozenDictionary<int, List<int>>[] ConstructCornerDictionaries(
-    List<(TileMask TileMask, TileAtlas TileAtlas)> items)
+  private static void AddIndex(
+    Dictionary<int, List<int>>[] tileIdToItemIndexTemp, int field, int tileId, int itemIndex)
   {
-    var cornerDictionariesTemp = new Dictionary<int, List<int>>[8];
-    var cornerDictionaries = new FrozenDictionary<int, List<int>>[8];
-
-    for (int i = 0; i < cornerDictionaries.Length; i++)
-      cornerDictionariesTemp[i] = [];
-
-    for (int i = 0; i < items.Count; i++)
-    {
-      var tileMask = items[i].TileMask;
-      AddItemToDictionary(cornerDictionariesTemp[0], tileMask.TopLeft, i);
-      AddItemToDictionary(cornerDictionariesTemp[1], tileMask.Top, i);
-      AddItemToDictionary(cornerDictionariesTemp[2], tileMask.TopRight, i);
-      AddItemToDictionary(cornerDictionariesTemp[3], tileMask.Right, i);
-      AddItemToDictionary(cornerDictionariesTemp[4], tileMask.BottomRight, i);
-      AddItemToDictionary(cornerDictionariesTemp[5], tileMask.Bottom, i);
-      AddItemToDictionary(cornerDictionariesTemp[6], tileMask.BottomLeft, i);
-      AddItemToDictionary(cornerDictionariesTemp[7], tileMask.Left, i);
-    }
-
-    for (int i = 0; i < cornerDictionaries.Length; i++)
-      cornerDictionaries[i] = cornerDictionariesTemp[i].ToFrozenDictionary();
-
-    return cornerDictionaries;
-  }
-
-  private static void AddItemToDictionary(
-    Dictionary<int, List<int>> cornerDictionary, int tileId, int itemIndex)
-  {
-    if (!cornerDictionary.TryGetValue(tileId, out var list))
+    var dict = tileIdToItemIndexTemp[field];
+    if (!dict.TryGetValue(tileId, out var list))
     {
       list = [];
-      cornerDictionary[tileId] = list;
+      dict[tileId] = list;
     }
     list.Add(itemIndex);
   }
 
-  private static int ProcessDimension(
-    FrozenDictionary<int, List<int>> cornerDictionary,
-    int targetTileId,
-    int[] itemIndexToMatchCount,
-    ref int bestMatchCount,
-    int currentBestIndex)
+  public (TileMask TileMask, TileAtlas TileAtlas) FindBestMatch(TileMask target)
   {
-    if (cornerDictionary.TryGetValue(targetTileId, out var list))
+    if (ExistingMasks.TryGetValue(target, out var atlas))
+      return (target, atlas);
+
+    int bestScore = 0, bestIdx = -1;
+    currentGeneration++;
+    if (currentGeneration == 0)
     {
+      Array.Clear(itemIndexToSeenGeneration, 0, itemIndexToSeenGeneration.Length);
+      currentGeneration = 1;
+    }
+
+    for (int field = 0; field < 8; field++)
+    {
+      int val = field switch
+      {
+        0 => target.TopLeft,
+        1 => target.Top,
+        2 => target.TopRight,
+        3 => target.Right,
+        4 => target.BottomRight,
+        5 => target.Bottom,
+        6 => target.BottomLeft,
+        7 => target.Left,
+        _ => throw new InvalidOperationException()
+      };
+
+      if (!tileIdToItemIndex[field].TryGetValue(val, out var list))
+        continue;
+
       foreach (var itemIndex in list)
       {
-        itemIndexToMatchCount[itemIndex]++;
-        if (itemIndexToMatchCount[itemIndex] > bestMatchCount)
+        if (itemIndexToSeenGeneration[itemIndex] != currentGeneration)
         {
-          bestMatchCount = itemIndexToMatchCount[itemIndex];
-          currentBestIndex = itemIndex;
+          itemIndexToSeenGeneration[itemIndex] = (int)currentGeneration;
+          itemIndexToBestScore[itemIndex] = 0;
+        }
 
-          if (bestMatchCount == DIMENSION_COUNT)
-            break;
+        itemIndexToBestScore[itemIndex]++;
+        if (itemIndexToBestScore[itemIndex] > bestScore)
+        {
+          bestScore = itemIndexToBestScore[itemIndex];
+          bestIdx = itemIndex;
         }
       }
     }
-    return currentBestIndex;
+
+    return bestIdx < 0 ? new(new(), new()) : items[bestIdx];
   }
 }

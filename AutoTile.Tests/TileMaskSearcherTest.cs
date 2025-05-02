@@ -77,8 +77,8 @@ public class TileMaskSearcherTest
     var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(new(0, 0, 0));
 
     // Then
-    Assertions.AssertEqual(new(Vector2.Zero, TileAtlas.DEFAULT_FILE), resultTileAtlas);
-    Assertions.AssertEqual(new(-1, -1, -1, -1, -1, -1, -1, -1), resultTileMask);
+    Assertions.AssertEqual(new(), resultTileAtlas);
+    Assertions.AssertEqual(new(), resultTileMask);
   }
 
   [SimpleTestMethod]

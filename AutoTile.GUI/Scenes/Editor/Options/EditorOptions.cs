@@ -1,3 +1,4 @@
+using System.IO;
 using Godot;
 using Qwaitumin.AutoTile.GUI.Core;
 using Qwaitumin.AutoTile.GUI.Core.Signals;
@@ -75,7 +76,8 @@ public partial class EditorOptions : MarginContainer
 
   private void LoadImageFromFile(string path)
   {
-    var image = Image.LoadFromFile(path);
+    var relativePath = Path.GetRelativePath(".", path);
+    var image = Image.LoadFromFile(relativePath);
     image.Resize(
       image.GetWidth() * Editor.IMAGE_SCALING,
       image.GetHeight() * Editor.IMAGE_SCALING,
@@ -86,7 +88,7 @@ public partial class EditorOptions : MarginContainer
 
     Rect2I imageSize = new(Vector2I.Zero, new(image.GetWidth(), image.GetHeight()));
     ImageRectangleObservable.ChangeValueAndNotifyObservers(imageSize);
-    ImageFileObservable.ChangeValueAndNotifyObservers(path);
-    Editor.Logger.Log($"Changed image to: {path}");
+    ImageFileObservable.ChangeValueAndNotifyObservers(relativePath);
+    Editor.Logger.Log($"Changed image to: {relativePath}");
   }
 }
