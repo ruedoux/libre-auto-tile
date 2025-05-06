@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Qwaitumin.AutoTile.Configuration;
 using Qwaitumin.SimpleTest;
 
@@ -7,23 +8,12 @@ namespace Qwaitumin.AutoTile.Tests;
 [SimpleTestClass]
 public class AutoTilerTest
 {
-  const int TILE_ID = 0;
-  static readonly Vector2[] DIRECTIONS = [
-    Vector2.TopLeft,
-    Vector2.Top,
-    Vector2.TopRight,
-    Vector2.Right,
-    Vector2.BottomRight,
-    Vector2.Bottom,
-    Vector2.BottomLeft,
-    Vector2.Left];
-
   [SimpleTestMethod]
   public void PlaceTile_CorrectlyPlacesTile_WhenCalled()
   {
     // Given
     TileMaskSearcher tileMaskSearcher = new([]);
-    AutoTiler autoTiler = new(1, new() { { TILE_ID, tileMaskSearcher } });
+    AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher } });
 
     // When
     autoTiler.PlaceTile(0, Vector2.Zero, 0);
@@ -42,7 +32,7 @@ public class AutoTilerTest
   {
     // Given
     TileMaskSearcher tileMaskSearcher = new([]);
-    AutoTiler autoTiler = new(1, new() { { TILE_ID, tileMaskSearcher } });
+    AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher } });
 
     List<Vector2> positions = [];
     for (int x = 0; x < 10; x++)
@@ -75,9 +65,9 @@ public class AutoTilerTest
     // Given
     (TileMask TileMask, TileAtlas TileAtlas)[] definedPairs = [
       (new(-1, -1, -1, -1, -1, -1, -1, -1), new(new(1, 0), "a.png"))];
-    var items = GetItemNoise(new(-1, 1), definedPairs);
+    var items = GetItemNoise(new(-1, 0), definedPairs);
     TileMaskSearcher tileMaskSearcher = new(items);
-    AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher }, { 1, tileMaskSearcher } });
+    AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher } });
 
     // When
     autoTiler.PlaceTile(0, Vector2.Zero, 0);
@@ -96,36 +86,32 @@ public class AutoTilerTest
   }
 
   [SimpleTestMethod]
-  public void PlaceTile_CorrectlyPlacesTileMask_WhenCalled()
+  public void PlaceTile_CorrectlyPlacesSingleTile_WhenCalled()
   {
     // Given
-    (TileMask TileMask, TileAtlas TileAtlas)[] definedPairs = [
-      (new(1, 1, 1, 1, 1, 1, 1, 1), new(new(1, 0), "a.png")),
-      (new(-1, -1, -1, -1, -1, -1, -1, 0), new(new(2, 0), "b.png")),
-      (new(0, 0, 0, 0, 0, 0, 0, 0), new(new(3, 0), "c.png")),
-      (new(0, -1, 0, -1, 0, -1, 0, -1), new(new(4, 0), "d.png"))];
-    var items = GetItemNoise(new(-1, 1), definedPairs);
+    string fileName = "a.jpg";
 
-    TileMaskSearcher tileMaskSearcher = new(items);
-    AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher }, { 1, tileMaskSearcher } });
+    var jsonString = File.ReadAllText("../resources/TileMasks.json");
+    var mappedTileMasks = JsonSerializer.Deserialize(
+      jsonString, AutoTileTestJsonContext.Default.DictionaryVector2Int32Array)
+        ?? throw new ArgumentException();
+    var reversedMappedTileMasks = mappedTileMasks.ToDictionary(
+      kvp => TileMask.FromArray(kvp.Value), kvp => kvp.Key);
+    (TileMask TileMask, TileAtlas TileAtlas)[] definedPairs = mappedTileMasks
+      .Select<KeyValuePair<Vector2, int[]>, (TileMask TileMask, TileAtlas TileAtlas)>(
+        kvp => new(TileMask.FromArray(kvp.Value), new TileAtlas(kvp.Key, fileName))).ToArray();
+
+    TileMaskSearcher tileMaskSearcher = new([.. definedPairs]);
+    AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher } });
+    TileDataVerifier tileDataVerifier = new(autoTiler, reversedMappedTileMasks, fileName);
 
     // When
     // Then
-    foreach (var definedPair in definedPairs)
-      VerifyTileMaskMatches(autoTiler, 0, definedPair.TileMask, definedPair.TileAtlas);
-  }
-
-  private static void VerifyTileMaskMatches(
-    AutoTiler autoTiler, int centreTileId, TileMask tileMask, TileAtlas targetTileAtlas)
-  {
-    var tileMaskArray = tileMask.ToArray();
-    autoTiler.PlaceTile(0, Vector2.Zero, centreTileId);
-    for (int i = 0; i < 8; i++)
-      autoTiler.PlaceTile(0, DIRECTIONS[i], tileMaskArray[i]);
-
-    TileData tileData = autoTiler.GetTile(0, Vector2.Zero);
-    Assertions.AssertEqual(TileMask.FromArray(tileMaskArray), tileData.TileMask);
-    Assertions.AssertEqual(targetTileAtlas, tileData.TileAtlas);
+    tileDataVerifier.PlaceTileAndVerify(0, Vector2.Zero, new(-1, -1, -1, -1, -1, -1, -1, -1));
+    tileDataVerifier.PlaceTileAndVerify(0, Vector2.Top, new(-1, -1, -1, -1, -1, 0, -1, -1));
+    tileDataVerifier.PlaceTileAndVerify(0, Vector2.Bottom, new(-1, 0, -1, -1, -1, -1, -1, -1));
+    tileDataVerifier.PlaceTileAndVerify(0, Vector2.Left, new(-1, -1, -1, 0, -1, -1, -1, -1));
+    tileDataVerifier.PlaceTileAndVerify(0, Vector2.Right, new(-1, -1, -1, -1, -1, -1, -1, 0));
   }
 
   private static List<(TileMask, TileAtlas)> GetItemNoise(
@@ -154,5 +140,23 @@ public class AutoTilerTest
     }
 
     return items;
+  }
+}
+
+
+public class TileDataVerifier(
+  AutoTiler autoTiler,
+  Dictionary<TileMask, Vector2> reversedMappedTileMasks,
+  string fileName)
+{
+  private readonly AutoTiler autoTiler = autoTiler;
+  private readonly Dictionary<TileMask, Vector2> reversedMappedTileMasks = reversedMappedTileMasks;
+  private readonly string fileName = fileName;
+
+  public void PlaceTileAndVerify(int tileId, Vector2 position, TileMask tileMask)
+  {
+    autoTiler.PlaceTile(0, position, tileId);
+    TileData tileData = autoTiler.GetTile(0, position);
+    Assertions.AssertEqual(new(reversedMappedTileMasks[tileMask], fileName), tileData.TileAtlas);
   }
 }

@@ -17,13 +17,13 @@ public static class BitmaskCalculator
 
   public static readonly Vector2I[] BITMASK_POSITIONS =
   [
-    TOP_LEFT, TOP, TOP_RIGHT, LEFT, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT, MIDDLE
+    TOP_LEFT, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT , MIDDLE
   ];
 
   public static TileMask.SurroundingDirection PositionToDirection(Vector2I position)
   {
     int index = Array.FindIndex(BITMASK_POSITIONS, x => x == position);
-    if (index == -1)
+    if (index <= -1 || index >= 8)
       throw new ArgumentException($"Position cannot be mapped to tileMask: {position}");
     return (TileMask.SurroundingDirection)index;
   }

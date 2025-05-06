@@ -11,11 +11,10 @@ public class AutoTileMap : Node2D
 
   public AutoTileMap(
     uint layerCount,
-    string imageDirectoryPath,
     AutoTileConfiguration autoTileConfiguration)
   {
-    AutoTilerComposer autoTilerComposer = new(imageDirectoryPath, autoTileConfiguration);
-    tileMapWrapper = new(imageDirectoryPath, autoTileConfiguration);
+    AutoTilerComposer autoTilerComposer = new(autoTileConfiguration);
+    tileMapWrapper = new(autoTileConfiguration);
     autoTileDrawer = new(
       new TileMapDrawer(tileMapWrapper),
       autoTilerComposer.GetAutoTiler(layerCount));

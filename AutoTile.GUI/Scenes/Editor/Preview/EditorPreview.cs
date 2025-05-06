@@ -51,11 +51,10 @@ public partial class EditorPreview : MarginContainer, IState
       ChangeActiveTile((TileMapTile)tileList.GetChildren().First());
   }
 
-  public void InitializeTileMap(
-    string imageDirectoryPath, AutoTileConfiguration autoTileConfiguration)
+  public void InitializeTileMap(AutoTileConfiguration autoTileConfiguration)
   {
     AutoTileMap?.QueueFree();
-    AutoTileMap = new(1, imageDirectoryPath, autoTileConfiguration);
+    AutoTileMap = new(1, autoTileConfiguration);
   }
 
   public void InitializeState()

@@ -35,6 +35,12 @@ public readonly struct TileMask
     Left = left;
   }
 
+  public static TileMask GetZero()
+    => new(0, 0, 0, 0, 0, 0, 0, 0);
+
+  public static TileMask GetMinusOne()
+    => new(-1, -1, -1, -1, -1, -1, -1, -1);
+
   public static TileMask FromArray(int[] arr)
   {
     if (arr.Length != 8)

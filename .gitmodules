@@ -1,3 +1,6 @@
 [submodule "modules/simple-test"]
 	path = modules/simple-test
 	url = https://github.com/ruedoux/simple-test.git
+[submodule "modules/logging"]
+	path = modules/logging
+	url = https://github.com/ruedoux/logging.git

@@ -49,16 +49,17 @@ public class TileMaskSearcherTest
   public void FindBestMatch_ShouldFindBestResult_WhenGivenNotPreciseTileMask()
   {
     // Given
-    TileAtlas TileAtlas = new(new(0, 0), IMAGE_FILE_NAME);
-    TileMask target = new(0, 0, 0, -1, 2, -1, -1, -1);
+    TileAtlas TileAtlas = new(new(0, 0), "a");
+    TileMask target = new(0, 0, -1, -1, -1, 2, -1, 0);
     TileMaskSearcher tileMaskSearcher = new([
       new(target, TileAtlas),
-      new(new(0, 0, -1, -1, 2, -1, -1, -1), new(new(0, 1), IMAGE_FILE_NAME)),
-      new(new(0, 0, 0, 0, -1, 2, -1, -1), new(new(0, 2), IMAGE_FILE_NAME)),
-      new(new(0, 0, 1, -1, -1, 2, -1, -1), new(new(0, 3), IMAGE_FILE_NAME))]);
+      new(new(0, 1, -1, -1, 2, -1, -1, -1), new(new(0, 1), "b")),
+      new(new(0, 1, 0, 0, -1, 2, -1, -1), new(new(0, 2), "c")),
+      new(new(0, 1, 1, -1, -1, 2, -1, -1), new(new(0, 3), "d"))]);
 
     // When
-    var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(new(0, 0, 0));
+    var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(
+      new(0, 0, -1, -1, -1, -1, -1, 0));
 
     // Then
     Assertions.AssertEqual(TileAtlas, resultTileAtlas);
@@ -86,19 +87,19 @@ public class TileMaskSearcherTest
   {
     // Given
     TileAtlas tileAtlas = new(new(0, 0), IMAGE_FILE_NAME);
-    TileMask target = new(0, 0, 0, -1, -1, -1, -1, -1);
+    TileMask target = new(0, 0, -1, -1, -1, -1, -1, 0);
     Random random = new(8008);
     List<(TileMask, TileAtlas)> items = Enumerable.Range(0, 1000)
       .Select(_ => (
         new TileMask(
           topLeft: 0,
           top: 0,
-          topRight: -1,
+          topRight: random.Next(-100, 100),
           right: random.Next(-100, 100),
           bottomRight: random.Next(-100, 100),
           bottom: random.Next(-100, 100),
           bottomLeft: random.Next(-100, 100),
-          left: random.Next(-100, 100)
+          left: -1
         ),
         new TileAtlas(new(0, 1), IMAGE_FILE_NAME)
       )).ToList();
@@ -108,10 +109,10 @@ public class TileMaskSearcherTest
 
     // When
     var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(
-      new(0, 0, 0, 1, -1, -1, -1, -1));
+      new(0, 0, -1, -1, -1, -1, -1, 0));
 
     // Then
     Assertions.AssertEqual(tileAtlas, resultTileAtlas);
-    Assertions.AssertEqual(resultTileMask, target);
+    Assertions.AssertEqual(target, resultTileMask);
   }
 }

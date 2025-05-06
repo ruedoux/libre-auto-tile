@@ -2,7 +2,7 @@ using Qwaitumin.AutoTile.Configuration;
 
 namespace Qwaitumin.AutoTile;
 
-public class AutoTilerComposer(string imageDirectoryPath, AutoTileConfiguration autoTileConfiguration)
+public class AutoTilerComposer(AutoTileConfiguration autoTileConfiguration)
 {
   public AutoTiler GetAutoTiler(uint layerCount)
     => new(layerCount, GetTileMaskSearchers());
@@ -13,8 +13,8 @@ public class AutoTilerComposer(string imageDirectoryPath, AutoTileConfiguration 
 
     foreach (var (_, tileDefinition) in autoTileConfiguration.TileDefinitions)
       foreach (var (imageFileName, _) in tileDefinition.ImageFileNameToTileMaskDefinition)
-        if (!File.Exists(Path.Join(imageDirectoryPath, imageFileName)))
-          throw new DirectoryNotFoundException($"Image does not exist: {Path.Join(imageDirectoryPath, imageFileName)}");
+        if (!File.Exists(Path.Join(imageFileName)))
+          throw new DirectoryNotFoundException($"Image does not exist: {imageFileName}");
 
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {

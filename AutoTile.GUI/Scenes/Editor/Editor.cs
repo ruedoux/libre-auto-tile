@@ -21,7 +21,7 @@ public partial class Editor : Control
 {
   public const int IMAGE_SCALING = 4;
   public readonly static Logger Logger = new(
-    [(msg) => GD.PrintRich(msg.GetAsString(true))], new());
+    [(msg) => GD.PrintRich(msg)], new(BBCode: true));
 
   private readonly GodotInputListener inputListener = new();
   private readonly CameraControl cameraControl;
@@ -85,7 +85,9 @@ public partial class Editor : Control
       (texture) => bitmaskContainer.TileSetTexture.Texture = texture]);
     editorOptions.ToolHasChanged.AddObserver(toolsStateMachine.SwitchStateTo);
     editorOptions.ConfigurationSaved.AddObserver(SaveConfiguration);
-    editorOptions.ImageFileObservable.AddObserver((_) => UpdateBitmask());
+    editorOptions.ImageFileObservable.AddObservers([
+      (_) => UpdateBitmask(),
+      (_) => {cameraControl.Position = Godot.Vector2.Zero;}]);
     editorOptions.ConfigurationCleared.AddObserver((_) => ClearBitmasks());
     editorOptions.ConfigurationLoaded.AddObserver(LoadConfiguration);
 
@@ -261,7 +263,7 @@ public partial class Editor : Control
     cameraControl.View = new(-int.MaxValue / 2, -int.MaxValue / 2, int.MaxValue, int.MaxValue);
     cameraControl.Position = Godot.Vector2.Zero;
 
-    editorPreview.InitializeTileMap(".", ExtractAutoTileConfiguration());
+    editorPreview.InitializeTileMap(ExtractAutoTileConfiguration());
     AddChild(editorPreview.AutoTileMap);
     if (editorPreview.AutoTileMap is not null)
       editorPreview.AutoTileMap.Scale = new(IMAGE_SCALING, IMAGE_SCALING);

@@ -16,14 +16,15 @@ internal class TileMapDrawer(TileMapWrapper tileMapWrapper) : ITileMapDrawer
     {
       foreach (var (position, tileData) in positionsToTileData)
       {
-        if (!tileMapWrapper.TileIdToSourceId.TryGetValue(tileData.CentreTileId, out int sourceId))
-          sourceId = -1;
-
-        Vector2I? atlasCoords = GodotTypeMapper.Map(tileData.TileAtlas.Position);
-        if (tileData.CentreTileId < 0 || tileData.TileAtlas.ImageFileName == string.Empty)
+        Vector2I? atlasCoords = null;
+        var sourceId = -1;
+        if (tileData.TileAtlas.ImageFileName is not null && tileData.TileAtlas.ImageFileName != "")
         {
-          atlasCoords = null;
-          sourceId = -1;
+          if (tileMapWrapper.ImageFileToSourceId.TryGetValue(tileData.TileAtlas.ImageFileName, out int overrideSourceId))
+          {
+            atlasCoords = GodotTypeMapper.Map(tileData.TileAtlas.Position);
+            sourceId = overrideSourceId;
+          }
         }
 
         tileMapWrapper.TileMapLayer.SetCell(GodotTypeMapper.Map(position), sourceId, atlasCoords);
