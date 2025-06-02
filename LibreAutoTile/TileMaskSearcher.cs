@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Collections.Immutable;
+using Microsoft.VisualBasic;
 using Qwaitumin.LibreAutoTile.Configuration;
 
 namespace Qwaitumin.LibreAutoTile;
@@ -28,22 +29,86 @@ public readonly struct TileAtlas(Vector2 position, string imageFileName)
     => !(left == right);
 }
 
+class IndexSearcher(int itemCount)
+{
+  public readonly int[] ResultIndexToItemIndex = new int[itemCount];
+
+  private readonly int[] itemIndexToBestScore = new int[itemCount];
+  private readonly int[] itemIndexToSeenGeneration = new int[itemCount];
+  private readonly object _lock = new();
+  private int currentGeneration = 1;
+
+
+  public (int ResultCount, int BestScore) GetResultCount(
+    TileMask target, FrozenDictionary<int, List<int>>[] tileIdToItemIndex)
+  {
+    lock (_lock)
+    {
+      IncrementGeneration();
+      int resultIndex = -1;
+
+      int bestScore = 0;
+      for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
+      {
+        int tileId = target.GetTileIdByIndex(fieldIndex);
+        int scoreWeight = fieldIndex % 2 == 0 ? 1 : 2;
+
+        if (!tileIdToItemIndex[fieldIndex].TryGetValue(tileId, out var itemIndexList))
+          continue;
+
+        foreach (var itemIndex in itemIndexList)
+        {
+          if (itemIndexToSeenGeneration[itemIndex] != currentGeneration)
+          {
+            itemIndexToSeenGeneration[itemIndex] = currentGeneration;
+            itemIndexToBestScore[itemIndex] = 0;
+          }
+
+          itemIndexToBestScore[itemIndex] += scoreWeight;
+
+          if (itemIndexToBestScore[itemIndex] > bestScore)
+          {
+            bestScore = itemIndexToBestScore[itemIndex];
+            resultIndex = 0;
+            ResultIndexToItemIndex[resultIndex] = itemIndex;
+          }
+          else if (itemIndexToBestScore[itemIndex] == bestScore)
+          {
+            bestScore = itemIndexToBestScore[itemIndex];
+            resultIndex++;
+            ResultIndexToItemIndex[resultIndex] = itemIndex;
+          }
+        }
+      }
+
+      return (resultIndex, bestScore);
+    }
+  }
+
+  private void IncrementGeneration()
+  {
+    currentGeneration++;
+    if (currentGeneration < 0)
+    {
+      Array.Clear(itemIndexToSeenGeneration, 0, itemIndexToSeenGeneration.Length);
+      currentGeneration = 1;
+    }
+  }
+}
+
 public class TileMaskSearcher
 {
   public readonly FrozenDictionary<TileMask, TileAtlas> ExistingMasks;
   private readonly ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items;
   private readonly FrozenDictionary<int, List<int>>[] tileIdToItemIndex;
-
+  private readonly IndexSearcher indexSearcher;
   private readonly bool stripCorners;
-  private readonly int[] itemIndexToBestScore;
-  private readonly int[] itemIndexToSeenGeneration;
-  private int currentGeneration = 1;
 
   public TileMaskSearcher(
-    List<(TileMask TileMask, TileAtlas TileAtlas)> rawItems, bool stripCorners = true)
+    List<(TileMask TileMask, TileAtlas TileAtlas)> rawItems,
+    bool stripCorners = true)
   {
     this.stripCorners = stripCorners;
-
     ExistingMasks = rawItems
       .GroupBy(item => item.TileMask)
       .Select(g => g.First())
@@ -51,17 +116,24 @@ public class TileMaskSearcher
       .ToFrozenDictionary();
     items = ExistingMasks
       .Select(kvp => (TileMask: kvp.Key, TileAtlas: kvp.Value)).ToImmutableArray();
-    itemIndexToBestScore = new int[items.Length];
-    itemIndexToSeenGeneration = new int[items.Length];
+    indexSearcher = new(items.Length);
     tileIdToItemIndex = GetAssignedIndexes(items).Select(d => d.ToFrozenDictionary()).ToArray();
   }
 
   public (TileMask TileMask, TileAtlas TileAtlas) FindBestMatch(TileMask target)
   {
-    var firstRoundResult = GetHits(target);
+    if (ExistingMasks.TryGetValue(target, out var tileAtlas))
+      return (target, tileAtlas);
 
-    var tileMask = firstRoundResult.TileMask;
-    var hitsMask = firstRoundResult.HitsMask;
+    (int resultCount, int _) = indexSearcher.GetResultCount(target, tileIdToItemIndex);
+    if (resultCount == -1)
+      return (new(), new());
+
+    int rawBestIndex = indexSearcher.ResultIndexToItemIndex[resultCount];
+    var tileMask = rawBestIndex != -1 ? items[rawBestIndex].TileMask : new();
+    var hitsMask = GetHitsMask(target, tileMask);
+
+    //Console.WriteLine($"{tileMask} {hitsMask}");
 
     // Get rid of fields that were never hit
     int h0 = hitsMask.TopLeft == 0 ? tileMask.TopLeft : -1;
@@ -73,84 +145,20 @@ public class TileMaskSearcher
     int h6 = hitsMask.BottomLeft == 0 ? tileMask.BottomLeft : -1;
     int h7 = hitsMask.Left == 0 ? tileMask.Left : -1;
 
-    return FindBestMatchRound(new TileMask(h0, h1, h2, h3, h4, h5, h6, h7));
-  }
+    TileMask trimmedTarget = new(h0, h1, h2, h3, h4, h5, h6, h7);
 
-  private (TileMask TileMask, TileMask HitsMask) GetHits(TileMask target)
-  {
-    if (ExistingMasks.TryGetValue(target, out var _))
-      return (target, TileMask.GetZero());
-
-    int bestIndex = GetBestIndex(target);
-
-    var bestMask = bestIndex != -1 ? items[bestIndex].TileMask : new();
-    var hitsMask = GetHitsMask(target, bestMask);
-
-    return (bestMask, hitsMask);
-  }
-
-  private (TileMask TileMask, TileAtlas TileAtlas) FindBestMatchRound(TileMask target)
-  {
     if (stripCorners)
-      target = StripCorners(target);
+      trimmedTarget = TileMask.StripCorners(trimmedTarget);
 
-    if (ExistingMasks.TryGetValue(target, out var atlas))
-      return (target, atlas);
+    if (ExistingMasks.TryGetValue(trimmedTarget, out var atlas))
+      return (trimmedTarget, atlas);
 
-    int bestIndex = GetBestIndex(target);
-
+    (int bestResultCount, int _) = indexSearcher.GetResultCount(target, tileIdToItemIndex);
+    int bestIndex = indexSearcher.ResultIndexToItemIndex[bestResultCount];
     var bestMask = bestIndex != -1 ? items[bestIndex].TileMask : new();
     var bestAtlas = bestIndex != -1 ? items[bestIndex].TileAtlas : new();
+
     return (bestMask, bestAtlas);
-  }
-
-  private int GetBestIndex(TileMask target)
-  {
-    currentGeneration++;
-    if (currentGeneration < 0)
-    {
-      Array.Clear(itemIndexToSeenGeneration, 0, itemIndexToSeenGeneration.Length);
-      currentGeneration = 1;
-    }
-
-    int bestScore = 0, bestIdx = -1;
-    for (int field = 0; field < 8; field++)
-    {
-      int val = field switch
-      {
-        0 => target.TopLeft,
-        1 => target.Top,
-        2 => target.TopRight,
-        3 => target.Right,
-        4 => target.BottomRight,
-        5 => target.Bottom,
-        6 => target.BottomLeft,
-        7 => target.Left,
-        _ => throw new InvalidOperationException()
-      };
-
-      if (!tileIdToItemIndex[field].TryGetValue(val, out var list))
-        continue;
-
-      foreach (var itemIndex in list)
-      {
-        if (itemIndexToSeenGeneration[itemIndex] != currentGeneration)
-        {
-          itemIndexToSeenGeneration[itemIndex] = currentGeneration;
-          itemIndexToBestScore[itemIndex] = 0;
-        }
-
-        itemIndexToBestScore[itemIndex]++;
-
-        if (itemIndexToBestScore[itemIndex] > bestScore)
-        {
-          bestScore = itemIndexToBestScore[itemIndex];
-          bestIdx = itemIndex;
-        }
-      }
-    }
-
-    return bestIdx;
   }
 
   private static TileMask GetHitsMask(TileMask target, TileMask bestMask)
@@ -167,29 +175,6 @@ public class TileMaskSearcher
     return new(h0, h1, h2, h3, h4, h5, h6, h7);
   }
 
-  private static TileMask StripCorners(TileMask target)
-  {
-    int topLeft = target.TopLeft;
-    int topRight = target.TopRight;
-    int bottomRight = target.BottomRight;
-    int bottomLeft = target.BottomLeft;
-
-    if (target.Top == -1 || target.Left == -1) topLeft = -1;
-    if (target.Top == -1 || target.Right == -1) topRight = -1;
-    if (target.Bottom == -1 || target.Left == -1) bottomLeft = -1;
-    if (target.Bottom == -1 || target.Right == -1) bottomRight = -1;
-
-    return new(
-      topLeft: topLeft,
-      top: target.Top,
-      topRight: topRight,
-      right: target.Right,
-      bottomRight: bottomRight,
-      bottom: target.Bottom,
-      bottomLeft: bottomLeft,
-      left: target.Left);
-  }
-
   private static Dictionary<int, List<int>>[] GetAssignedIndexes(
     ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items)
   {
@@ -199,29 +184,21 @@ public class TileMaskSearcher
 
     for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
     {
-      var timeMask = items[itemIndex].TileMask;
-      AddIndex(tileIdToItemIndexTemp, 0, timeMask.TopLeft, itemIndex);
-      AddIndex(tileIdToItemIndexTemp, 1, timeMask.Top, itemIndex);
-      AddIndex(tileIdToItemIndexTemp, 2, timeMask.TopRight, itemIndex);
-      AddIndex(tileIdToItemIndexTemp, 3, timeMask.Right, itemIndex);
-      AddIndex(tileIdToItemIndexTemp, 4, timeMask.BottomRight, itemIndex);
-      AddIndex(tileIdToItemIndexTemp, 5, timeMask.Bottom, itemIndex);
-      AddIndex(tileIdToItemIndexTemp, 6, timeMask.BottomLeft, itemIndex);
-      AddIndex(tileIdToItemIndexTemp, 7, timeMask.Left, itemIndex);
+      var tileMask = items[itemIndex].TileMask;
+      var tileMaskArray = tileMask.ToArray();
+      for (int maskIndex = 0; maskIndex < tileMaskArray.Length; maskIndex++)
+      {
+        var tileId = tileMaskArray[maskIndex];
+        var dict = tileIdToItemIndexTemp[maskIndex];
+        if (!dict.TryGetValue(tileId, out var list))
+        {
+          list = [];
+          dict[tileId] = list;
+        }
+        list.Add(itemIndex);
+      }
     }
 
     return tileIdToItemIndexTemp;
-  }
-
-  private static void AddIndex(
-    Dictionary<int, List<int>>[] tileIdToItemIndexTemp, int field, int tileId, int itemIndex)
-  {
-    var dict = tileIdToItemIndexTemp[field];
-    if (!dict.TryGetValue(tileId, out var list))
-    {
-      list = [];
-      dict[tileId] = list;
-    }
-    list.Add(itemIndex);
   }
 }

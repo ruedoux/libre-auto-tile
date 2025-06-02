@@ -35,6 +35,46 @@ public readonly struct TileMask
     Left = left;
   }
 
+  public int GetTileIdByIndex(int fieldIndex)
+  {
+    int tileId = fieldIndex switch
+    {
+      0 => TopLeft,
+      1 => Top,
+      2 => TopRight,
+      3 => Right,
+      4 => BottomRight,
+      5 => Bottom,
+      6 => BottomLeft,
+      7 => Left,
+      _ => -2
+    };
+    return tileId;
+  }
+
+  public static TileMask StripCorners(TileMask target)
+  {
+    int topLeft = target.TopLeft;
+    int topRight = target.TopRight;
+    int bottomRight = target.BottomRight;
+    int bottomLeft = target.BottomLeft;
+
+    if (target.Top == -1 || target.Left == -1) topLeft = -1;
+    if (target.Top == -1 || target.Right == -1) topRight = -1;
+    if (target.Bottom == -1 || target.Left == -1) bottomLeft = -1;
+    if (target.Bottom == -1 || target.Right == -1) bottomRight = -1;
+
+    return new(
+      topLeft: topLeft,
+      top: target.Top,
+      topRight: topRight,
+      right: target.Right,
+      bottomRight: bottomRight,
+      bottom: target.Bottom,
+      bottomLeft: bottomLeft,
+      left: target.Left);
+  }
+
   public static TileMask GetZero()
     => new(0, 0, 0, 0, 0, 0, 0, 0);
 

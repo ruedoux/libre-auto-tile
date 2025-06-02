@@ -82,9 +82,9 @@ public class AutoTiler
       }
 
       TileMask tileMask = FromArray(tileMaskArray);
-      var tileAtlas = tileIdToTileMaskSearcher[tileId].FindBestMatch(tileMask).TileAtlas;
+      var bestMatch = tileIdToTileMaskSearcher[tileId].FindBestMatch(tileMask);
       data[layer][position] = new(
-        tileId, tileMask, tileAtlas);
+        tileId, tileMask, bestMatch.TileAtlas);
     }
 
     for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
