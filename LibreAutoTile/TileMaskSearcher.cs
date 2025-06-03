@@ -31,29 +31,38 @@ public readonly struct TileAtlas(Vector2 position, string imageFileName)
 
 class IndexSearcher(int itemCount)
 {
+  const int TOP_SCORE = 3;
+  const int LOW_SCORE = 2;
+  const int NO_SCORE = 1;
   public readonly int[] ResultIndexToItemIndex = new int[itemCount];
 
   private readonly int[] itemIndexToBestScore = new int[itemCount];
   private readonly int[] itemIndexToSeenGeneration = new int[itemCount];
+  private readonly int[] tileScore = new int[8];
   private readonly object _lock = new();
   private int currentGeneration = 1;
 
 
   public (int ResultCount, int BestScore) GetResultCount(
-    TileMask target, FrozenDictionary<int, List<int>>[] tileIdToItemIndex)
+    TileMask target, FrozenDictionary<int, List<int>>[] tileIdToItemIndexs)
   {
     lock (_lock)
     {
       IncrementGeneration();
       int resultIndex = -1;
-
       int bestScore = 0;
+      for (int i = 0; i < tileScore.Length; i++)
+        tileScore[i] = i % 2 == 0 ? LOW_SCORE : TOP_SCORE; // default score 2 for not corner ids
+
+      tileScore[(int)TileMask.SurroundingDirection.TopLeft] = target.IsTopLeftConnected() ? TOP_SCORE : NO_SCORE;
+      tileScore[(int)TileMask.SurroundingDirection.TopRight] = target.IsTopRightConnected() ? TOP_SCORE : NO_SCORE;
+      tileScore[(int)TileMask.SurroundingDirection.BottomLeft] = target.IsBottomLeftConnected() ? TOP_SCORE : NO_SCORE;
+      tileScore[(int)TileMask.SurroundingDirection.BottomRight] = target.IsBottomRightConnected() ? TOP_SCORE : NO_SCORE;
+
       for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
       {
         int tileId = target.GetTileIdByIndex(fieldIndex);
-        int scoreWeight = fieldIndex % 2 == 0 ? 1 : 2;
-
-        if (!tileIdToItemIndex[fieldIndex].TryGetValue(tileId, out var itemIndexList))
+        if (!tileIdToItemIndexs[fieldIndex].TryGetValue(tileId, out var itemIndexList))
           continue;
 
         foreach (var itemIndex in itemIndexList)
@@ -64,7 +73,7 @@ class IndexSearcher(int itemCount)
             itemIndexToBestScore[itemIndex] = 0;
           }
 
-          itemIndexToBestScore[itemIndex] += scoreWeight;
+          itemIndexToBestScore[itemIndex] += tileScore[fieldIndex];
 
           if (itemIndexToBestScore[itemIndex] > bestScore)
           {
@@ -75,8 +84,7 @@ class IndexSearcher(int itemCount)
           else if (itemIndexToBestScore[itemIndex] == bestScore)
           {
             bestScore = itemIndexToBestScore[itemIndex];
-            resultIndex++;
-            ResultIndexToItemIndex[resultIndex] = itemIndex;
+            ResultIndexToItemIndex[++resultIndex] = itemIndex;
           }
         }
       }
@@ -102,13 +110,9 @@ public class TileMaskSearcher
   private readonly ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items;
   private readonly FrozenDictionary<int, List<int>>[] tileIdToItemIndex;
   private readonly IndexSearcher indexSearcher;
-  private readonly bool stripCorners;
 
-  public TileMaskSearcher(
-    List<(TileMask TileMask, TileAtlas TileAtlas)> rawItems,
-    bool stripCorners = true)
+  public TileMaskSearcher(List<(TileMask TileMask, TileAtlas TileAtlas)> rawItems)
   {
-    this.stripCorners = stripCorners;
     ExistingMasks = rawItems
       .GroupBy(item => item.TileMask)
       .Select(g => g.First())
@@ -133,8 +137,6 @@ public class TileMaskSearcher
     var tileMask = rawBestIndex != -1 ? items[rawBestIndex].TileMask : new();
     var hitsMask = GetHitsMask(target, tileMask);
 
-    //Console.WriteLine($"{tileMask} {hitsMask}");
-
     // Get rid of fields that were never hit
     int h0 = hitsMask.TopLeft == 0 ? tileMask.TopLeft : -1;
     int h1 = hitsMask.Top == 0 ? tileMask.Top : -1;
@@ -146,9 +148,7 @@ public class TileMaskSearcher
     int h7 = hitsMask.Left == 0 ? tileMask.Left : -1;
 
     TileMask trimmedTarget = new(h0, h1, h2, h3, h4, h5, h6, h7);
-
-    if (stripCorners)
-      trimmedTarget = TileMask.StripCorners(trimmedTarget);
+    trimmedTarget = TileMask.StripCorners(trimmedTarget);
 
     if (ExistingMasks.TryGetValue(trimmedTarget, out var atlas))
       return (trimmedTarget, atlas);

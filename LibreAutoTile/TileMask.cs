@@ -35,6 +35,16 @@ public readonly struct TileMask
     Left = left;
   }
 
+  // TODO: No wild card being considered so far
+  public bool IsTopLeftConnected()
+    => TopLeft == Top && TopLeft == Left;
+  public bool IsTopRightConnected()
+    => TopRight == Top && TopRight == Right;
+  public bool IsBottomLeftConnected()
+    => BottomLeft == Bottom && BottomLeft == Left;
+  public bool IsBottomRightConnected()
+    => BottomRight == Bottom && BottomRight == Right;
+
   public int GetTileIdByIndex(int fieldIndex)
   {
     int tileId = fieldIndex switch
