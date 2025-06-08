@@ -35,7 +35,6 @@ public readonly struct TileMask
     Left = left;
   }
 
-  // TODO: No wild card being considered so far
   public bool IsTopLeftConnected()
     => TopLeft == Top && TopLeft == Left;
   public bool IsTopRightConnected()

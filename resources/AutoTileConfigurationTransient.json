@@ -128,7 +128,9 @@
     "1": {
       "ImageFileNameToTileMaskDefinition": {
         "resources/Water.png": {
-          "AtlasPositionToTileMasks": { "(0,0,0)": [[1, 1, 1, 1, 1, 1, 1, 1]] }
+          "AtlasPositionToTileMasks": {
+            "(0,0,0)": [[-2, -2, -2, -2, -2, -2, -2, -2]]
+          }
         },
         "resources/GrassHillsWater.png": { "AtlasPositionToTileMasks": {} }
       },
