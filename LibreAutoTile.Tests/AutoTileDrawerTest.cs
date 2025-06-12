@@ -11,14 +11,14 @@ public class AutoTileDrawerTest
 
   private static AutoTiler GetMockedAutoTiler(uint layerCount)
   {
-    TileMaskSearcher tileMaskSearcher = new([]);
+    TileMaskSearcher tileMaskSearcher = new([(new(), new())]);
     return new(layerCount, new() { { TILE_ID, tileMaskSearcher } });
   }
 
-  private static KeyValuePair<Vector2, int>[] GetMockedPositionsToTileIds(
+  private static (Vector2, int)[] GetMockedPositionsToTileIds(
     Vector2[] positions, int tileId)
   {
-    List<KeyValuePair<Vector2, int>> positionsToTileIds = [];
+    List<(Vector2, int)> positionsToTileIds = [];
     foreach (var position in positions)
       positionsToTileIds.Add(new(position, tileId));
 
@@ -30,7 +30,6 @@ public class AutoTileDrawerTest
   {
     // Given
     Vector2[] positions = GetVector2Rectangle(Vector2.Zero, new(16, 16));
-
     AutoTiler autoTiler = GetMockedAutoTiler(1);
     MockedTileMapDrawer testTileMapDrawer = new(1);
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);

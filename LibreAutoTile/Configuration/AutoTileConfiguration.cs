@@ -33,6 +33,17 @@ public sealed class AutoTileConfiguration
     return deserialized;
   }
 
+  public static AutoTileConfiguration LoadFromFile(string filePath)
+  {
+    var jsonString = File.ReadAllText(filePath);
+    var autoTileConfiguration = FromJsonString(jsonString)
+      ?? throw new ArgumentException("Invalid configuration file.");
+    return autoTileConfiguration;
+  }
+
+  public Dictionary<string, int> GetTileNamesToTileIds()
+    => TileDefinitions.ToDictionary(k => k.Value.Name, v => (int)v.Key);
+
   public string ToJsonString()
     => JsonSerializer.Serialize(this, AutoTileJsonContext.Default.AutoTileConfiguration);
 

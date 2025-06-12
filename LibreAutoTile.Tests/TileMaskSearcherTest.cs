@@ -115,19 +115,21 @@ public class TileMaskSearcherTest
   }
 
   [SimpleTestMethod]
-  public void FindBestMatch_ShouldReturnDefaultMask_WhenNoMatches()
+  public void FindBestMatch_ShouldReturnFirstMask_WhenNoMatches()
   {
     // Given
-    TileAtlas tileAtlas = new(new(0, 0), IMAGE_FILE_NAME);
-    TileMask target = new(1, 2, 3, 4, 5, 6, 7, 8);
-    TileMaskSearcher tileMaskSearcher = new([new(target, tileAtlas)]);
+    TileAtlas tileAtlas1 = new(new(0, 0), IMAGE_FILE_NAME);
+    TileAtlas tileAtlas2 = new(new(0, 1), IMAGE_FILE_NAME);
+    TileMask target1 = new(1, 2, 3, 4, 5, 6, 7, 8);
+    TileMask target2 = new(2, 3, 4, 5, 6, 7, 8, 9);
+    TileMaskSearcher tileMaskSearcher = new([new(target1, tileAtlas1), new(target2, tileAtlas2)]);
 
     // When
     var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(new(0, 0, 0));
 
     // Then
-    Assertions.AssertEqual(new(), resultTileAtlas);
-    Assertions.AssertEqual(new(), resultTileMask);
+    Assertions.AssertEqual(tileAtlas1, resultTileAtlas);
+    Assertions.AssertEqual(target1, resultTileMask);
   }
 
   [SimpleTestMethod]

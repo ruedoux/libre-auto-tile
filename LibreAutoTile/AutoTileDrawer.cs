@@ -21,13 +21,13 @@ public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
     ClearFinishedTasks();
   }
 
-  public void DrawTilesAsync(int layer, KeyValuePair<Vector2, int>[] positionToTileIds)
+  public void DrawTilesAsync(int layer, (Vector2 Position, int TileId)[] positionToTileIds)
   {
     ClearFinishedTasks();
     tasks.Add(Task.Run(() => DrawTiles(layer, positionToTileIds)));
   }
 
-  public void DrawTiles(int layer, KeyValuePair<Vector2, int>[] positionToTileIds)
+  public void DrawTiles(int layer, (Vector2 Position, int TileId)[] positionToTileIds)
   {
     List<Vector2> positions = [];
     foreach (var (position, tileId) in positionToTileIds)

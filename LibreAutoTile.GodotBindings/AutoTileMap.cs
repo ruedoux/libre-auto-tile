@@ -36,22 +36,18 @@ public class AutoTileMap : Node2D
   public void Wait()
     => autoTileDrawer.Wait();
 
-  public void DrawTilesAsync(int layer, KeyValuePair<Vector2I, int>[] positionToTileIds)
+  public void DrawTilesAsync(int layer, (Vector2I Position, int TileId)[] positionToTileIds)
   {
     var positionToTileIdsConverted = positionToTileIds
-      .Select(kvp => new KeyValuePair<Configuration.Vector2, int>(
-          GodotTypeMapper.Map(kvp.Key),
-          kvp.Value))
+      .Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))
       .ToArray();
     autoTileDrawer.DrawTilesAsync(layer, positionToTileIdsConverted);
   }
 
-  public void DrawTiles(int layer, KeyValuePair<Vector2I, int>[] positionToTileIds)
+  public void DrawTiles(int layer, (Vector2I Position, int TileId)[] positionToTileIds)
   {
     var positionToTileIdsConverted = positionToTileIds
-      .Select(kvp => new KeyValuePair<Configuration.Vector2, int>(
-          GodotTypeMapper.Map(kvp.Key),
-          kvp.Value))
+      .Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))
       .ToArray();
     autoTileDrawer.DrawTiles(layer, positionToTileIdsConverted);
   }

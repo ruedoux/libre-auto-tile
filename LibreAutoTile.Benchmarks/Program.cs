@@ -11,10 +11,10 @@ public static class Program
   static void Main(string[] args)
   {
     var config = DefaultConfig.Instance
-        .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond));
+      .WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond));
 
     BenchmarkSwitcher
-        .FromAssembly(Assembly.GetExecutingAssembly())
-        .Run(args, config);
+      .FromAssembly(Assembly.GetExecutingAssembly())
+      .Run(args, config);
   }
 }

@@ -12,7 +12,7 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesTile_WhenCalled()
   {
     // Given
-    TileMaskSearcher tileMaskSearcher = new([]);
+    TileMaskSearcher tileMaskSearcher = new([(new(), new())]);
     AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher } });
 
     // When
@@ -31,7 +31,7 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesTiles_WhenCalledAsync()
   {
     // Given
-    TileMaskSearcher tileMaskSearcher = new([]);
+    TileMaskSearcher tileMaskSearcher = new([(new(), new())]);
     AutoTiler autoTiler = new(1, new() { { 0, tileMaskSearcher } });
 
     List<Vector2> positions = [];
@@ -89,7 +89,7 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesSingleTileTransientFilledSquare_WhenCalled()
   {
     // Given
-    var jsonString = File.ReadAllText("../resources/AutoTileConfigurationTransient.json");
+    var jsonString = File.ReadAllText("resources/AutoTileConfigurationTransient.json");
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration, false);
@@ -157,7 +157,7 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesSingleTileTransientEmptySquare_WhenCalled()
   {
     // Given
-    var jsonString = File.ReadAllText("../resources/AutoTileConfigurationTransient.json");
+    var jsonString = File.ReadAllText("resources/AutoTileConfigurationTransient.json");
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration, false);
@@ -216,7 +216,7 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesMultipleTileTransientFilledSquare_WhenCalled()
   {
     // Given
-    var jsonString = File.ReadAllText("../resources/AutoTileConfigurationTransient.json");
+    var jsonString = File.ReadAllText("resources/AutoTileConfigurationTransient.json");
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration, false);
@@ -288,7 +288,7 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesMultipleTileTransientEmptySquare_WhenCalled()
   {
     // Given
-    var jsonString = File.ReadAllText("../resources/AutoTileConfigurationTransient.json");
+    var jsonString = File.ReadAllText("resources/AutoTileConfigurationTransient.json");
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration, false);
