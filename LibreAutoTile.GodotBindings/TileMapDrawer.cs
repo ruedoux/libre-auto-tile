@@ -10,7 +10,7 @@ internal class TileMapDrawer(TileMapWrapper tileMapWrapper) : ITileMapDrawer
     => Callable.From(tileMapWrapper.TileMapLayer.Clear).CallDeferred();
 
   public void DrawTiles(
-    int tileLayer, KeyValuePair<Configuration.Vector2, TileData>[] positionsToTileData)
+    int tileLayer, IEnumerable<(Configuration.Vector2, TileData)> positionsToTileData)
   {
     Callable.From(() =>
     {

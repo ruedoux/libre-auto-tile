@@ -117,9 +117,9 @@ public class TileMaskSearcher
   private readonly FrozenDictionary<int, List<int>>[] tileIdToItemIndex;
   private readonly IndexSearcher indexSearcher;
 
-  public TileMaskSearcher(List<(TileMask TileMask, TileAtlas TileAtlas)> rawItems)
+  public TileMaskSearcher(IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> rawItems)
   {
-    if (rawItems.Count == 0)
+    if (!rawItems.Any())
       throw new ArgumentException("TileMaskSearcher needs at least one item");
 
     ExistingMasks = rawItems
