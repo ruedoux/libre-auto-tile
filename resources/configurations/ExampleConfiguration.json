@@ -3,10 +3,10 @@
   "TileDefinitions": {
     "0": {
       "ImageFileNameToTileMaskDefinition": {
-        "../resources/Grass.png": {
+        "resources/Grass.png": {
           "AtlasPositionToTileMasks": {}
         },
-        "../resources/Fences.png": {
+        "resources/Fences.png": {
           "AtlasPositionToTileMasks": {
             "(0,2,0)": [[-1, 0, -1, -1, -1, -1, -1, -1]],
             "(0,1,0)": [[-1, 0, -1, -1, -1, 0, -1, -1]],
@@ -32,7 +32,7 @@
     },
     "1": {
       "ImageFileNameToTileMaskDefinition": {
-        "../resources/Grass.png": {
+        "resources/Grass.png": {
           "AtlasPositionToTileMasks": {
             "(0,2,0)": [[-1, 1, 1, 1, -1, -1, -1, -1]],
             "(4,3,0)": [[-1, 1, -1, 1, -1, -1, -1, -1]],
@@ -85,7 +85,7 @@
             "(4,4,0)": [[-1, 1, -1, 1, -1, 1, -1, -1]]
           }
         },
-        "../resources/Fences.png": {
+        "resources/Fences.png": {
           "AtlasPositionToTileMasks": {}
         }
       },

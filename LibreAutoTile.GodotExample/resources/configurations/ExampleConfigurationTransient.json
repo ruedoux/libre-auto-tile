@@ -3,8 +3,8 @@
   "TileDefinitions": {
     "0": {
       "ImageFileNameToTileMaskDefinition": {
-        "resources/Water.png": { "AtlasPositionToTileMasks": {} },
-        "resources/GrassHillsWater.png": {
+        "../resources/Water.png": { "AtlasPositionToTileMasks": {} },
+        "../resources/GrassHillsWater.png": {
           "AtlasPositionToTileMasks": {
             "(7,3,0)": [[1, 1, 1, 1, 1, 1, 1, 0]],
             "(3,6,0)": [[-1, -1, -1, 0, -1, 0, -1, 0]],
@@ -128,12 +128,12 @@
     },
     "1": {
       "ImageFileNameToTileMaskDefinition": {
-        "resources/Water.png": {
+        "../resources/Water.png": {
           "AtlasPositionToTileMasks": {
             "(0,0,0)": [[-1, -1, -1, -1, -1, -1, -1, -1]]
           }
         },
-        "resources/GrassHillsWater.png": { "AtlasPositionToTileMasks": {} }
+        "../resources/GrassHillsWater.png": { "AtlasPositionToTileMasks": {} }
       },
       "Name": "Water",
       "Color": "(255,0,0,178)"

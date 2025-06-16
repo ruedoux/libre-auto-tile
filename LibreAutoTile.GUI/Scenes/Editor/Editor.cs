@@ -20,8 +20,6 @@ public enum EditorTools { Tiles, Settings, Preview }
 public partial class Editor : Control
 {
   public const int IMAGE_SCALING = 4;
-  public readonly static Logger Logger = new(
-    [(msg) => GD.PrintRich(msg)], new(BBCode: true));
 
   private readonly GodotInputListener inputListener = new();
   private readonly CameraControl cameraControl;
@@ -131,11 +129,11 @@ public partial class Editor : Control
 
   private void ClearBitmasks()
   {
-    Logger.Log("> Starting clearing editor state");
+    GodotLogger.Logger.Log("> Starting clearing editor state");
     editorTiles.ClearAll();
     bitmaskContainer.Clear();
     UpdateBitmask();
-    Logger.Log("> Finished clearing editor state");
+    GodotLogger.Logger.Log("> Finished clearing editor state");
   }
 
   private void AutoTileMapInput(InputEventMouse inputEventMouse)
@@ -201,7 +199,7 @@ public partial class Editor : Control
     var configuration = ExtractAutoTileConfiguration();
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
-    Logger.Log($"Saved configuration to: {filePath}");
+    GodotLogger.Logger.Log($"Saved configuration to: {filePath}");
     messageDisplay.DisplayText($"[color=green]Saved configuration to: {filePath}[/color]");
   }
 
@@ -210,7 +208,7 @@ public partial class Editor : Control
     ConfigurationExtractor.LoadConfiguration(filePath, editorTiles, bitmaskContainer);
     UpdateBitmask();
     messageDisplay.DisplayText($"[color=green]Loaded configuration from: {filePath}[/color]");
-    Logger.Log($"Loaded configuration from: {filePath}");
+    GodotLogger.Logger.Log($"Loaded configuration from: {filePath}");
   }
 
   private AutoTileConfiguration ExtractAutoTileConfiguration()
@@ -267,7 +265,7 @@ public partial class Editor : Control
     AddChild(editorPreview.AutoTileMap);
     if (editorPreview.AutoTileMap is not null)
       editorPreview.AutoTileMap.Scale = new(IMAGE_SCALING, IMAGE_SCALING);
-    Logger.Log($"Entered preview and loaded AutoTileMap");
+    GodotLogger.Logger.Log($"Entered preview and loaded AutoTileMap");
   }
 
   private void ExitEditorPreview()
@@ -283,6 +281,6 @@ public partial class Editor : Control
     UpdateBitmask();
 
     RemoveChild(editorPreview.AutoTileMap);
-    Logger.Log($"Exited preview and unloaded AutoTileMap");
+    GodotLogger.Logger.Log($"Exited preview and unloaded AutoTileMap");
   }
 }

@@ -5,7 +5,7 @@ namespace Qwaitumin.LibreAutoTile;
 public interface ITileMapDrawer
 {
   public void Clear();
-  public void DrawTiles(int tileLayer, KeyValuePair<Vector2, TileData>[] positionsToTileData);
+  public void DrawTiles(int tileLayer, IEnumerable<(Vector2 Position, TileData TileData)> positionsToTileData);
 }
 
 public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
@@ -21,13 +21,13 @@ public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
     ClearFinishedTasks();
   }
 
-  public void DrawTilesAsync(int layer, (Vector2 Position, int TileId)[] positionToTileIds)
+  public void DrawTilesAsync(int layer, IEnumerable<(Vector2 Position, int TileId)> positionToTileIds)
   {
     ClearFinishedTasks();
     tasks.Add(Task.Run(() => DrawTiles(layer, positionToTileIds)));
   }
 
-  public void DrawTiles(int layer, (Vector2 Position, int TileId)[] positionToTileIds)
+  public void DrawTiles(int layer, IEnumerable<(Vector2 Position, int TileId)> positionToTileIds)
   {
     List<Vector2> positions = [];
     foreach (var (position, tileId) in positionToTileIds)
@@ -39,9 +39,9 @@ public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
     UpdateTiles(layer, [.. positions]);
   }
 
-  public void UpdateTiles(int tileLayer, Vector2[] positions)
+  public void UpdateTiles(int tileLayer, IEnumerable<Vector2> positions)
   {
-    List<KeyValuePair<Vector2, TileData>> tileLayerToData = [];
+    List<(Vector2, TileData)> tileLayerToData = [];
     foreach (var position in positions)
       tileLayerToData.Add(new(position, autoTiler.GetTile(tileLayer, position)));
 

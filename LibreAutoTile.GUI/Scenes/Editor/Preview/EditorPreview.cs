@@ -4,6 +4,7 @@ using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Core;
+using Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Core.Signals;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
 
@@ -38,7 +39,7 @@ public partial class EditorPreview : MarginContainer, IState
 
     foreach (var guiTile in CreatedTiles)
     {
-      Editor.Logger.Log(guiTile.TileName);
+      GodotLogger.Logger.Log(guiTile.TileName);
       var tileMapTile = tileMapTileScene.Instantiate<TileMapTile>();
       tileList.AddChild(tileMapTile);
       tileMapTile.TileSelected.AddObserver(ChangeActiveTile);
@@ -75,6 +76,6 @@ public partial class EditorPreview : MarginContainer, IState
       ActiveTile.SelectButton.Modulate = Colors.White;
     tileMapTile.SelectButton.Modulate = new(r: 0, g: 2, b: 0);
     ActiveTile = tileMapTile;
-    Editor.Logger.Log($"Changed active tile: {tileMapTile.NameLabel.Text}");
+    GodotLogger.Logger.Log($"Changed active tile: {tileMapTile.NameLabel.Text}");
   }
 }

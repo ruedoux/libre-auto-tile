@@ -9,9 +9,7 @@ public class AutoTileMap : Node2D
   private readonly AutoTileDrawer autoTileDrawer;
   private readonly int tileSize;
 
-  public AutoTileMap(
-    uint layerCount,
-    AutoTileConfiguration autoTileConfiguration)
+  public AutoTileMap(uint layerCount, AutoTileConfiguration autoTileConfiguration)
   {
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration);
     tileMapWrapper = new(autoTileConfiguration);
@@ -36,7 +34,7 @@ public class AutoTileMap : Node2D
   public void Wait()
     => autoTileDrawer.Wait();
 
-  public void DrawTilesAsync(int layer, (Vector2I Position, int TileId)[] positionToTileIds)
+  public void DrawTilesAsync(int layer, IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
   {
     var positionToTileIdsConverted = positionToTileIds
       .Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))
@@ -44,7 +42,7 @@ public class AutoTileMap : Node2D
     autoTileDrawer.DrawTilesAsync(layer, positionToTileIdsConverted);
   }
 
-  public void DrawTiles(int layer, (Vector2I Position, int TileId)[] positionToTileIds)
+  public void DrawTiles(int layer, IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
   {
     var positionToTileIdsConverted = positionToTileIds
       .Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))

@@ -118,13 +118,13 @@ class MockedTileMapDrawer : ITileMapDrawer
       dataLayer.Clear();
   }
 
-  public void ClearTiles(int layer, Vector2[] positions)
+  public void ClearTiles(int layer, IEnumerable<Vector2> positions)
   {
     foreach (var position in positions)
       Data[layer].Remove(position);
   }
 
-  public void DrawTiles(int tileLayer, KeyValuePair<Vector2, TileData>[] positionsToTileData)
+  public void DrawTiles(int tileLayer, IEnumerable<(Vector2 Position, TileData TileData)> positionsToTileData)
   {
     foreach (var (position, tileData) in positionsToTileData)
       Data[tileLayer][position] = tileData;
