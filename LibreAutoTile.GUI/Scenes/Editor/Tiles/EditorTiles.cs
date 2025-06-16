@@ -38,11 +38,11 @@ public partial class EditorTiles : MarginContainer, IState
 
   public void ClearAll()
   {
-    Editor.Logger.Log("> Starting clearing tiles");
+    GodotLogger.Logger.Log("> Starting clearing tiles");
     foreach (var guiTile in CreatedTiles)
       RemoveTile(guiTile.TileName);
     ActiveTile = null;
-    Editor.Logger.Log("> Finished clearing tiles");
+    GodotLogger.Logger.Log("> Finished clearing tiles");
   }
 
   public Dictionary<string, Color> GetTileNamesToColors()
@@ -60,12 +60,12 @@ public partial class EditorTiles : MarginContainer, IState
   {
     if (CreatedTiles.Any(guiTile => guiTile.TileId == tileId))
     {
-      Editor.Logger.LogError($"Cannot create tile with already taken id: '{tileId}'");
+      GodotLogger.Logger.LogError($"Cannot create tile with already taken id: '{tileId}'");
       return;
     }
     if (CreatedTiles.Any(guiTile => guiTile.TileName == tileName))
     {
-      Editor.Logger.LogError($"Cannot create tile with already taken name: '{tileName}'");
+      GodotLogger.Logger.LogError($"Cannot create tile with already taken name: '{tileName}'");
       return;
     }
 
@@ -83,7 +83,7 @@ public partial class EditorTiles : MarginContainer, IState
     tileInstance.ColorPickerButton.ColorChanged += TileColorChanged.NotifyObservers;
 
     CreatedTiles.Add(tileInstance);
-    Editor.Logger.Log($"Added new tile: {tileName}");
+    GodotLogger.Logger.Log($"Added new tile: {tileName}");
   }
 
   private void AddTile()
@@ -106,7 +106,7 @@ public partial class EditorTiles : MarginContainer, IState
     tile.SelectButton.Modulate = new(r: 0, g: 2, b: 0);
     ActiveTile = tile;
     ChangedActiveTile.NotifyObservers(tile);
-    Editor.Logger.Log($"Changed active tile: {tile.TileName}");
+    GodotLogger.Logger.Log($"Changed active tile: {tile.TileName}");
   }
 
   private void TryChangeTileName(Tuple<GuiTile, string> tileAndName)
@@ -125,7 +125,7 @@ public partial class EditorTiles : MarginContainer, IState
 
     tile.TileName = newTileName;
     tile.TileNameEdit.Text = newTileName;
-    Editor.Logger.Log($"Changed tile name from {oldTileName} to {newTileName}");
+    GodotLogger.Logger.Log($"Changed tile name from {oldTileName} to {newTileName}");
   }
 
   private void RemoveTile(string tileName)
@@ -133,7 +133,7 @@ public partial class EditorTiles : MarginContainer, IState
     var tileToDelete = CreatedTiles.FirstOrDefault(guiTile => guiTile.TileName == tileName);
     if (tileToDelete is null)
     {
-      Editor.Logger.Log($"Tile cannot be deleted, tile name not found: '{tileName}'");
+      GodotLogger.Logger.Log($"Tile cannot be deleted, tile name not found: '{tileName}'");
       return;
     }
 
@@ -145,7 +145,7 @@ public partial class EditorTiles : MarginContainer, IState
 
     if (tileToDelete == ActiveTile)
       ActiveTile = null;
-    Editor.Logger.Log($"Removed tile {tileName}");
+    GodotLogger.Logger.Log($"Removed tile {tileName}");
   }
 
   private int GetNextFreeTileId()

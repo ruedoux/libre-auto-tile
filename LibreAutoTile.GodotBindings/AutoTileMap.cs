@@ -9,9 +9,7 @@ public class AutoTileMap : Node2D
   private readonly AutoTileDrawer autoTileDrawer;
   private readonly int tileSize;
 
-  public AutoTileMap(
-    uint layerCount,
-    AutoTileConfiguration autoTileConfiguration)
+  public AutoTileMap(uint layerCount, AutoTileConfiguration autoTileConfiguration)
   {
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration);
     tileMapWrapper = new(autoTileConfiguration);

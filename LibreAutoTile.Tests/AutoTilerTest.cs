@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.SimpleTest;
 
@@ -8,6 +7,14 @@ namespace Qwaitumin.LibreAutoTile.Tests;
 [SimpleTestClass]
 public class AutoTilerTest
 {
+  private string jsonString = "";
+
+  [SimpleBeforeAll]
+  public void BeforeAll()
+  {
+    jsonString = File.ReadAllText("../resources/configurations/ExampleConfigurationTransient.json");
+  }
+
   [SimpleTestMethod]
   public void PlaceTile_CorrectlyPlacesTile_WhenCalled()
   {
@@ -89,7 +96,6 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesSingleTileTransientFilledSquare_WhenCalled()
   {
     // Given
-    var jsonString = File.ReadAllText("resources/AutoTileConfigurationTransient.json");
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration, false);
@@ -157,7 +163,6 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesSingleTileTransientEmptySquare_WhenCalled()
   {
     // Given
-    var jsonString = File.ReadAllText("resources/AutoTileConfigurationTransient.json");
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration, false);
@@ -216,7 +221,6 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesMultipleTileTransientFilledSquare_WhenCalled()
   {
     // Given
-    var jsonString = File.ReadAllText("resources/AutoTileConfigurationTransient.json");
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration, false);
@@ -288,7 +292,6 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesMultipleTileTransientEmptySquare_WhenCalled()
   {
     // Given
-    var jsonString = File.ReadAllText("resources/AutoTileConfigurationTransient.json");
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration, false);
