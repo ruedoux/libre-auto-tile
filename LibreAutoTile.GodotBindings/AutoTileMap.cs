@@ -11,6 +11,11 @@ public class AutoTileMap : Node2D
 
   public AutoTileMap(uint layerCount, AutoTileConfiguration autoTileConfiguration)
   {
+    foreach (var (_, tileDefinition) in autoTileConfiguration.TileDefinitions)
+      foreach (var (imageFileName, _) in tileDefinition.ImageFileNameToTileMaskDefinition)
+        if (!File.Exists(imageFileName))
+          throw new FileNotFoundException($"File defined in configuration does not exist: '{imageFileName}'");
+
     AutoTilerComposer autoTilerComposer = new(autoTileConfiguration);
     tileMapWrapper = new(autoTileConfiguration);
     autoTileDrawer = new(
