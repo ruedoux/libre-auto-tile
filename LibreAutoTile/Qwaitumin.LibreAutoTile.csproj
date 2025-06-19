@@ -12,16 +12,20 @@
     <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
   <PropertyGroup>
     <PackageId>Qwaitumin.LibreAutoTile</PackageId>
-    <Version>1.0.0-alpha1</Version>
-    <Authors>Ruedoux</Authors>
-    <PackageReadmeFile>../README.md</PackageReadmeFile>
-    <PackageLicenseFile>../LICENSE.txt</PackageLicenseFile>
+    <Version>1.0.0-alpha.1</Version>
+    <Authors>ruedoux</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Description>Autotile algorithm implementation</Description>
-    <RepositoryUrl>https://github.com/ruedoux/autotile</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ruedoux/libre-auto-tile/tree/main</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>auto tile libreautotile autotile libre</PackageTags>
   </PropertyGroup>
 

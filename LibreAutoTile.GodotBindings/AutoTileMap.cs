@@ -33,6 +33,9 @@ public class AutoTileMap : Node2D
     return new Vector2I(tileXScaledDown, tileYScaledDown);
   }
 
+  public TileData GetTile(int layer, Vector2I position)
+    => autoTileDrawer.GetTile(layer, GodotTypeMapper.Map(position));
+
   public void Clear()
     => autoTileDrawer.Clear();
 

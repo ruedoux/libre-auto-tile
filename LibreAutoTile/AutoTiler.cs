@@ -24,29 +24,41 @@ public struct TileData
     => $"\"CentreTileId\":{CentreTileId}, \"TileMask\":{TileMask}, \"TileAtlas\":{TileAtlas}";
 }
 
+/// <summary>
+/// Class that manages auto tiling. Thread safe.
+/// </summary>
 public class AutoTiler
 {
   public static readonly Vector2[] CELL_SURROUNDING_DIRECTIONS = [
       Vector2.TopLeft, Vector2.Top, Vector2.TopRight, Vector2.Right, Vector2.BottomRight, Vector2.Bottom, Vector2.BottomLeft, Vector2.Left ];
 
   private readonly FrozenDictionary<int, TileMaskSearcher> tileIdToTileMaskSearcher;
-  private readonly ConcurrentDictionary<Vector2, TileData>[] data;
+  private readonly Dictionary<Vector2, TileData>[] data;
+  private readonly ReaderWriterLockSlim _lock = new();
 
   public AutoTiler(uint layerCount, Dictionary<int, TileMaskSearcher> tileIdToTileMaskSearcher)
   {
     if (layerCount < 1)
       throw new ArgumentException($"Layer count must be higher than 1, given: {layerCount}");
 
-    data = new ConcurrentDictionary<Vector2, TileData>[layerCount];
+    data = new Dictionary<Vector2, TileData>[layerCount];
     for (int layer = 0; layer < data.Length; layer++)
-      data[layer] = new();
+      data[layer] = [];
     this.tileIdToTileMaskSearcher = tileIdToTileMaskSearcher.ToFrozenDictionary();
   }
 
   public void Clear()
   {
-    for (int i = 0; i < data.Length; i++)
-      data[i].Clear();
+    _lock.EnterWriteLock();
+    try
+    {
+      for (int i = 0; i < data.Length; i++)
+        data[i].Clear();
+    }
+    finally
+    {
+      _lock.ExitWriteLock();
+    }
   }
 
   public int GetLayerCount()
@@ -55,13 +67,29 @@ public class AutoTiler
   public Vector2[] GetAllPositions(int layer)
   {
     ValidateLayer(layer);
-    return [.. data[layer].Keys];
+    _lock.EnterReadLock();
+    try
+    {
+      return [.. data[layer].Keys];
+    }
+    finally
+    {
+      _lock.ExitReadLock();
+    }
   }
 
   public TileData GetTile(int layer, Vector2 position)
   {
     ValidateLayer(layer);
-    return GetTileDataAt(layer, position);
+    _lock.EnterReadLock();
+    try
+    {
+      return GetTileDataAt(layer, position);
+    }
+    finally
+    {
+      _lock.ExitReadLock();
+    }
   }
 
   public void PlaceTile(int layer, Vector2 position, int tileId)
@@ -69,26 +97,34 @@ public class AutoTiler
     ValidateLayer(layer);
     ValidateTileId(tileId);
 
-    if (tileId < 0)
-      data[layer].TryRemove(position, out _);
-    else
+    _lock.EnterWriteLock();
+    try
     {
-      int[] tileMaskArray = new int[8];
-      for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
+      if (tileId < 0)
+        data[layer].Remove(position, out _);
+      else
       {
-        var surroundingTileData = GetTileDataAt(layer, position + CELL_SURROUNDING_DIRECTIONS[i]);
-        var surroundingTileId = surroundingTileData.CentreTileId;
-        tileMaskArray[i] = surroundingTileId;
+        int[] tileMaskArray = new int[8];
+        for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
+        {
+          var surroundingTileData = GetTileDataAt(layer, position + CELL_SURROUNDING_DIRECTIONS[i]);
+          var surroundingTileId = surroundingTileData.CentreTileId;
+          tileMaskArray[i] = surroundingTileId;
+        }
+
+        TileMask tileMask = FromArray(tileMaskArray);
+        var bestMatch = tileIdToTileMaskSearcher[tileId].FindBestMatch(tileMask);
+        data[layer][position] = new(
+          tileId, tileMask, bestMatch.TileAtlas);
       }
 
-      TileMask tileMask = FromArray(tileMaskArray);
-      var bestMatch = tileIdToTileMaskSearcher[tileId].FindBestMatch(tileMask);
-      data[layer][position] = new(
-        tileId, tileMask, bestMatch.TileAtlas);
+      for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
+        UpdateTileRelative(layer, position, (SurroundingDirection)i);
     }
-
-    for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
-      UpdateTileRelative(layer, position, (SurroundingDirection)i);
+    finally
+    {
+      _lock.ExitWriteLock();
+    }
   }
 
 

@@ -108,6 +108,9 @@ class IndexSearcher(int itemCount)
   }
 }
 
+/// <summary>
+/// Finds best fitting atlas for a provided mask. Thread safe.
+/// </summary>
 public class TileMaskSearcher
 {
   public const int WILD_CARD_ID = -2;
