@@ -36,6 +36,13 @@ dotnet add package Qwaitumin.LibreAutoTile.GodotBindings --version 1.0.0-alpha.1
 dotnet add package Qwaitumin.LibreAutoTile --version 1.0.0-alpha.3
 ```
 
+> Note: Library is meant for:
+
+```xml
+<TargetFramework>net9.0</TargetFramework>
+<LangVersion>12.0</LangVersion>
+```
+
 ## Game Engine Integration
 
 Currently, only Godot engine bindings are supported. Contributions for other game engine bindings are welcome.
