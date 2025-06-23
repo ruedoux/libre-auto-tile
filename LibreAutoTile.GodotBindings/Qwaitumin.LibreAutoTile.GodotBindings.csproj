@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <NoWarn>IDE0130;NU1605</NoWarn>
     <IsAotCompatible>true</IsAotCompatible>
+    <RootNamespace>Qwaitumin.LibreAutoTile.GodotBingings</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

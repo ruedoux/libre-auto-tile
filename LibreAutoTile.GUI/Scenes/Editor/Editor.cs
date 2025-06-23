@@ -260,8 +260,8 @@ public partial class Editor : Control
     editorOptions.ConfigurationUiContainer.Hide();
     cameraControl.View = new(-int.MaxValue / 2, -int.MaxValue / 2, int.MaxValue, int.MaxValue);
     cameraControl.Position = Godot.Vector2.Zero;
-
-    editorPreview.InitializeTileMap(ExtractAutoTileConfiguration());
+    AutoTileConfiguration autoTileConfiguration = ExtractAutoTileConfiguration();
+    editorPreview.InitializeTileMap(autoTileConfiguration);
     AddChild(editorPreview.AutoTileMap);
     if (editorPreview.AutoTileMap is not null)
       editorPreview.AutoTileMap.Scale = new(IMAGE_SCALING, IMAGE_SCALING);

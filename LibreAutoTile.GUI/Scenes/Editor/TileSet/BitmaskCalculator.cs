@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Qwaitumin.LibreAutoTile.Tiling;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
 

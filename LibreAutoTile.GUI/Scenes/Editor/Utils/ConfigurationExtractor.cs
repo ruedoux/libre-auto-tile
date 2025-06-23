@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
+using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
+using Qwaitumin.LibreAutoTile.Tiling;
 
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
@@ -38,7 +40,7 @@ public static class ConfigurationExtractor
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
       editorTiles.AddTile((int)tileId, tileDefinition.Name, GodotTypeMapper.Map(tileDefinition.Color));
 
-    Dictionary<string, Dictionary<Configuration.Vector3, GuiTileData>> imageFileNameToMappedTileData = [];
+    Dictionary<string, Dictionary<Configuration.Models.Vector3, GuiTileData>> imageFileNameToMappedTileData = [];
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {
       foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
@@ -95,7 +97,7 @@ public static class ConfigurationExtractor
     Dictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition = [];
     foreach (var (fileName, positionToTileData) in editorContext.TileDatabase.GetAll())
     {
-      Dictionary<Configuration.Vector3, List<int[]>> positionsToTileMaskDefinitions = [];
+      Dictionary<Configuration.Models.Vector3, List<int[]>> positionsToTileMaskDefinitions = [];
       foreach (var (position, tileData) in positionToTileData)
       {
         foreach (var (layer, fullTileMask) in tileData.LayerFullTileMask)
@@ -104,7 +106,7 @@ public static class ConfigurationExtractor
           var tileMask = fullTileMask.TileMask;
           if (centreTileId != tileId) continue;
 
-          var positionWithLayer = Configuration.Vector3.From(
+          var positionWithLayer = Configuration.Models.Vector3.From(
             GodotTypeMapper.Map(position), layer);
           if (!positionsToTileMaskDefinitions.TryGetValue(positionWithLayer, out var tileMasks))
           {

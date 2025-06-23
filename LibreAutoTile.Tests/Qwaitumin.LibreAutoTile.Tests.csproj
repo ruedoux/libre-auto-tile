@@ -11,8 +11,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>12.0</LangVersion>
-    <NoWarn>NU1605</NoWarn>
+    <NoWarn>NU1605;IDE0130</NoWarn>
     <IsAotCompatible>true</IsAotCompatible>
+    <RootNamespace>Qwaitumin.LibreAutoTile.Tests</RootNamespace>
   </PropertyGroup>
 
 </Project>
