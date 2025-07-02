@@ -17,34 +17,17 @@ public interface ITileMapDrawer
 /// </summary>
 public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
 {
-  private readonly HashSet<Task> tasks = [];
-  private readonly object taskLock = new();
-
   public void Clear()
-    => autoTiler.Clear();
-
-  public void Wait()
   {
-    Task[] tasksCopy;
-    lock (taskLock)
-    {
-      tasksCopy = [.. tasks];
-    }
-    Task.WhenAll(tasksCopy).Wait();
-    ClearFinishedTasks();
+    tileMapDrawer.Clear();
+    autoTiler.Clear();
   }
 
   public TileData GetTile(int layer, Vector2 position)
     => autoTiler.GetTile(layer, position);
 
-  public void DrawTilesAsync(int layer, IEnumerable<(Vector2 Position, int TileId)> positionToTileIds)
-  {
-    ClearFinishedTasks();
-    lock (taskLock)
-    {
-      tasks.Add(Task.Run(() => DrawTiles(layer, positionToTileIds)));
-    }
-  }
+  public async Task DrawTilesAsync(int layer, IEnumerable<(Vector2 Position, int TileId)> positionToTileIds)
+    => await Task.Run(() => DrawTiles(layer, positionToTileIds));
 
   public void DrawTiles(int layer, IEnumerable<(Vector2 Position, int TileId)> positionToTileIds)
   {
@@ -65,14 +48,5 @@ public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
       tileLayerToData.Add(new(position, autoTiler.GetTile(tileLayer, position)));
 
     tileMapDrawer.DrawTiles(tileLayer, [.. tileLayerToData]);
-  }
-
-  private void ClearFinishedTasks()
-  {
-    lock (taskLock)
-    {
-      foreach (var task in tasks.Where(task => task.IsCompleted).ToList())
-        tasks.Remove(task);
-    }
   }
 }

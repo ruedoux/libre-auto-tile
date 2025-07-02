@@ -3,8 +3,8 @@
   "TileDefinitions": {
     "0": {
       "ImageFileNameToTileMaskDefinition": {
-        "resources/Grass.png": { "AtlasPositionToTileMasks": {} },
-        "resources/Fences.png": {
+        "../resources/Grass.png": { "AtlasPositionToTileMasks": {} },
+        "../resources/Fences.png": {
           "AtlasPositionToTileMasks": {
             "(0,1,0)": [[-1, 0, -1, -1, -1, 0, -1, -1]],
             "(3,2,0)": [[-1, 0, -1, -1, -1, -1, -1, 0]],
@@ -24,14 +24,14 @@
             "(0,0,0)": [[-1, -1, -1, -1, -1, 0, -1, -1]]
           }
         },
-        "resources/TwoSets.png": { "AtlasPositionToTileMasks": {} }
+        "../resources/TwoSets.png": { "AtlasPositionToTileMasks": {} }
       },
       "Name": "Fence",
       "Color": "(150,218,181,178)"
     },
     "1": {
       "ImageFileNameToTileMaskDefinition": {
-        "resources/Grass.png": {
+        "../resources/Grass.png": {
           "AtlasPositionToTileMasks": {
             "(7,4,0)": [[-1, 1, -1, -1, -1, 1, -1, 1]],
             "(7,0,0)": [[-1, -1, -1, -1, -1, 1, -1, 1]],
@@ -84,17 +84,17 @@
             "(0,0,0)": [[-1, -1, -1, 1, 1, 1, -1, -1]]
           }
         },
-        "resources/Fences.png": { "AtlasPositionToTileMasks": {} },
-        "resources/TwoSets.png": { "AtlasPositionToTileMasks": {} }
+        "../resources/Fences.png": { "AtlasPositionToTileMasks": {} },
+        "../resources/TwoSets.png": { "AtlasPositionToTileMasks": {} }
       },
       "Name": "Grass",
       "Color": "(167,58,145,178)"
     },
     "2": {
       "ImageFileNameToTileMaskDefinition": {
-        "resources/Grass.png": { "AtlasPositionToTileMasks": {} },
-        "resources/Fences.png": { "AtlasPositionToTileMasks": {} },
-        "resources/TwoSets.png": {
+        "../resources/Grass.png": { "AtlasPositionToTileMasks": {} },
+        "../resources/Fences.png": { "AtlasPositionToTileMasks": {} },
+        "../resources/TwoSets.png": {
           "AtlasPositionToTileMasks": {
             "(7,4,0)": [[-1, 2, -1, 2, -1, -1, -1, 2]],
             "(4,5,0)": [[-1, 2, -1, 2, -1, -1, -1, -1]],
@@ -151,9 +151,9 @@
     },
     "3": {
       "ImageFileNameToTileMaskDefinition": {
-        "resources/Grass.png": { "AtlasPositionToTileMasks": {} },
-        "resources/Fences.png": { "AtlasPositionToTileMasks": {} },
-        "resources/TwoSets.png": {
+        "../resources/Grass.png": { "AtlasPositionToTileMasks": {} },
+        "../resources/Fences.png": { "AtlasPositionToTileMasks": {} },
+        "../resources/TwoSets.png": {
           "AtlasPositionToTileMasks": {
             "(13,1,0)": [[-1, 3, 3, 3, 3, 3, 3, 3]],
             "(15,1,0)": [[3, 3, -1, 3, 3, 3, -1, 3]],

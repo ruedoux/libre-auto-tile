@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://bwtlxe3l1rsh1"]
 
 [ext_resource type="Script" uid="uid://bksen8in7ky54" path="res://Scenes/Editor/Editor.cs" id="1_fov24"]
-[ext_resource type="FontFile" uid="uid://da3uql1vplvrw" path="res://resources/SpaceMono-Regular.ttf" id="2_3uwva"]
+[ext_resource type="FontFile" uid="uid://2cika1jlvtuc" path="res://resources/SpaceMono-Regular.ttf" id="2_3uwva"]
 [ext_resource type="Script" uid="uid://brul1rr1v7a23" path="res://Scenes/Editor/Options/EditorOptions.cs" id="2_lixid"]
 [ext_resource type="Script" uid="uid://dn0j51c1qgmp4" path="res://Scenes/Editor/Settings/EditorSettings.cs" id="2_qcnmo"]
 [ext_resource type="Script" uid="uid://cfe53ulh582jj" path="res://Scenes/Editor/Tiles/EditorTiles.cs" id="5_alqnb"]

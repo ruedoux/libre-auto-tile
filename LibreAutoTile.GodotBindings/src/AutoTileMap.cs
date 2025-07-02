@@ -6,7 +6,7 @@ namespace Qwaitumin.LibreAutoTile.GodotBindings;
 
 public class AutoTileMap : Node2D
 {
-  private readonly TileMapWrapper tileMapWrapper;
+  private readonly TileMapWrapper[] tileMapWrappers;
   private readonly AutoTileDrawer autoTileDrawer;
   private readonly int tileSize;
 
@@ -17,13 +17,18 @@ public class AutoTileMap : Node2D
         if (!File.Exists(imageFileName))
           throw new FileNotFoundException($"File defined in configuration does not exist: '{imageFileName}'");
 
-    tileMapWrapper = new(autoTileConfiguration);
+    tileMapWrappers = new TileMapWrapper[layerCount];
+    for (int layer = 0; layer < layerCount; layer++)
+    {
+      TileMapWrapper tileMapWrapper = new(autoTileConfiguration);
+      tileMapWrappers[layer] = tileMapWrapper;
+      AddChild(tileMapWrapper.TileMapLayer);
+    }
+
     autoTileDrawer = new(
-      new TileMapDrawer(tileMapWrapper),
+      new TileMapDrawer(this.tileMapWrappers),
       new AutoTiler(layerCount, autoTileConfiguration));
     tileSize = autoTileConfiguration.TileSize;
-
-    AddChild(tileMapWrapper.TileMapLayer);
   }
 
   public Vector2I WorldToMap(Godot.Vector2 worldPosition)
@@ -39,16 +44,18 @@ public class AutoTileMap : Node2D
   public void Clear()
     => autoTileDrawer.Clear();
 
-  public void Wait()
-    => autoTileDrawer.Wait();
+  public int GetLayerCount()
+    => tileMapWrappers.Length;
 
-  public void DrawTilesAsync(int layer, IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
+  public TileMapLayer GetTileMapLayer(int layer)
   {
-    var positionToTileIdsConverted = positionToTileIds
-      .Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))
-      .ToArray();
-    autoTileDrawer.DrawTilesAsync(layer, positionToTileIdsConverted);
+    if (tileMapWrappers.Length <= layer)
+      throw new IndexOutOfRangeException($"Layer does not exist: {layer}");
+    return tileMapWrappers[layer].TileMapLayer;
   }
+
+  public async Task DrawTilesAsync(int layer, IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
+    => await Task.Run(() => DrawTiles(layer, positionToTileIds));
 
   public void DrawTiles(int layer, IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
   {
@@ -64,12 +71,10 @@ public class AutoTileMap : Node2D
     autoTileDrawer.UpdateTiles(tileLayer, positionsConverted);
   }
 
-  public TileMapLayer GetTileMapLayer()
-    => tileMapWrapper.TileMapLayer;
-
   public new void QueueFree()
   {
-    tileMapWrapper.TileMapLayer.QueueFree();
+    foreach (var tileMapWrapper in tileMapWrappers)
+      tileMapWrapper.TileMapLayer.QueueFree();
     base.QueueFree();
   }
 }

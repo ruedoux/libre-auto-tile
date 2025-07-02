@@ -2,16 +2,25 @@ using Godot;
 
 namespace Qwaitumin.LibreAutoTile.GodotBindings;
 
-internal class TileMapDrawer(TileMapWrapper tileMapWrapper) : ITileMapDrawer
+internal class TileMapDrawer(TileMapWrapper[] tileMapWrappers) : ITileMapDrawer
 {
-  private readonly TileMapWrapper tileMapWrapper = tileMapWrapper;
+  private readonly TileMapWrapper[] tileMapWrappers = tileMapWrappers;
 
   public void Clear()
-    => Callable.From(tileMapWrapper.TileMapLayer.Clear).CallDeferred();
+  {
+    Callable.From(() =>
+    {
+      foreach (var tileMapWrapper in tileMapWrappers)
+        tileMapWrapper.TileMapLayer.Clear();
+    }).CallDeferred();
+  }
 
   public void DrawTiles(
     int tileLayer, IEnumerable<(Configuration.Models.Vector2, Tiling.TileData)> positionsToTileData)
   {
+    if (tileLayer >= tileMapWrappers.Length)
+      throw new ArgumentException($"No layer: {tileLayer}");
+
     Callable.From(() =>
     {
       foreach (var (position, tileData) in positionsToTileData)
@@ -20,14 +29,14 @@ internal class TileMapDrawer(TileMapWrapper tileMapWrapper) : ITileMapDrawer
         var sourceId = -1;
         if (tileData.TileAtlas.ImageFileName is not null && tileData.TileAtlas.ImageFileName != "")
         {
-          if (tileMapWrapper.ImageFileToSourceId.TryGetValue(tileData.TileAtlas.ImageFileName, out int overrideSourceId))
+          if (tileMapWrappers[tileLayer].ImageFileToSourceId.TryGetValue(tileData.TileAtlas.ImageFileName, out int overrideSourceId))
           {
             atlasCoords = GodotTypeMapper.Map(tileData.TileAtlas.Position);
             sourceId = overrideSourceId;
           }
         }
 
-        tileMapWrapper.TileMapLayer.SetCell(GodotTypeMapper.Map(position), sourceId, atlasCoords);
+        tileMapWrappers[tileLayer].TileMapLayer.SetCell(GodotTypeMapper.Map(position), sourceId, atlasCoords);
       }
     }).CallDeferred();
   }

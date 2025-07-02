@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dbb4jshyysk6f"]
 
 [ext_resource type="Script" uid="uid://c5l4hj1b3xn8a" path="res://Scenes/Utils/MouseLabel.cs" id="1_f6wrf"]
-[ext_resource type="FontFile" uid="uid://da3uql1vplvrw" path="res://resources/SpaceMono-Regular.ttf" id="2_7yknh"]
+[ext_resource type="FontFile" uid="uid://2cika1jlvtuc" path="res://resources/SpaceMono-Regular.ttf" id="2_7yknh"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exv8m"]
 bg_color = Color(0.137551, 0.137551, 0.137551, 1)

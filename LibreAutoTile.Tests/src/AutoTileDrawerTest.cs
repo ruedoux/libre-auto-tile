@@ -38,7 +38,7 @@ public class AutoTileDrawerTest
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);
 
     // When
-    autoTileDrawer.DrawTilesAsync(0, Helpers.GetMockedPositionsToTileIds(positions));
+    var _ = autoTileDrawer.DrawTilesAsync(0, Helpers.GetMockedPositionsToTileIds(positions));
 
     // Then
     Assertions.AssertAwaitAtMost(100, () => // 100ms is more than enough for 16x16 tiles
@@ -59,8 +59,8 @@ public class AutoTileDrawerTest
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);
 
     // When
-    autoTileDrawer.DrawTilesAsync(0, Helpers.GetMockedPositionsToTileIds(positions));
-    autoTileDrawer.Wait();
+    var task = autoTileDrawer.DrawTilesAsync(0, Helpers.GetMockedPositionsToTileIds(positions));
+    task.Wait();
 
     // Then
     foreach (var position in positions)

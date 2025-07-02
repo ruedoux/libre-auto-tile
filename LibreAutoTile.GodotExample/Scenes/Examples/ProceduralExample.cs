@@ -11,7 +11,7 @@ public partial class ProceduralExample : Node2D
 {
   enum TILES { GRASS = 0, WATER = 1 }
 
-  const string CONFIG_PATH = "resources/configurations/ExampleConfigurationTransient.json";
+  const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
   const int LAYER = 0;
 
   public override void _Ready()

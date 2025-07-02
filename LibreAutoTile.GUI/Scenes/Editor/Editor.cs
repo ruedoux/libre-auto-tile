@@ -11,7 +11,6 @@ using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
-using Qwaitumin.Logging;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor;
 

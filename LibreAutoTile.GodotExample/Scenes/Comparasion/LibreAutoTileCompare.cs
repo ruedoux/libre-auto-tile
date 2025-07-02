@@ -9,7 +9,7 @@ namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes.Comparasion;
 
 public partial class LibreAutoTileCompare : Node2D
 {
-  const string CONFIG_PATH = "resources/configurations/ExampleConfigurationTransient.json";
+  const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
   const int LAYER = 0;
 
   private readonly Vector2I mapSize = new(512, 512);
