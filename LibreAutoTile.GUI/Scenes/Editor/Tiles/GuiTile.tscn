@@ -48,7 +48,7 @@ text = "↓"
 layout_mode = 2
 focus_mode = 0
 theme_override_fonts/font = ExtResource("2_w5ugi")
-text = "✓"
+text = "o"
 
 [node name="Fields" type="VBoxContainer" parent="Panel/H"]
 layout_mode = 2
