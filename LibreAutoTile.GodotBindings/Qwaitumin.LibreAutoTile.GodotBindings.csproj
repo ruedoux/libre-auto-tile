@@ -22,7 +22,6 @@
 
   <PropertyGroup>
     <PackageId>Qwaitumin.LibreAutoTile.GodotBindings</PackageId>
-    <Version>1.0.0-alpha.4</Version>
     <Authors>ruedoux</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

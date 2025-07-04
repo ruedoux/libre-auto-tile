@@ -1,14 +1,14 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 shopt -s globstar
 
 info() {
-  echo "[INFO] - $@"
+  echo "[INFO] - $@" 
 }
 
 error() {
-  echo "[ERRO] - $@"
+  echo "[ERRO] - $@" >&2
 }
 
 build_gui() {
@@ -21,23 +21,23 @@ build_gui() {
       wget -O rcedit-x64.exe https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe
   fi
 
-  mkdir -p $GUI_LINUX_TEMP
-  mkdir -p $GUI_WINDOWS_TEMP
+  mkdir -p "$GUI_LINUX_TEMP"
+  mkdir -p "$GUI_WINDOWS_TEMP"
 
   info "Building GUI export for Linux"
-  if ! godot --path LibreAutoTile.GUI --verbose --headless --export-release "Linux" $GUI_LINUX_TEMP/LibreAutoTile.GUI.exe; then
+  if ! godot --path LibreAutoTile.GUI --verbose --headless --export-release "Linux" "$GUI_LINUX_TEMP"/LibreAutoTile.GUI; then
       error "Godot linux export failed"
       exit 1
   fi
 
   info "Building GUI export for Windows"
-  if ! godot --path LibreAutoTile.GUI --verbose --headless --export-release "Windows Desktop" $GUI_WINDOWS_TEMP/LibreAutoTile.GUI.exe; then
+  if ! godot --path LibreAutoTile.GUI --verbose --headless --export-release "Windows Desktop" "$GUI_WINDOWS_TEMP"/LibreAutoTile.GUI.exe; then
       error "Godot windows export failed"
       exit 1
   fi
 
-  tar -czvf $EXPORT_OUTPUT/linux-gui.tar -C "$(dirname "$GUI_LINUX_TEMP")" GUI > /dev/null
-  tar -czvf $EXPORT_OUTPUT/windows-gui.tar -C "$(dirname "$GUI_WINDOWS_TEMP")" GUI > /dev/null
+  tar -czvf "$EXPORT_OUTPUT"/linux-gui.tar.gz -C "$GUI_LINUX_TEMP" . > /dev/null
+  tar -czvf "$EXPORT_OUTPUT"/windows-gui.tar.gz -C "$GUI_WINDOWS_TEMP" . > /dev/null
 }
 
 build_libs() {
@@ -45,22 +45,53 @@ build_libs() {
   info "Dotnet Version"
   dotnet --info
 
-  mkdir -p $LIB_TEMP
+  mkdir -p "$LIB_TEMP"
 
   info "Building libraries"
   rm -rf LibreAutoTile/bin
   rm -rf LibreAutoTile.GodotBindings/bin
 
-  dotnet pack LibreAutoTile -c Release
-  dotnet pack LibreAutoTile.GodotBindings -c Release
+  if [[ -z "${PACKAGE_VERSION:-}" ]]; then
+      PACKAGE_VERSION="0.0.0-debug"
+  fi
 
-  cp LibreAutoTile/bin/Release/**/*.{dll,pdb,json} $LIB_TEMP/ 2>/dev/null || true
-  cp LibreAutoTile.GodotBindings/bin/Release/**/*.{dll,pdb,json} $LIB_TEMP/ 2>/dev/null || true
-  cp LibreAutoTile/bin/Release/*.nupkg $EXPORT_OUTPUT/
-  cp LibreAutoTile.GodotBindings/bin/Release/*.nupkg $EXPORT_OUTPUT/
-
-  tar -czvf $EXPORT_OUTPUT/libs.tar -C "$LIB_TEMP" . > /dev/null
+  dotnet restore
+  dotnet pack LibreAutoTile -c Release -p:PackageVersion="$PACKAGE_VERSION"
+  dotnet pack LibreAutoTile.GodotBindings -c Release -p:PackageVersion="$PACKAGE_VERSION"
+  cp LibreAutoTile/bin/Release/*.nupkg "$EXPORT_OUTPUT"/
+  cp LibreAutoTile.GodotBindings/bin/Release/*.nupkg "$EXPORT_OUTPUT"/
+  
+  find LibreAutoTile/bin/Release/ -type f \( -name "*.dll" -o -name "*.pdb" -o -name "*.json" \) -exec cp {} "$LIB_TEMP/" \;
+  find LibreAutoTile.GodotBindings/bin/Release/ -type f \( -name "*.dll" -o -name "*.pdb" -o -name "*.json" \) -exec cp {} "$LIB_TEMP/" \;
+  tar -czvf "$EXPORT_OUTPUT"/libs.tar -C "$LIB_TEMP" . > /dev/null
 }
+
+publish() {
+    if [[ -z "$NUGET_API_KEY" ]]; then
+        error "NUGET_API_KEY is not set."
+        exit 1
+    fi
+
+    if [[ ! -f release-notes.txt ]]; then
+        error "release-notes.txt not found."
+        exit 1
+    fi
+
+    for pkg in "$EXPORT_OUTPUT"/*.nupkg; do
+        dotnet nuget push "$pkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
+    done
+
+    gh release create "$PACKAGE_VERSION" "$EXPORT_OUTPUT"/* --title "$PACKAGE_VERSION" --notes-file release-notes.txt
+}
+
+help() {
+  echo "Usage: $0 [--build-gui|--build-libs|--build-all|--publish <version>]"
+}
+
+if [[ $# -eq 0 ]]; then
+    help
+    exit 1
+fi
 
 CURRENT_PATH=$(pwd)
 GUI_LINUX_TEMP="$CURRENT_PATH/build/linux/GUI"
@@ -68,23 +99,52 @@ GUI_WINDOWS_TEMP="$CURRENT_PATH/build/windows/GUI"
 LIB_TEMP="$CURRENT_PATH/build/libs"
 EXPORT_OUTPUT="$CURRENT_PATH/build/export"
 
-info "Preparing build directory"
-rm -rf ./build
-mkdir -p $EXPORT_OUTPUT
-
 case "$1" in
     --build-gui)
+        mkdir -p "$EXPORT_OUTPUT"
         build_gui
         ;;
     --build-libs)
+        mkdir -p "$EXPORT_OUTPUT"
         build_libs
         ;;
-    --all)
+    --build-all)
+        mkdir -p "$EXPORT_OUTPUT"
         build_libs
         build_gui
         ;;
+    --publish)
+        if [[ -z "$2" ]]; then
+            echo "Usage: $0 --publish <version>"
+            exit 1
+        fi
+
+        PACKAGE_VERSION="$2"
+        if [[ ! "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9._]+)?$ ]]; then
+            error "Package version must match x.x.x or x.x.x-suffix"
+            exit 1
+        fi
+
+        rm -rf ./build
+        mkdir -p "$EXPORT_OUTPUT"
+        build_libs
+        build_gui
+
+        if [[ "${CI:-}" == "true" ]]; then
+            # CI detected, skip prompts
+            confirm="y"
+        else
+            read -p "Are you sure you want to publish version '$2'? [y/N] " confirm
+        fi
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            echo "Aborted."
+            exit 1
+        fi
+
+        publish "$2"
+        ;;
     *)
-        echo "Usage: $0 [--build-gui|--build-libs|--all]"
+        help
         exit 1
         ;;
 esac

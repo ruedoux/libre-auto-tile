@@ -28,12 +28,12 @@ For creating configuration files, there is a dedicated [GUI](https://github.com/
 
 ```sh
 # For godot bindings (https://www.nuget.org/packages/Qwaitumin.LibreAutoTile.GodotBindings/)
-dotnet add package Qwaitumin.LibreAutoTile.GodotBindings --version 1.0.0-alpha.1
+dotnet add package Qwaitumin.LibreAutoTile.GodotBindings --version 1.0.0-alpha.4
 ```
 
 ```sh
 # For core library (https://www.nuget.org/packages/Qwaitumin.LibreAutoTile/)
-dotnet add package Qwaitumin.LibreAutoTile --version 1.0.0-alpha.3
+dotnet add package Qwaitumin.LibreAutoTile --version 1.0.0-alpha.4
 ```
 
 > Note: Library is meant for:
