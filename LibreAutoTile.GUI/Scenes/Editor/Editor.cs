@@ -3,8 +3,7 @@ using System.IO;
 using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.GUI.Core;
-using Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Options;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Preview;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
@@ -41,6 +40,7 @@ public partial class Editor : Control
     tileDrawer = GodotApi.AddChild<EditorTileDrawer>(this, new());
     mouseLabel = GodotApi.AddChild(this, ResourceLoader.Load<PackedScene>("res://Scenes/Utils/MouseLabel.tscn").Instantiate<MouseLabel>());
     bitmaskContainer = GodotApi.AddChild<BitmaskContainer>(this, new());
+    mouseLabel.Hide();
   }
 
   public override void _Ready()
@@ -118,12 +118,6 @@ public partial class Editor : Control
       mouseLabel.Hide();
       bitmaskContainer.TileSetBitmaskDrawer.HideBitmaskGhost();
     }
-  }
-
-  public override void _PhysicsProcess(double delta)
-  {
-    if (!GodotApi.IsMouseOnElements([.. UiElements]))
-      inputListener.ListenToProcess();
   }
 
   private void ClearBitmasks()
@@ -275,7 +269,7 @@ public partial class Editor : Control
     editorOptions.ImageUiContainer.Show();
     editorOptions.ConfigurationUiContainer.Show();
     cameraControl.View = editorOptions.ImageRectangleObservable.Value;
-    cameraControl.Position = Godot.Vector2.Zero;
+    cameraControl.Position = Vector2.Zero;
     UpdateGrid();
     UpdateBitmask();
 

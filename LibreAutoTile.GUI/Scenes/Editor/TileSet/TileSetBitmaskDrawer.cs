@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;

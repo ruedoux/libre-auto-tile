@@ -81,7 +81,7 @@ publish() {
         dotnet nuget push "$pkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
     done
 
-    gh release create "$PACKAGE_VERSION" "$EXPORT_OUTPUT"/* --title "$PACKAGE_VERSION" --notes-file release-notes.txt
+    gh release create "$PACKAGE_VERSION" "$EXPORT_OUTPUT"/* --title "$PACKAGE_VERSION" --notes-file release-notes.md
 }
 
 help() {

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Linq;
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes.Comparasion;
+namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
 
 public partial class BuiltInCompare : Node2D
 {
@@ -13,7 +13,7 @@ public partial class BuiltInCompare : Node2D
   {
     CameraControl cameraControl = new()
     {
-      View = new(Vector2I.Zero, mapSize * 16)
+      View = new(Vector2I.Zero, Comparasion.MAP_SIZE * 16)
     };
     AddChild(cameraControl);
     Execute();
@@ -29,7 +29,7 @@ public partial class BuiltInCompare : Node2D
     };
     AddChild(tileMapLayer);
 
-    var positionToTileId = Comparasion.GetPositionToTileId(mapSize);
+    var positionToTileId = Comparasion.GetPositionToTileId();
 
     // Just gonna split id 0 and 1 to separate positions
     var positionsGrass = new Godot.Collections.Array<Vector2I>(

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
+namespace Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
 internal class ActionWithCooldown(Action action, long cooldownMs)
 {

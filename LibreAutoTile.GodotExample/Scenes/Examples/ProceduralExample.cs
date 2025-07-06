@@ -5,7 +5,7 @@ using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 
-namespace Qwaitumin.LibreAutoTile.GodotExample;
+namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
 
 public partial class ProceduralExample : Node2D
 {

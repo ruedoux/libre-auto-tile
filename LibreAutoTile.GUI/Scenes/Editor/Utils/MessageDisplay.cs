@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Godot;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
 
@@ -38,7 +39,7 @@ public partial class MessageDisplay : MarginContainer
     int updateIntervalMs = 10)
   {
     if (updateIntervalMs <= 0)
-      throw new ArgumentException($"Update interval must be bigger than 0 but is: {updateIntervalMs}");
+      GodotLogger.LogErrorAndThrow($"Update interval must be bigger than 0 but is: {updateIntervalMs}");
 
     RichTextLabel.Modulate = new Color(1, 1, 1, 1);
     await Task.Delay(holdMs, token);

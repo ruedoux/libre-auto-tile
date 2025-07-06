@@ -1,5 +1,5 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
 

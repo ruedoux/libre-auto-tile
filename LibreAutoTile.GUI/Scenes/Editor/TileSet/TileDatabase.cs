@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using Godot;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;

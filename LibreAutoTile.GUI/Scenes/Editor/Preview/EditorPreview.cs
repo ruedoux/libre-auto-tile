@@ -3,9 +3,8 @@ using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.GodotBindings;
-using Qwaitumin.LibreAutoTile.GUI.Core;
-using Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
-using Qwaitumin.LibreAutoTile.GUI.Core.Signals;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
+using Qwaitumin.LibreAutoTile.GUI.Signals;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Preview;

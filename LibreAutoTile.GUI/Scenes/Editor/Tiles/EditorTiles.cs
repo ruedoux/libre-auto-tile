@@ -1,7 +1,7 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Core;
-using Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
-using Qwaitumin.LibreAutoTile.GUI.Core.Signals;
+using Qwaitumin.LibreAutoTile.GUI;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
+using Qwaitumin.LibreAutoTile.GUI.Signals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,15 +59,9 @@ public partial class EditorTiles : MarginContainer, IState
   public void AddTile(int tileId, string tileName, Color color)
   {
     if (CreatedTiles.Any(guiTile => guiTile.TileId == tileId))
-    {
-      GodotLogger.Logger.LogError($"Cannot create tile with already taken id: '{tileId}'");
-      return;
-    }
+      GodotLogger.LogErrorAndThrow($"Cannot create tile with already taken id: '{tileId}'");
     if (CreatedTiles.Any(guiTile => guiTile.TileName == tileName))
-    {
-      GodotLogger.Logger.LogError($"Cannot create tile with already taken name: '{tileName}'");
-      return;
-    }
+      GodotLogger.LogErrorAndThrow($"Cannot create tile with already taken name: '{tileName}'");
 
     GuiTile tileInstance = tileScene.Instantiate<GuiTile>();
     tileList.AddChild(tileInstance);
@@ -132,10 +126,7 @@ public partial class EditorTiles : MarginContainer, IState
   {
     var tileToDelete = CreatedTiles.FirstOrDefault(guiTile => guiTile.TileName == tileName);
     if (tileToDelete is null)
-    {
-      GodotLogger.Logger.Log($"Tile cannot be deleted, tile name not found: '{tileName}'");
-      return;
-    }
+      GodotLogger.LogErrorAndThrow($"Tile cannot be deleted, tile name not found: '{tileName}'");
 
     tileList.RemoveChild(tileToDelete);
     TileDeleted.NotifyObservers(tileToDelete);

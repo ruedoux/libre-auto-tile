@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
+namespace Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
 public static class GodotApi
 {

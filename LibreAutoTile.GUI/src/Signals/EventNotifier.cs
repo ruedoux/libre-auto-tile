@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Core.Signals;
+namespace Qwaitumin.LibreAutoTile.GUI.Signals;
 
 public class EventNotifier<T>
 {

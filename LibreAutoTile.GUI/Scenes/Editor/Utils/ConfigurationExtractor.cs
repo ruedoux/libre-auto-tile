@@ -6,6 +6,7 @@ using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.GodotBindings;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
 using Qwaitumin.LibreAutoTile.Tiling;
@@ -25,14 +26,15 @@ public static class ConfigurationExtractor
     string filePath, EditorTiles editorTiles, BitmaskContainer bitmaskContainer)
   {
     if (!File.Exists(filePath))
-      throw new FileNotFoundException($"File doesnt exist: '{filePath}'");
+      GodotLogger.LogErrorAndThrow($"File doesnt exist: '{filePath}'");
 
     var jsonString = File.ReadAllText(filePath);
-    var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
-      ?? throw new ArgumentException("Loading json file results in null");
+    var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString);
+    if (autoTileConfiguration is null)
+      GodotLogger.LogErrorAndThrow("Loading json file results in null");
 
     if (autoTileConfiguration.TileDefinitions.Count == 0)
-      throw new ArgumentException("To load you need at least one tile definition");
+      GodotLogger.LogErrorAndThrow("To load you need at least one tile definition");
 
     editorTiles.ClearAll();
     bitmaskContainer.TileDatabase.Clear();

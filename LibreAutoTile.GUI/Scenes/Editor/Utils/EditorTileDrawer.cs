@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Core.GodotBindings;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
 

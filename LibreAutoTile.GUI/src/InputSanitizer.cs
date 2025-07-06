@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Core;
+namespace Qwaitumin.LibreAutoTile.GUI;
 
 public static class InputSanitizer
 {

@@ -1,24 +1,21 @@
-using System;
 using System.Diagnostics;
 using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 
-namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes.Comparasion;
+namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
 
 public partial class LibreAutoTileCompare : Node2D
 {
   const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
   const int LAYER = 0;
 
-  private readonly Vector2I mapSize = new(512, 512);
-
   public override void _Ready()
   {
     CameraControl cameraControl = new()
     {
-      View = new(Vector2I.Zero, mapSize * 16)
+      View = new(Vector2I.Zero, Comparasion.MAP_SIZE * 16)
     };
     AddChild(cameraControl);
     Execute();
@@ -30,7 +27,7 @@ public partial class LibreAutoTileCompare : Node2D
     AutoTileMap autoTileMap = new(1, autoTileConfiguration);
     AddChild(autoTileMap);
 
-    var positionToTileId = Comparasion.GetPositionToTileId(mapSize);
+    var positionToTileId = Comparasion.GetPositionToTileId();
 
     Stopwatch stopwatch = Stopwatch.StartNew();
     autoTileMap.DrawTiles(

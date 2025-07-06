@@ -2,7 +2,7 @@ using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Core;
+namespace Qwaitumin.LibreAutoTile.GUI;
 
 public interface IState
 {

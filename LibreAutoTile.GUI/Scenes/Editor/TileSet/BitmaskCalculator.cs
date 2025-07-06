@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.Tiling;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
@@ -25,7 +26,7 @@ public static class BitmaskCalculator
   {
     int index = Array.FindIndex(BITMASK_POSITIONS, x => x == position);
     if (index <= -1 || index >= 8)
-      throw new ArgumentException($"Position cannot be mapped to tileMask: {position}");
+      GodotLogger.LogErrorAndThrow($"Position cannot be mapped to tileMask: {position}");
     return (TileMask.SurroundingDirection)index;
   }
 
