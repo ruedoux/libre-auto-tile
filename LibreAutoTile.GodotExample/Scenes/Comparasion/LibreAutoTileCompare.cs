@@ -32,6 +32,6 @@ public partial class LibreAutoTileCompare : Node2D
     Stopwatch stopwatch = Stopwatch.StartNew();
     autoTileMap.DrawTiles(
       LAYER, positionToTileId.Select(kv => (Position: kv.Key, TileId: kv.Value)).ToArray());
-    GD.Print($"Rendering the map took: {stopwatch.ElapsedMilliseconds}ms");
+    GD.Print($"Rendering {Comparasion.MAP_SIZE} map took: {stopwatch.ElapsedMilliseconds}ms");
   }
 }

@@ -48,6 +48,8 @@ Use the `build-release.sh` script. On Windows use WSL or compile each project ma
 
 Currently, only Godot engine bindings are supported. Contributions for other game engine bindings are welcome.
 
+Example usage in a live project [here](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAutoTile.GodotExample/Scenes/Examples).
+
 Library bindings draw terrains [10x](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAutoTile.GodotExample/Scenes/Comparasion) faster than godot terrain implementation.
 
 ## Contributions
