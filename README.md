@@ -56,6 +56,6 @@ Library bindings draw terrains [10x](https://github.com/ruedoux/libre-auto-tile/
 
 Anyone is free to contribute. Before creating a large component, please open an issue to ensure it aligns with the project's direction.
 
-## Additional projects
+## Additional Mentions
 
-- Check out [better-terrain](https://github.com/Portponky/better-terrain) for integrated Godot addon
+- Check out [better-terrain](https://github.com/Portponky/better-terrain) which partially inspired this project
