@@ -8,7 +8,7 @@ Godot Bindings implementation for LibreAutoTile. Example usage on live project [
 2. Using NuGet:
 
 ```sh
-dotnet add package Qwaitumin.LibreAutoTile.GodotBindings --version 1.0.0-alpha.1
+dotnet add package Qwaitumin.LibreAutoTile.GodotBindings
 ```
 
 ## Example Usage

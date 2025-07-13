@@ -24,6 +24,11 @@ window/size/viewport_height=720
 
 project/assembly_name="Qwaitumin.LibreAutoTile.GUI"
 
+[filesystem]
+
+import/fbx2gltf/enabled=false
+import/blender/enabled=false
+
 [input]
 
 Test={

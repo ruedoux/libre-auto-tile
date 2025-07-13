@@ -9,6 +9,15 @@ Implementation of an autotile algorithm for tilemaps with JSON configuration, su
 - Game engine-agnostic core library
 - [High performance](https://github.com/ruedoux/libre-auto-tile/blob/main/LibreAutoTile.Benchmarks/README.md)
 
+## Installation
+
+1. Using .csproj repository from repo (recommended for most recent version)
+2. Using NuGet:
+
+```sh
+dotnet add package Qwaitumin.LibreAutoTile
+```
+
 ## Example usage
 
 > Note: `MyTileMap` is your engine’s tilemap implementation. The library only provides the autotiling logic.

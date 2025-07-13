@@ -50,9 +50,6 @@ public sealed class AutoTileConfiguration
           throw new DirectoryNotFoundException($"Image does not exist: {imageFileName}");
   }
 
-  public Dictionary<string, int> GetTileNamesToTileIds()
-    => TileDefinitions.ToDictionary(k => k.Value.Name, v => (int)v.Key);
-
   public string ToJsonString()
     => JsonSerializer.Serialize(this, AutoTileJsonContext.Default.AutoTileConfiguration);
 

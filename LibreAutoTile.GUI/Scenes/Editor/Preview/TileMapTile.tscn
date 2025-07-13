@@ -46,5 +46,8 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ColorRect" type="ColorRect" parent="Panel/H/Fields/Texture"]
+[node name="TextureRect" type="TextureRect" parent="Panel/H/Fields/Texture"]
+texture_filter = 1
 layout_mode = 2
+expand_mode = 1
+stretch_mode = 4

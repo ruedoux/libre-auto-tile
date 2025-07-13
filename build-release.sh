@@ -63,7 +63,7 @@ build_libs() {
   
   find LibreAutoTile/bin/Release/ -type f \( -name "*.dll" -o -name "*.pdb" -o -name "*.json" \) -exec cp {} "$LIB_TEMP/" \;
   find LibreAutoTile.GodotBindings/bin/Release/ -type f \( -name "*.dll" -o -name "*.pdb" -o -name "*.json" \) -exec cp {} "$LIB_TEMP/" \;
-  tar -czvf "$EXPORT_OUTPUT"/libs.tar -C "$LIB_TEMP" . > /dev/null
+  tar -czvf "$EXPORT_OUTPUT"/libs.tar.gz -C "$LIB_TEMP" . > /dev/null
 }
 
 publish() {
@@ -72,8 +72,8 @@ publish() {
         exit 1
     fi
 
-    if [[ ! -f release-notes.txt ]]; then
-        error "release-notes.txt not found."
+    if [[ ! -f release-notes.md ]]; then
+        error "release-notes.md not found."
         exit 1
     fi
 

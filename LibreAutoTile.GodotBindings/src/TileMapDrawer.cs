@@ -40,4 +40,12 @@ internal class TileMapDrawer(TileMapWrapper[] tileMapWrappers) : ITileMapDrawer
       }
     }).CallDeferred();
   }
+
+  public int GetSourceId(string imageFileName)
+  {
+    int sourceId = -1;
+    if (tileMapWrappers[0].ImageFileToSourceId.TryGetValue(imageFileName, out int foundSourceId))
+      return foundSourceId;
+    return sourceId;
+  }
 }

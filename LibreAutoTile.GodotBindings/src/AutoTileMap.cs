@@ -9,6 +9,7 @@ public class AutoTileMap : Node2D
   private readonly TileMapWrapper[] tileMapWrappers;
   private readonly AutoTileDrawer autoTileDrawer;
   private readonly int tileSize;
+  private readonly TileMapDrawer tileMapDrawer;
 
   public AutoTileMap(uint layerCount, AutoTileConfiguration autoTileConfiguration)
   {
@@ -25,9 +26,9 @@ public class AutoTileMap : Node2D
       AddChild(tileMapWrapper.TileMapLayer);
     }
 
+    tileMapDrawer = new TileMapDrawer(tileMapWrappers);
     autoTileDrawer = new(
-      new TileMapDrawer(this.tileMapWrappers),
-      new AutoTiler(layerCount, autoTileConfiguration));
+      tileMapDrawer, new AutoTiler(layerCount, autoTileConfiguration));
     tileSize = autoTileConfiguration.TileSize;
   }
 
@@ -37,6 +38,9 @@ public class AutoTileMap : Node2D
     int tileYScaledDown = (int)Math.Floor(worldPosition.Y / tileSize);
     return new Vector2I(tileXScaledDown, tileYScaledDown);
   }
+
+  public int GetSourceId(string imageFileName)
+    => tileMapDrawer.GetSourceId(imageFileName);
 
   public Tiling.TileData GetTile(int layer, Vector2I position)
     => autoTileDrawer.GetTile(layer, GodotTypeMapper.Map(position));

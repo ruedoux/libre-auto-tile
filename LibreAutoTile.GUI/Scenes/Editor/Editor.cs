@@ -245,7 +245,7 @@ public partial class Editor : Control
 
   private void EnterEditorPreview()
   {
-    editorPreview.AddCreatedTiles(editorTiles.CreatedTiles);
+
     editorLayer.Hide();
     bitmaskContainer.Hide();
     tileDrawer.GridDrawNode.Hide();
@@ -255,6 +255,7 @@ public partial class Editor : Control
     cameraControl.Position = Godot.Vector2.Zero;
     AutoTileConfiguration autoTileConfiguration = ExtractAutoTileConfiguration();
     editorPreview.InitializeTileMap(autoTileConfiguration);
+    editorPreview.AddCreatedTiles(editorTiles.CreatedTiles, autoTileConfiguration);
     AddChild(editorPreview.AutoTileMap);
     if (editorPreview.AutoTileMap is not null)
       editorPreview.AutoTileMap.Scale = new(IMAGE_SCALING, IMAGE_SCALING);

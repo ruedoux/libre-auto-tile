@@ -28,9 +28,9 @@ A dedicated [GUI](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAuto
 
 ```sh
 # Godot bindings
-dotnet add package Qwaitumin.LibreAutoTile.GodotBindings --version 1.0.0-alpha.4
+dotnet add package Qwaitumin.LibreAutoTile.GodotBindings
 # Core library
-dotnet add package Qwaitumin.LibreAutoTile --version 1.0.0-alpha.4
+dotnet add package Qwaitumin.LibreAutoTile
 ```
 
 > Library targets:
