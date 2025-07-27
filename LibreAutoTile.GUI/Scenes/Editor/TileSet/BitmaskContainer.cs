@@ -4,7 +4,6 @@ using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.Tiling;
-using Qwaitumin.Logging;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
 
@@ -12,7 +11,7 @@ public partial class BitmaskContainer : Node2D
 {
   public TextureRect TileSetTexture { private set; get; } = null!;
   public readonly TileSetBitmaskDrawer TileSetBitmaskDrawer;
-  public TileDatabase TileDatabase { private set; get; } = new();
+  public GuiTileDatabase TileDatabase { private set; get; } = new();
 
   public BitmaskContainer()
   {
@@ -29,6 +28,7 @@ public partial class BitmaskContainer : Node2D
   {
     TileDatabase.Clear();
     TileSetBitmaskDrawer.RedrawBitmask([]);
+    TileSetBitmaskDrawer.ClearAllDrawn();
     GodotLogger.Logger.Log("Cleared all Bitmasks");
   }
 

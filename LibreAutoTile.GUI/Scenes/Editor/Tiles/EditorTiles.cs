@@ -1,5 +1,4 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
 using System;

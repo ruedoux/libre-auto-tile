@@ -6,9 +6,7 @@ using Qwaitumin.LibreAutoTile.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
-using System;
-using System.Collections.Immutable;
-using Qwaitumin.LibreAutoTile.Tiling;
+using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Preview;
 
@@ -30,10 +28,12 @@ public partial class EditorPreview : MarginContainer, IState
     tileList = GetNode<Control>("V/ScrollContainer/List");
   }
 
-  // TODO this needs refactor
   public void AddCreatedTiles(
     HashSet<GuiTile> CreatedTiles, AutoTileConfiguration autoTileConfiguration)
   {
+    if (AutoTileMap is null)
+      GodotLogger.LogErrorAndThrow("AutoTileMap is null");
+
     ActiveTile = null;
     foreach (var tileMapTile in tileList.GetChildren())
     {
@@ -41,47 +41,39 @@ public partial class EditorPreview : MarginContainer, IState
       tileMapTile.QueueFree();
     }
 
-    var defaultMask = TileMask.FromArray([-1, -1, -1, -1, -1, -1, -1, -1]);
-    Dictionary<uint, Tuple<Configuration.Models.Vector3, string>> tileIdToAtlasPosition = [];
-    foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
-      foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
-        foreach (var (atlasPosition, tileMask) in tileMaskDefinition.AtlasPositionToTileMasks)
-          if (TileMask.FromArray(tileMask.SelectMany(e => e).ToArray()) == defaultMask)
-            tileIdToAtlasPosition[tileId] = new(atlasPosition, imageFileName);
-
+    var tileIdToImageLocation = ConfigurationExtractor.GetTileIdToImageLocation(
+      autoTileConfiguration);
     foreach (var guiTile in CreatedTiles)
     {
-      GodotLogger.Logger.Log(guiTile.TileName);
-      var tileMapTile = tileMapTileScene.Instantiate<TileMapTile>();
-      tileList.AddChild(tileMapTile);
-      tileMapTile.TileSelected.AddObserver(ChangeActiveTile);
-      tileMapTile.NameLabel.Text = guiTile.TileName;
-      tileMapTile.TileId = guiTile.TileId;
-
-      if (AutoTileMap is null)
+      Texture2D texture = ImageTexture.CreateFromImage(
+        Image.CreateEmpty(1, 1, false, Image.Format.Rgba8));
+      if (!tileIdToImageLocation.TryGetValue((uint)guiTile.TileId, out var imageAtlasToImageName))
       {
-        GodotLogger.Logger.LogError("AutoTileMap is null");
-        return;
+        GodotLogger.Logger.LogWarning($"Could not get texture for tile id: {guiTile.TileId}");
       }
-
-      var tileSize = autoTileConfiguration.TileSize;
-      var image = Image.CreateEmpty(tileSize, tileSize, false, Image.Format.Rgba8);
-      var texture = (Texture2D)ImageTexture.CreateFromImage(image);
-      if (tileIdToAtlasPosition.TryGetValue((uint)guiTile.TileId, out var imageAtlasToImageName))
+      else
       {
         var atlasPosition = imageAtlasToImageName.Item1;
         var imageFileName = imageAtlasToImageName.Item2;
         var sourceId = AutoTileMap.GetSourceId(imageFileName);
         var source = AutoTileMap.GetTileMapLayer(0).TileSet.GetSource(sourceId);
+        var tileSize = autoTileConfiguration.TileSize;
         texture = GodotApi.GetTileTexture(
           (TileSetAtlasSource)source,
           new(atlasPosition.X, atlasPosition.Y),
           new(tileSize, tileSize));
       }
+
+      var tileMapTile = tileMapTileScene.Instantiate<TileMapTile>();
+      tileList.AddChild(tileMapTile);
+
+      tileMapTile.TileSelected.AddObserver(ChangeActiveTile);
+      tileMapTile.NameLabel.Text = guiTile.TileName;
+      tileMapTile.TileId = guiTile.TileId;
       tileMapTile.TextureRectangle.Texture = texture;
     }
 
-    if (CreatedTiles.Count > 0)
+    if (CreatedTiles.Count > 0 && tileList.GetChildren().Count > 0)
       ChangeActiveTile((TileMapTile)tileList.GetChildren().First());
   }
 

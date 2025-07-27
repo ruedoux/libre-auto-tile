@@ -3,7 +3,7 @@ using Godot;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
 
-public class TileDatabase
+public class GuiTileDatabase
 {
   private readonly Dictionary<string, Dictionary<Vector2I, GuiTileData>> data = [];
 

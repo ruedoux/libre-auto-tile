@@ -1,1 +1,7 @@
-First release with both windows and linux versions
+## Fixes
+
+- Fixed minor GUI bugs
+
+## New Features
+
+- Added images next to tiles in GUI preview mode

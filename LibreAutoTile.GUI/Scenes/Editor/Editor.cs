@@ -230,10 +230,14 @@ public partial class Editor : Control
 
   private void UpdateSelectedTile(Godot.Vector2 mousePosition)
   {
-    bitmaskContainer.RedrawBitmaskGhost(
-      mousePosition,
-      editorSettings.ScaledTileSizeObservable.Value,
-      new(r: 255f, g: 255f, b: 255f, a: 0.5f));
+    if (toolsStateMachine.CurrentState == editorTiles)
+    {
+      bitmaskContainer.RedrawBitmaskGhost(
+        mousePosition,
+        editorSettings.ScaledTileSizeObservable.Value,
+        new(r: 255f, g: 255f, b: 255f, a: 0.5f));
+    }
+
     tileDrawer.RedrawTile(
       mousePosition,
       editorSettings.SelectionColorObservable.Value,
@@ -245,7 +249,6 @@ public partial class Editor : Control
 
   private void EnterEditorPreview()
   {
-
     editorLayer.Hide();
     bitmaskContainer.Hide();
     tileDrawer.GridDrawNode.Hide();

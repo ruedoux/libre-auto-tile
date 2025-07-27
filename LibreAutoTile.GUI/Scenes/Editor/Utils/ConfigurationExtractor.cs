@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
 public record EditorContext(
   int TileSize,
   HashSet<GuiTile> CreatedTiles,
-  TileDatabase TileDatabase
+  GuiTileDatabase TileDatabase
 );
 
 public static class ConfigurationExtractor
@@ -124,5 +123,37 @@ public static class ConfigurationExtractor
     }
 
     return imageFileNameToTileMaskDefinition;
+  }
+
+  public static Dictionary<uint, (Configuration.Models.Vector3, string)> GetTileIdToImageLocation(
+    AutoTileConfiguration autoTileConfiguration)
+  {
+
+    Dictionary<uint, (Configuration.Models.Vector3, string)> tileIdToImageLocation = [];
+    foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
+    {
+      var bestImageLocation = FindBestImageLocation(tileDefinition);
+      if (bestImageLocation is not null)
+        tileIdToImageLocation[tileId] = bestImageLocation.Value;
+    }
+
+    return tileIdToImageLocation;
+  }
+
+  private static (Configuration.Models.Vector3, string)? FindBestImageLocation(TileDefinition tileDefinition)
+  {
+    var defaultMask = TileMask.FromArray([-1, -1, -1, -1, -1, -1, -1, -1]);
+    (Configuration.Models.Vector3, string)? latestMatch = null;
+    foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
+    {
+      foreach (var (atlasPosition, tileMask) in tileMaskDefinition.AtlasPositionToTileMasks)
+      {
+        if (TileMask.FromArray(tileMask.SelectMany(e => e).ToArray()) == defaultMask)
+          return new(atlasPosition, imageFileName);
+        latestMatch = new(atlasPosition, imageFileName);
+      }
+    }
+
+    return latestMatch;
   }
 }

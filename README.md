@@ -26,10 +26,15 @@ A dedicated [GUI](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAuto
 1. Link the `.csproj` from this repository (for latest version), or
 2. Install from NuGet:
 
+If you want to install godot bindings
+
 ```sh
-# Godot bindings
 dotnet add package Qwaitumin.LibreAutoTile.GodotBindings
-# Core library
+```
+
+If you want to install core library
+
+```sh
 dotnet add package Qwaitumin.LibreAutoTile
 ```
 
