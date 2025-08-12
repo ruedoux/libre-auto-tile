@@ -26,7 +26,8 @@ public class TileMaskSearcherTest
       new(tileMask000, TileAtlas000),
       new(tileMask111, TileAtlas111),
       new(tileMask012, TileAtlas012),
-      new(tileMask333, TileAtlas333)]);
+      new(tileMask333, TileAtlas333)],
+      []);
 
     // When
     var (resultTileMask000, resultTileAtlas000) = tileMaskSearcher.FindBestMatch(tileMask000);
@@ -56,7 +57,8 @@ public class TileMaskSearcherTest
       new(target, TileAtlas),
       new(new(0, 1, -1, -1, 2, -1, -1, -1), new(new(0, 1), "b")),
       new(new(0, 1, 0, 0, -1, 2, -1, -1), new(new(0, 2), "c")),
-      new(new(0, 1, 1, -1, -1, 2, -1, -1), new(new(0, 3), "d"))]);
+      new(new(0, 1, 1, -1, -1, 2, -1, -1), new(new(0, 3), "d"))],
+      []);
 
     // When
     var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(
@@ -72,18 +74,18 @@ public class TileMaskSearcherTest
   {
     // Given
     TileAtlas TileAtlas = new(new(0, 0), "a");
-    TileMask target = new(0, -1, -1, -1, -1, TileMaskSearcher.WILD_CARD_ID, TileMaskSearcher.WILD_CARD_ID, TileMaskSearcher.WILD_CARD_ID);
+    TileMask target = new(0, -1, -1, -1, -1, 1, 1, TileMaskSearcher.DEFAULT_WILDCARD_ID);
     TileMaskSearcher tileMaskSearcher = new([
       new(target, TileAtlas),
       new(new(0, -1, -1, -1, -1, 1, 0, 0), new(new(0, 1), "b")),
       new(new(0, -1, -1, -1, -1, 0, 1, 0), new(new(0, 2), "c")),
-      new(new(0, -1, -1, -1, -1, 0, 0, 1), new(new(0, 3), "d")),
-      new(new(0, -1, -1, -1, -1, 0, 1, 1), new(new(0, 4), "e")),
-      new(new(0, -1, -1, -1, 1, 1, 1, 1), new(new(0, 5), "f"))]);
+      new(new(0, -1, -1, -1, -1, 0, 0, 0), new(new(0, 3), "d")),
+      new(new(0, -1, -1, -1, -1, 1, 1, 0), new(new(0, 4), "e"))],
+      []);
 
     // When
     var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(
-      new(0, -1, -1, -1, -1, 1, 1, 1));
+      new(0, -1, -1, -1, -1, 1, 1, 999));
 
     // Then
     Assertions.AssertEqual(TileAtlas, resultTileAtlas);
@@ -96,15 +98,15 @@ public class TileMaskSearcherTest
     // Given
     TileAtlas TileAtlas = new(new(0, 0), "a");
     TileMask target = new(
-      TileMaskSearcher.WILD_CARD_ID,
-      TileMaskSearcher.WILD_CARD_ID,
-      TileMaskSearcher.WILD_CARD_ID,
-      TileMaskSearcher.WILD_CARD_ID,
-      TileMaskSearcher.WILD_CARD_ID,
-      TileMaskSearcher.WILD_CARD_ID,
-      TileMaskSearcher.WILD_CARD_ID,
-      TileMaskSearcher.WILD_CARD_ID);
-    TileMaskSearcher tileMaskSearcher = new([new(target, TileAtlas)]);
+      TileMaskSearcher.DEFAULT_WILDCARD_ID,
+      TileMaskSearcher.DEFAULT_WILDCARD_ID,
+      TileMaskSearcher.DEFAULT_WILDCARD_ID,
+      TileMaskSearcher.DEFAULT_WILDCARD_ID,
+      TileMaskSearcher.DEFAULT_WILDCARD_ID,
+      TileMaskSearcher.DEFAULT_WILDCARD_ID,
+      TileMaskSearcher.DEFAULT_WILDCARD_ID,
+      TileMaskSearcher.DEFAULT_WILDCARD_ID);
+    TileMaskSearcher tileMaskSearcher = new([new(target, TileAtlas)], []);
 
     // When
     var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(
@@ -123,7 +125,9 @@ public class TileMaskSearcherTest
     TileAtlas tileAtlas2 = new(new(0, 1), IMAGE_FILE_NAME);
     TileMask target1 = new(1, 2, 3, 4, 5, 6, 7, 8);
     TileMask target2 = new(2, 3, 4, 5, 6, 7, 8, 9);
-    TileMaskSearcher tileMaskSearcher = new([new(target1, tileAtlas1), new(target2, tileAtlas2)]);
+    TileMaskSearcher tileMaskSearcher = new(
+      [new(target1, tileAtlas1), new(target2, tileAtlas2)],
+      []);
 
     // When
     var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(new(0, 0, 0));
@@ -156,7 +160,7 @@ public class TileMaskSearcherTest
       )).ToList();
 
     items.Add(new(target, tileAtlas));
-    TileMaskSearcher tileMaskSearcher = new(items);
+    TileMaskSearcher tileMaskSearcher = new(items, []);
 
     // When
     var (resultTileMask, resultTileAtlas) = tileMaskSearcher.FindBestMatch(

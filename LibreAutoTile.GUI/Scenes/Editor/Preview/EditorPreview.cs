@@ -61,7 +61,7 @@ public partial class EditorPreview : MarginContainer, IState
         texture = GodotApi.GetTileTexture(
           (TileSetAtlasSource)source,
           new(atlasPosition.X, atlasPosition.Y),
-          new(tileSize, tileSize));
+          new((int)tileSize, (int)tileSize));
       }
 
       var tileMapTile = tileMapTileScene.Instantiate<TileMapTile>();

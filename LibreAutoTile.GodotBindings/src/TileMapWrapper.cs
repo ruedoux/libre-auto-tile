@@ -11,7 +11,7 @@ internal class TileMapWrapper
 
   public TileMapWrapper(AutoTileConfiguration autoTileConfiguration)
   {
-    Vector2I tileSize = new(autoTileConfiguration.TileSize, autoTileConfiguration.TileSize);
+    Vector2I tileSize = new((int)autoTileConfiguration.TileSize, (int)autoTileConfiguration.TileSize);
     Dictionary<string, HashSet<Vector2I>> imageFileNamesToAtlasPositions = GetImageFileNameToAtlasPositions(
       autoTileConfiguration);
 

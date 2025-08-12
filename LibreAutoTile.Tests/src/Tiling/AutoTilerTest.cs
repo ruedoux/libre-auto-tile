@@ -21,7 +21,7 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesTile_WhenCalled()
   {
     // Given
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([]) } });
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([], []) } });
 
     // When
     autoTiler.PlaceTile(0, Vector2.Zero, 0);
@@ -39,7 +39,7 @@ public class AutoTilerTest
   public void PlaceTile_CorrectlyPlacesTiles_WhenCalledAsync()
   {
     // Given
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([]) } });
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([], []) } });
 
     List<Vector2> positions = [];
     for (int x = 0; x < 10; x++)
@@ -73,7 +73,7 @@ public class AutoTilerTest
     (TileMask TileMask, TileAtlas TileAtlas)[] definedPairs = [
       (new(-1, -1, -1, -1, -1, -1, -1, -1), new(new(1, 0), "a.png"))];
     var items = GetItemNoise(new(-1, 0), definedPairs);
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new(items) } });
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new(items, []) } });
 
     // When
     autoTiler.PlaceTile(0, Vector2.Zero, 0);

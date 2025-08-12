@@ -89,7 +89,7 @@ public static class ConfigurationExtractor
       tileDefinitions[(uint)guiTile.TileId] = tileDefinition;
     }
 
-    return AutoTileConfiguration.Construct(editorContext.TileSize, tileDefinitions);
+    return AutoTileConfiguration.Construct((uint)editorContext.TileSize, tileDefinitions);
   }
 
   private static Dictionary<string, TileMaskDefinition> GetImageFileNameToTileMaskDefinition(

@@ -32,7 +32,7 @@ public partial class CameraControl : Camera2D
 
   public override void _PhysicsProcess(double delta)
   {
-    InputListener.ListenToProcess();
+    InputListener.ListenToProcess(delta);
   }
 
   public override void _Input(InputEvent @event)

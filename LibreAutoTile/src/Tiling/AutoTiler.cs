@@ -36,6 +36,10 @@ public class AutoTiler
   private static Dictionary<int, TileMaskSearcher> BuildTileIdToTileMaskSearcher(
     AutoTileConfiguration autoTileConfiguration)
   {
+    var connectionGroupToTileIds = autoTileConfiguration.TileDefinitions
+      .GroupBy(td => td.Value.ConnectionGroup)
+      .ToDictionary(g => g.Key, g => new HashSet<int>(g.Select(td => (int)td.Key)));
+
     Dictionary<int, TileMaskSearcher> tileIdToTileMaskSearcher = [];
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {
@@ -44,8 +48,14 @@ public class AutoTiler
         foreach (var (position, tileMaskArrays) in tileMaskDefinition.AtlasPositionToTileMasks)
           foreach (var tileMaskArray in tileMaskArrays)
             tileMaskSearcherItems.Add(
-                new(TileMask.FromArray([.. tileMaskArray]), new(position.ToVector2(), imageFileName)));
-      tileIdToTileMaskSearcher.Add((int)tileId, new(tileMaskSearcherItems));
+              new(FromArray([.. tileMaskArray]), new(position.ToVector2(), imageFileName)));
+
+      tileIdToTileMaskSearcher.Add(
+        (int)tileId,
+        new TileMaskSearcher(
+          tileMaskSearcherItems,
+          connectionGroupToTileIds[tileDefinition.ConnectionGroup],
+          autoTileConfiguration.WildcardId));
     }
     return tileIdToTileMaskSearcher;
   }

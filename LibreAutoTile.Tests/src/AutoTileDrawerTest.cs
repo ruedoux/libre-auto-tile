@@ -1,7 +1,6 @@
 using Qwaitumin.LibreAutoTile.Tiling;
 using Qwaitumin.SimpleTest;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
-using System.Security.Cryptography;
 using Qwaitumin.LibreAutoTile.Tiling.Search;
 
 namespace Qwaitumin.LibreAutoTile.Tests;
@@ -15,7 +14,7 @@ public class AutoTileDrawerTest
   {
     // Given
     Vector2[] positions = Helpers.GetVector2Rectangle(Vector2.Zero, new(16, 16));
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([]) } }); MockedTileMapDrawer testTileMapDrawer = new(1);
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([], []) } }); MockedTileMapDrawer testTileMapDrawer = new(1);
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);
 
     // When
@@ -33,7 +32,7 @@ public class AutoTileDrawerTest
     // Given
     Vector2[] positions = Helpers.GetVector2Rectangle(Vector2.Zero, new(16, 16));
 
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([]) } });
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([], []) } });
     MockedTileMapDrawer testTileMapDrawer = new(1);
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);
 
@@ -55,7 +54,7 @@ public class AutoTileDrawerTest
     // Given
     Vector2[] positions = Helpers.GetVector2Rectangle(Vector2.Zero, new(16, 16));
 
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([]) } }); MockedTileMapDrawer testTileMapDrawer = new(1);
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([], []) } }); MockedTileMapDrawer testTileMapDrawer = new(1);
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);
 
     // When

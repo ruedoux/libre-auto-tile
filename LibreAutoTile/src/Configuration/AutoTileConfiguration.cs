@@ -7,16 +7,17 @@ namespace Qwaitumin.LibreAutoTile.Configuration;
 
 public sealed class AutoTileConfiguration
 {
-  public int TileSize { get; private set; }
+  public uint? WildcardId { get; private set; }
+  public uint TileSize { get; private set; }
   public ImmutableDictionary<uint, TileDefinition> TileDefinitions { get; private set; }
 
   [JsonConstructor]
   public AutoTileConfiguration(
-    int tileSize, ImmutableDictionary<uint, TileDefinition> tileDefinitions)
+    uint tileSize, ImmutableDictionary<uint, TileDefinition> tileDefinitions, uint? wildcardId = null)
   {
     TileSize = tileSize;
     TileDefinitions = tileDefinitions;
-
+    WildcardId = wildcardId;
     Dictionary<string, uint> tileNameToTileIds = [];
     foreach (var (tileId, tileDefinition) in tileDefinitions)
       if (!tileNameToTileIds.TryAdd(tileDefinition.Name, tileId))
@@ -24,8 +25,8 @@ public sealed class AutoTileConfiguration
   }
 
   public static AutoTileConfiguration Construct(
-    int tileSize, Dictionary<uint, TileDefinition> tileDefinitions)
-      => new(tileSize, tileDefinitions.ToImmutableDictionary());
+    uint tileSize, Dictionary<uint, TileDefinition> tileDefinitions, uint? wildcardId = null)
+      => new(tileSize, tileDefinitions.ToImmutableDictionary(), wildcardId);
 
   public static AutoTileConfiguration? FromJsonString(string jsonString)
   {

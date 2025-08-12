@@ -10,10 +10,12 @@ public partial class GuiTile : PanelContainer
   public Button RemoveButton { private set; get; } = null!;
   public Button SelectButton { private set; get; } = null!;
   public LineEdit TileNameEdit { private set; get; } = null!;
+  public LineEdit TileIdEdit { private set; get; } = null!;
   public ColorPickerButton ColorPickerButton { private set; get; } = null!;
 
   public readonly EventNotifier<string> TryDeleteNotifier = new();
   public readonly EventNotifier<Tuple<GuiTile, string>> TryChangeTileNameNotifier = new();
+  public readonly EventNotifier<Tuple<GuiTile, string>> TryChangeTileIdNotifier = new();
   public readonly EventNotifier<GuiTile> SelectActiveTileNotifier = new();
   public string TileName = "<DEFAULT>";
   public int TileId = -1;
@@ -25,6 +27,7 @@ public partial class GuiTile : PanelContainer
     RemoveButton = GetNode<Button>("Panel/H/Remove");
     SelectButton = GetNode<Button>("Panel/H/Select");
     TileNameEdit = GetNode<LineEdit>("Panel/H/Fields/Name/LineEdit");
+    TileIdEdit = GetNode<LineEdit>("Panel/H/Fields/Id/LineEdit");
     ColorPickerButton = GetNode<ColorPickerButton>("Panel/H/Fields/Color/ColorPicker");
 
     MoveUpButton.Pressed += MoveUp;
@@ -33,6 +36,8 @@ public partial class GuiTile : PanelContainer
     SelectButton.Pressed += TrySelectActiveTile;
     TileNameEdit.TextSubmitted += TrySetNewTileName;
     TileNameEdit.FocusExited += TileNameEditExitedFocus;
+    TileIdEdit.TextSubmitted += TrySetNewTileId;
+    TileIdEdit.FocusExited += TileIdEditExitedFocus;
   }
 
   private void TrySelectActiveTile()
@@ -41,8 +46,14 @@ public partial class GuiTile : PanelContainer
   private void TileNameEditExitedFocus()
     => TrySetNewTileName(TileNameEdit.Text);
 
+  private void TileIdEditExitedFocus()
+    => TrySetNewTileId(TileIdEdit.Text);
+
   private void TrySetNewTileName(string name)
     => TryChangeTileNameNotifier.NotifyObservers(new(this, name));
+
+  private void TrySetNewTileId(string id)
+  => TryChangeTileIdNotifier.NotifyObservers(new(this, id));
 
   private void Remove()
    => TryDeleteNotifier.NotifyObservers(TileName);

@@ -64,8 +64,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
 theme_override_fonts/font = ExtResource("2_w5ugi")
-text = "Color
-"
+text = "Color"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -85,12 +84,32 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 theme_override_fonts/font = ExtResource("2_w5ugi")
-text = "Name
-"
+text = "Name"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LineEdit" type="LineEdit" parent="Panel/H/Fields/Name"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_w5ugi")
+text = "NOT SET"
+
+[node name="Id" type="HBoxContainer" parent="Panel/H/Fields"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="Panel/H/Fields/Id"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("2_w5ugi")
+text = "Id"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="Panel/H/Fields/Id"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

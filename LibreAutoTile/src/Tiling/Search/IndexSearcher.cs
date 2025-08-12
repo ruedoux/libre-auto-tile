@@ -2,13 +2,16 @@ using System.Collections.Frozen;
 
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
-internal class IndexSearcher(int itemCount)
+internal class IndexSearcher(
+  int itemCount, FrozenDictionary<int, List<int>>[] tileIdToItemIndexes, int wildcardId)
 {
   const int TOP_SCORE = 3;
   const int LOW_SCORE = 2;
   const int NO_SCORE = 1;
 
+  private readonly FrozenDictionary<int, List<int>>[] tileIdToItemIndexes = tileIdToItemIndexes;
   public readonly int[] ResultIndexToItemIndex = new int[itemCount];
+  public readonly int WildcardId = wildcardId;
 
   private readonly int[] itemIndexToBestScore = new int[itemCount];
   private readonly int[] itemIndexToSeenGeneration = new int[itemCount];
@@ -17,8 +20,7 @@ internal class IndexSearcher(int itemCount)
   private int currentGeneration = 1;
 
 
-  public (int ResultCount, int BestScore) Search(
-    TileMask target, FrozenDictionary<int, List<int>>[] tileIdToItemIndexes)
+  public (int ResultCount, int BestScore) Search(TileMask target)
   {
     lock (_lock)
     {
@@ -37,8 +39,11 @@ internal class IndexSearcher(int itemCount)
       {
         // Get list of items that match template for current side id
         int tileId = target.GetTileIdByIndex(fieldIndex);
-        if (!tileIdToItemIndexes[fieldIndex].TryGetValue(tileId, out var itemIndexList))
+        if (!tileIdToItemIndexes[fieldIndex].TryGetValue(tileId, out var itemIndexList) &&
+            !tileIdToItemIndexes[fieldIndex].TryGetValue((int)WildcardId, out itemIndexList))
+        {
           continue;
+        }
 
         // Iterate over items that have tileId on a given field
         foreach (var itemIndex in itemIndexList)

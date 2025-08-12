@@ -5,87 +5,80 @@ using Godot;
 
 namespace Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
-internal class ActionWithCooldown(Action action, long cooldownMs)
+internal class ListenerAction<T>(
+  Action<T> action,
+  Func<T, bool>? condition = null,
+  long cooldownMs = 0)
 {
   private readonly Stopwatch stopwatch = Stopwatch.StartNew();
 
-  public bool TryAction()
+  public bool TryAction(T value)
   {
-    if (!IsReady())
+    if (stopwatch.ElapsedMilliseconds < cooldownMs)
       return false;
 
-    action();
+    if (condition is not null)
+      if (!condition(value))
+        return false;
+
+    action(value);
     stopwatch.Restart();
     return true;
   }
-
-  private bool IsReady()
-    => stopwatch.ElapsedMilliseconds >= cooldownMs;
 }
 
 public class GodotInputListener
 {
   public bool Active = true;
 
-  private readonly Dictionary<string, ActionWithCooldown> inputKeyActions = [];
-  private readonly Dictionary<string, ActionWithCooldown> processKeyActions = [];
-  private readonly HashSet<Action<InputEventMouseMotion>> inputMouseMotionActions = [];
-  private readonly HashSet<Action<InputEventMouseButton>> inputMouseButtonActions = [];
-  private readonly HashSet<Action> processActions = [];
+  private readonly HashSet<ListenerAction<InputEvent>> inputActions = [];
+  private readonly HashSet<ListenerAction<InputEventMouse>> inputMouseActions = [];
+  private readonly HashSet<ListenerAction<InputEventMouseButton>> inputMouseButtonActions = [];
+  private readonly HashSet<ListenerAction<InputEventMouseMotion>> inputMouseMotionActions = [];
+  private readonly HashSet<ListenerAction<double>> processActions = [];
 
-  public void AddInputAction(string actionName, long cooldownMs, Action action)
-  {
-    if (!InputMap.GetActions().Contains(actionName))
-      throw new ArgumentException($"InputMap does not contain action with name {actionName}! This action should be added to KeyMap.json");
+  public void AddInputAction(Action<InputEvent> action, Func<InputEvent, bool>? condition = null, long cooldownMs = 0)
+    => inputActions.Add(new(action, condition, cooldownMs));
 
-    inputKeyActions[actionName] = new(action, cooldownMs);
-  }
+  public void AddInputMouseAction(Action<InputEventMouse> action, Func<InputEventMouse, bool>? condition = null, long cooldownMs = 0)
+    => inputMouseActions.Add(new(action, condition, cooldownMs));
 
-  public void AddProcessActionByName(string actionName, long cooldownMs, Action action)
-  {
-    if (!InputMap.GetActions().Contains(actionName))
-      throw new ArgumentException($"InputMap does not contain action with name {actionName}! This action should be added to KeyMap.json");
+  public void AddInputMouseButtonAction(Action<InputEventMouseButton> action, Func<InputEventMouseButton, bool>? condition = null, long cooldownMs = 0)
+    => inputMouseButtonActions.Add(new(action, condition, cooldownMs));
 
-    processKeyActions[actionName] = new(action, cooldownMs);
-  }
+  public void AddInputMouseMotionAction(Action<InputEventMouseMotion> action, Func<InputEventMouseMotion, bool>? condition = null, long cooldownMs = 0)
+    => inputMouseMotionActions.Add(new(action, condition, cooldownMs));
 
-  public void AddInputMouseMotionAction(Action<InputEventMouseMotion> action)
-    => inputMouseMotionActions.Add(action);
-
-  public void AddInputMouseButtonAction(Action<InputEventMouseButton> action)
-    => inputMouseButtonActions.Add(action);
-
-  public void AddProcessAction(Action action)
-    => processActions.Add(action);
+  public void AddProcessAction(Action<double> action, Func<double, bool>? condition = null, long cooldownMs = 0)
+    => processActions.Add(new(action, condition, cooldownMs));
 
   public void ListenToInput(InputEvent inputEvent)
   {
     if (!Active)
       return;
 
-    foreach (string actionName in inputKeyActions.Keys)
-      if (inputEvent.IsActionPressed(actionName))
-        inputKeyActions[actionName].TryAction();
+    foreach (var action in inputActions)
+      action.TryAction(inputEvent);
 
-    if (inputEvent is InputEventMouseButton mouseButton)
-      foreach (var inputMouseButtonAction in inputMouseButtonActions)
-        inputMouseButtonAction(mouseButton);
+    foreach (var action in inputMouseActions)
+      if (inputEvent is InputEventMouse inputEventType)
+        action.TryAction(inputEventType);
 
-    if (inputEvent is InputEventMouseMotion mouseMotion)
-      foreach (var inputMouseMotionAction in inputMouseMotionActions)
-        inputMouseMotionAction(mouseMotion);
+    foreach (var action in inputMouseButtonActions)
+      if (inputEvent is InputEventMouseButton inputEventType)
+        action.TryAction(inputEventType);
+
+    foreach (var action in inputMouseMotionActions)
+      if (inputEvent is InputEventMouseMotion inputEventType)
+        action.TryAction(inputEventType);
   }
 
-  public void ListenToProcess()
+  public void ListenToProcess(double delta)
   {
     if (!Active)
       return;
 
-    foreach (string actionName in processKeyActions.Keys)
-      if (Input.IsActionPressed(actionName))
-        processKeyActions[actionName].TryAction();
-
-    foreach (var processAction in processActions)
-      processAction();
+    foreach (var action in processActions)
+      action.TryAction(delta);
   }
 }

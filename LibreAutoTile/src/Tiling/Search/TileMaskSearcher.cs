@@ -1,5 +1,7 @@
 using System.Collections.Frozen;
 using System.Collections.Immutable;
+using System.ComponentModel;
+using System.Data;
 
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
@@ -9,15 +11,19 @@ namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 /// </summary>
 public class TileMaskSearcher
 {
-  public const int WILD_CARD_ID = -2;
+  public const int DEFAULT_WILDCARD_ID = -2;
 
   public readonly FrozenDictionary<TileMask, TileAtlas> ExistingMasks;
   private readonly ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items;
-  private readonly FrozenDictionary<int, List<int>>[] tileIdToItemIndex;
   private readonly IndexSearcher indexSearcher;
+  private readonly FrozenSet<int> connectionGroupTileIds;
 
-  public TileMaskSearcher(IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> rawItems)
+  public TileMaskSearcher(
+    IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> rawItems,
+    HashSet<int> connectionGroupTileIds,
+    uint? wildcardId = null)
   {
+    int parsedWildcardId = (int?)wildcardId ?? DEFAULT_WILDCARD_ID;
     ExistingMasks = rawItems
       .GroupBy(item => item.TileMask)
       .Select(g => g.First())
@@ -25,8 +31,11 @@ public class TileMaskSearcher
       .ToFrozenDictionary();
     items = ExistingMasks
       .Select(kvp => (TileMask: kvp.Key, TileAtlas: kvp.Value)).ToImmutableArray();
-    indexSearcher = new(items.Length);
-    tileIdToItemIndex = GetAssignedIndexes(items).Select(d => d.ToFrozenDictionary()).ToArray();
+    indexSearcher = new(
+      items.Length,
+      GetAssignedIndexes(items, parsedWildcardId).Select(d => d.ToFrozenDictionary()).ToArray(),
+      parsedWildcardId);
+    this.connectionGroupTileIds = connectionGroupTileIds.ToFrozenSet();
   }
 
   /// <summary>
@@ -39,19 +48,19 @@ public class TileMaskSearcher
 
     // Could probably iterate over results that have same best score
     // and decide the best fit? For now pick last best score
-    (int resultMaxIndex, int _) = indexSearcher.Search(target, tileIdToItemIndex);
+    (int resultMaxIndex, int _) = indexSearcher.Search(target);
     TileMask parsedTarget = new();
     if (resultMaxIndex != -1)
     {
       int rawBestIndex = indexSearcher.ResultIndexToItemIndex[resultMaxIndex];
       var rawTileMask = rawBestIndex != -1 ? items[rawBestIndex].TileMask : new();
-      parsedTarget = ParseTarget(target, rawTileMask);
+      parsedTarget = ParseTarget(target, rawTileMask, indexSearcher.WildcardId);
     }
 
     if (ExistingMasks.TryGetValue(parsedTarget, out var atlas))
       return (parsedTarget, atlas);
 
-    (int trimmedResultMaxIndex, int _) = indexSearcher.Search(target, tileIdToItemIndex);
+    (int trimmedResultMaxIndex, int _) = indexSearcher.Search(target);
     if (trimmedResultMaxIndex == -1)
       return GetDefaultItem();
 
@@ -59,10 +68,10 @@ public class TileMaskSearcher
     return bestIndex != -1 ? items[bestIndex] : GetDefaultItem();
   }
 
-  private static TileMask ParseTarget(TileMask target, TileMask rawTileMask)
+  private static TileMask ParseTarget(TileMask target, TileMask rawTileMask, int wildcardId)
   {
-    static int GetHitMask(int target, int rawTileMask)
-      => (target == rawTileMask || rawTileMask == WILD_CARD_ID) ? rawTileMask : -1;
+    int GetHitMask(int target, int rawTileMask)
+      => (target == rawTileMask || rawTileMask == wildcardId) ? rawTileMask : -1;
 
     int h0 = GetHitMask(target.TopLeft, rawTileMask.TopLeft);
     int h1 = GetHitMask(target.Top, rawTileMask.Top);
@@ -78,19 +87,29 @@ public class TileMaskSearcher
   }
 
   private static Dictionary<int, List<int>>[] GetAssignedIndexes(
-    ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items)
+    ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items, int wildcardId)
   {
-    var tileIdToItemIndexTemp = new Dictionary<int, List<int>>[8];
+    var tileIdToItemIndexesTemp = new Dictionary<int, List<int>>[8];
     for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
-      tileIdToItemIndexTemp[fieldIndex] = [];
+      tileIdToItemIndexesTemp[fieldIndex] = [];
 
+    AssignIndexes(items, tileIdToItemIndexesTemp);
+    AssignWildcards(items, tileIdToItemIndexesTemp, wildcardId);
+
+    return tileIdToItemIndexesTemp;
+  }
+
+  private static void AssignIndexes(
+    ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items,
+    Dictionary<int, List<int>>[] tileIdToItemIndexesTemp)
+  {
     for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
     {
       var tileMask = items[itemIndex].TileMask;
       for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
       {
         var tileId = tileMask.GetTileIdByIndex(fieldIndex);
-        var dict = tileIdToItemIndexTemp[fieldIndex];
+        var dict = tileIdToItemIndexesTemp[fieldIndex];
         if (!dict.TryGetValue(tileId, out var list))
         {
           list = [];
@@ -99,21 +118,25 @@ public class TileMaskSearcher
         list.Add(itemIndex);
       }
     }
+  }
 
+  private static void AssignWildcards(
+    ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items,
+    Dictionary<int, List<int>>[] tileIdToItemIndexesTemp,
+    int wildcardId)
+  {
     for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
     {
       var tileMask = items[itemIndex].TileMask;
       for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
       {
         var tileId = tileMask.GetTileIdByIndex(fieldIndex);
-        var dict = tileIdToItemIndexTemp[fieldIndex];
-        if (tileId == WILD_CARD_ID)
+        var dict = tileIdToItemIndexesTemp[fieldIndex];
+        if (tileId == wildcardId)
           foreach (var keyTileId in dict.Keys)
             dict[keyTileId].Add(itemIndex);
       }
     }
-
-    return tileIdToItemIndexTemp;
   }
 
   private (TileMask TileMask, TileAtlas TileAtlas) GetDefaultItem()

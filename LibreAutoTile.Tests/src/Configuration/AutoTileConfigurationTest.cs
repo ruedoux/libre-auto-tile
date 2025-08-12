@@ -8,7 +8,7 @@ namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
 [SimpleTestClass]
 public class AutoTileConfigurationTest
 {
-  const int TILE_SIZE = 16;
+  const uint TILE_SIZE = 16;
   const string AUTOTILE_MOCK_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
 
   readonly int[][] DEFAULT_TILEMASK = [[0, 0, 0, 0, 0, 0, 0, 0]];

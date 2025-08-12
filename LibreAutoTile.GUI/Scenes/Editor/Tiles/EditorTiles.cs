@@ -68,10 +68,12 @@ public partial class EditorTiles : MarginContainer, IState
     tileInstance.TileId = tileId;
     tileInstance.TileName = tileName;
     tileInstance.TileNameEdit.Text = tileName;
+    tileInstance.TileIdEdit.Text = tileId.ToString();
     tileInstance.ColorPickerButton.Color = color;
 
     tileInstance.TryDeleteNotifier.AddObserver(RemoveTile);
     tileInstance.TryChangeTileNameNotifier.AddObserver(TryChangeTileName);
+    tileInstance.TryChangeTileIdNotifier.AddObserver(TryChangeTileId);
     tileInstance.SelectActiveTileNotifier.AddObserver(ChangeActiveTile);
     tileInstance.ColorPickerButton.ColorChanged += TileColorChanged.NotifyObservers;
 
@@ -119,6 +121,28 @@ public partial class EditorTiles : MarginContainer, IState
     tile.TileName = newTileName;
     tile.TileNameEdit.Text = newTileName;
     GodotLogger.Logger.Log($"Changed tile name from {oldTileName} to {newTileName}");
+  }
+
+  private void TryChangeTileId(Tuple<GuiTile, string> tileAndName)
+  {
+    GuiTile tile = tileAndName.Item1;
+    int newId = InputSanitizer.SanitizeInt(tileAndName.Item2);
+    int oldId = tile.TileId;
+
+    if (newId < 0)
+      newId = 0;
+
+    Dictionary<int, GuiTile> tileIdsToGuiTiles = new(
+      CreatedTiles.ToDictionary(guiTile => guiTile.TileId, guiTile => guiTile));
+    if (tileIdsToGuiTiles.ContainsKey(newId))
+    {
+      if (tileIdsToGuiTiles[newId] == tile) return;
+      newId = GetNextFreeTileId();
+    }
+
+    tile.TileId = newId;
+    tile.TileIdEdit.Text = newId.ToString();
+    GodotLogger.Logger.Log($"Changed tile id from {newId} to {oldId}");
   }
 
   private void RemoveTile(string tileName)

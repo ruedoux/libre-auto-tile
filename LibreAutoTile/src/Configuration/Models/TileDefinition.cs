@@ -6,17 +6,26 @@ namespace Qwaitumin.LibreAutoTile.Configuration.Models;
 public sealed class TileDefinition(
   ImmutableDictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition,
   string name = TileDefinition.DEFAULT_STRING,
-  TileColor color = default)
+  TileColor color = default,
+  int connectionGroup = -1)
 {
   const string DEFAULT_STRING = "<NONE>";
 
   public readonly ImmutableDictionary<string, TileMaskDefinition> ImageFileNameToTileMaskDefinition = imageFileNameToTileMaskDefinition;
   public readonly string Name = name;
   public readonly TileColor Color = color;
+  public readonly int ConnectionGroup = connectionGroup;
 
   public static TileDefinition Construct(
-    Dictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition, string name = DEFAULT_STRING, TileColor color = default)
-      => new(imageFileNameToTileMaskDefinition: imageFileNameToTileMaskDefinition.ToImmutableDictionary(), name: name, color: color);
+    Dictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition,
+    string name = DEFAULT_STRING,
+    TileColor color = default,
+    int connectionGroup = -1)
+      => new(
+        imageFileNameToTileMaskDefinition: imageFileNameToTileMaskDefinition.ToImmutableDictionary(),
+        name: name,
+        color: color,
+        connectionGroup: connectionGroup);
 
   public static TileDefinition? FromJsonString(string jsonString)
   {
