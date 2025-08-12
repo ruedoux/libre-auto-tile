@@ -53,7 +53,7 @@ public class TileMaskSearcherBenchmark
   {
     items = TileMaskSearcherItemSetup.GetItems(N);
     itemsToMatch = TileMaskSearcherItemSetup.GetItems(N);
-    tileMaskSearcher = new(items);
+    tileMaskSearcher = new(items, []);
     randomTileMask = items[new Random(123).Next(0, items.Count)];
   }
 
