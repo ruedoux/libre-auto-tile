@@ -74,6 +74,9 @@ public partial class Editor : Control
     editorTiles.TileDeleted.AddObservers([
       (guiTile) => bitmaskContainer.RemoveTileId(guiTile.TileId),
       (_) => UpdateBitmask()]);
+    editorTiles.TileIdChanged.AddObservers([
+      (x) => bitmaskContainer.ChangeTileId(x.newId, x.oldId),
+      (_) => UpdateBitmask()]);
 
     editorOptions.ImageRectangleObservable.AddObservers([
       (imageSize) => cameraControl.View = imageSize,

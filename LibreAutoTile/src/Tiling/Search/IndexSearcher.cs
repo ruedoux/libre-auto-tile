@@ -3,7 +3,9 @@ using System.Collections.Frozen;
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
 internal class IndexSearcher(
-  int itemCount, FrozenDictionary<int, List<int>>[] tileIdToItemIndexes, int wildcardId)
+  int itemCount,
+  FrozenDictionary<int, List<int>>[] tileIdToItemIndexes,
+  int wildcardId)
 {
   const int TOP_SCORE = 3;
   const int LOW_SCORE = 2;

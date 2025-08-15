@@ -1,6 +1,5 @@
 using System.Collections.Frozen;
 using System.Collections.Immutable;
-using System.ComponentModel;
 using System.Data;
 
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
@@ -16,7 +15,7 @@ public class TileMaskSearcher
   public readonly FrozenDictionary<TileMask, TileAtlas> ExistingMasks;
   private readonly ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items;
   private readonly IndexSearcher indexSearcher;
-  private readonly FrozenSet<int> connectionGroupTileIds;
+  private readonly ImmutableArray<int> itemIndexToItemGroup;
 
   public TileMaskSearcher(
     IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> rawItems,
@@ -35,7 +34,6 @@ public class TileMaskSearcher
       items.Length,
       GetAssignedIndexes(items, parsedWildcardId).Select(d => d.ToFrozenDictionary()).ToArray(),
       parsedWildcardId);
-    this.connectionGroupTileIds = connectionGroupTileIds.ToFrozenSet();
   }
 
   /// <summary>

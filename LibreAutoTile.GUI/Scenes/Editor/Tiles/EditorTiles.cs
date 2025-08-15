@@ -15,6 +15,7 @@ public partial class EditorTiles : MarginContainer, IState
   public readonly GodotInputListener InputListener = new();
   public readonly EventNotifier<GuiTile> ChangedActiveTile = new();
   public readonly EventNotifier<GuiTile> TileDeleted = new();
+  public readonly EventNotifier<(int newId, int oldId)> TileIdChanged = new();
   public readonly EventNotifier<Color> TileColorChanged = new();
   public GuiTile? ActiveTile { private set; get; } = null;
   public readonly HashSet<GuiTile> CreatedTiles = [];
@@ -142,6 +143,7 @@ public partial class EditorTiles : MarginContainer, IState
 
     tile.TileId = newId;
     tile.TileIdEdit.Text = newId.ToString();
+    TileIdChanged.NotifyObservers(new(newId, oldId));
     GodotLogger.Logger.Log($"Changed tile id from {newId} to {oldId}");
   }
 

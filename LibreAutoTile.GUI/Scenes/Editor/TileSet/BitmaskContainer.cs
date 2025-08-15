@@ -128,4 +128,26 @@ public partial class BitmaskContainer : Node2D
       }
     }
   }
+
+  public void ChangeTileId(int newId, int oldId)
+  {
+    foreach (var (_, positionToPackedTileData) in TileDatabase.GetAll())
+    {
+      foreach (var (_, packedTileData) in positionToPackedTileData)
+      {
+        foreach (var (layer, fullTileMask) in packedTileData.LayerFullTileMask)
+        {
+          var centreTileId = packedTileData.GetCentreTileId(layer);
+          if (centreTileId == oldId)
+            packedTileData.SetCentreTileId(layer, newId);
+
+          var tileMask = packedTileData.GetTileMask(layer);
+          var updatedTileMaskArray = tileMask.ToArray()
+            .Select(x => x == oldId ? newId : x)
+            .ToArray();
+          packedTileData.SetTileMask(layer, TileMask.FromArray(updatedTileMaskArray));
+        }
+      }
+    }
+  }
 }
