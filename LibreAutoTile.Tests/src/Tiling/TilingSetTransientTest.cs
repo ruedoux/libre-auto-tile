@@ -7,7 +7,7 @@ namespace Qwaitumin.LibreAutoTile.Tests.Tiling;
 
 
 [SimpleTestClass]
-public class TilingTransientFullSetTest
+public class TilingSetTransientTest
 {
   private string jsonString = "";
 

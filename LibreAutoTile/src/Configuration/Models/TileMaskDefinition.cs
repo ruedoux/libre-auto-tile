@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Qwaitumin.LibreAutoTile.Configuration.Models;
 
-public sealed class TileMaskDefinition
+public class TileMaskDefinition
 {
   public readonly ImmutableDictionary<Vector3, ImmutableArray<ImmutableArray<int>>> AtlasPositionToTileMasks;
 

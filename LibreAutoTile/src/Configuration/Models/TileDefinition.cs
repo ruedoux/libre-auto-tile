@@ -3,24 +3,24 @@ using System.Text.Json;
 
 namespace Qwaitumin.LibreAutoTile.Configuration.Models;
 
-public sealed class TileDefinition(
+public class TileDefinition(
   ImmutableDictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition,
   string name = TileDefinition.DEFAULT_STRING,
   TileColor color = default,
-  int connectionGroup = -1)
+  uint? connectionGroup = default)
 {
   const string DEFAULT_STRING = "<NONE>";
 
   public readonly ImmutableDictionary<string, TileMaskDefinition> ImageFileNameToTileMaskDefinition = imageFileNameToTileMaskDefinition;
   public readonly string Name = name;
   public readonly TileColor Color = color;
-  public readonly int ConnectionGroup = connectionGroup;
+  public readonly uint? ConnectionGroup = connectionGroup;
 
   public static TileDefinition Construct(
     Dictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition,
     string name = DEFAULT_STRING,
     TileColor color = default,
-    int connectionGroup = -1)
+    uint? connectionGroup = default)
       => new(
         imageFileNameToTileMaskDefinition: imageFileNameToTileMaskDefinition.ToImmutableDictionary(),
         name: name,

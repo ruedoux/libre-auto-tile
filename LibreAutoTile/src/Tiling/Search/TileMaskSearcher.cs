@@ -4,7 +4,6 @@ using System.Data;
 
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
-
 /// <summary>
 /// Finds best fitting atlas for a provided mask. Thread safe.
 /// </summary>
@@ -14,15 +13,19 @@ public class TileMaskSearcher
 
   public readonly FrozenDictionary<TileMask, TileAtlas> ExistingMasks;
   private readonly ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items;
+  private readonly FrozenSet<int> connectionGroupTileIds;
+  private readonly int connectionGroupRepresentativeId = int.MinValue;
   private readonly IndexSearcher indexSearcher;
-  private readonly ImmutableArray<int> itemIndexToItemGroup;
+  private readonly int wildcardId;
 
   public TileMaskSearcher(
     IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> rawItems,
-    HashSet<int> connectionGroupTileIds,
+    HashSet<int>? connectionGroupTileIds = null,
     uint? wildcardId = null)
   {
-    int parsedWildcardId = (int?)wildcardId ?? DEFAULT_WILDCARD_ID;
+    this.wildcardId = (int?)wildcardId ?? DEFAULT_WILDCARD_ID;
+    this.connectionGroupTileIds = (connectionGroupTileIds ?? []).ToFrozenSet();
+    connectionGroupRepresentativeId = this.connectionGroupTileIds.FirstOrDefault(int.MinValue);
     ExistingMasks = rawItems
       .GroupBy(item => item.TileMask)
       .Select(g => g.First())
@@ -31,9 +34,7 @@ public class TileMaskSearcher
     items = ExistingMasks
       .Select(kvp => (TileMask: kvp.Key, TileAtlas: kvp.Value)).ToImmutableArray();
     indexSearcher = new(
-      items.Length,
-      GetAssignedIndexes(items, parsedWildcardId).Select(d => d.ToFrozenDictionary()).ToArray(),
-      parsedWildcardId);
+      items.Length, GetAssignedIndexes().Select(d => d.ToFrozenDictionary()).ToArray());
   }
 
   /// <summary>
@@ -44,21 +45,23 @@ public class TileMaskSearcher
     if (ExistingMasks.TryGetValue(target, out var tileAtlas))
       return (target, tileAtlas);
 
+    target = ParseTargetConnectionGroup(target);
+
     // Could probably iterate over results that have same best score
     // and decide the best fit? For now pick last best score
-    (int resultMaxIndex, int _) = indexSearcher.Search(target);
+    (int resultMaxIndex, int _) = indexSearcher.Search(target, wildcardId);
     TileMask parsedTarget = new();
     if (resultMaxIndex != -1)
     {
       int rawBestIndex = indexSearcher.ResultIndexToItemIndex[resultMaxIndex];
       var rawTileMask = rawBestIndex != -1 ? items[rawBestIndex].TileMask : new();
-      parsedTarget = ParseTarget(target, rawTileMask, indexSearcher.WildcardId);
+      parsedTarget = ParseTargetHitmask(target, rawTileMask);
     }
 
     if (ExistingMasks.TryGetValue(parsedTarget, out var atlas))
       return (parsedTarget, atlas);
 
-    (int trimmedResultMaxIndex, int _) = indexSearcher.Search(target);
+    (int trimmedResultMaxIndex, int _) = indexSearcher.Search(target, wildcardId);
     if (trimmedResultMaxIndex == -1)
       return GetDefaultItem();
 
@@ -66,7 +69,28 @@ public class TileMaskSearcher
     return bestIndex != -1 ? items[bestIndex] : GetDefaultItem();
   }
 
-  private static TileMask ParseTarget(TileMask target, TileMask rawTileMask, int wildcardId)
+  private TileMask ParseTargetConnectionGroup(TileMask target)
+  {
+    int MergeConnectionGroup(int targetId)
+      => connectionGroupTileIds.Contains(targetId) ? connectionGroupRepresentativeId : targetId;
+
+    if (connectionGroupTileIds.Count == 0)
+      return target;
+
+    // Merge tileIds in connection group
+    int tl = MergeConnectionGroup(target.TopLeft);
+    int tt = MergeConnectionGroup(target.Top);
+    int tr = MergeConnectionGroup(target.TopRight);
+    int rr = MergeConnectionGroup(target.Right);
+    int br = MergeConnectionGroup(target.BottomRight);
+    int bb = MergeConnectionGroup(target.Bottom);
+    int bl = MergeConnectionGroup(target.BottomLeft);
+    int ll = MergeConnectionGroup(target.Left);
+
+    return new(tl, tt, tr, rr, br, bb, bl, ll);
+  }
+
+  private TileMask ParseTargetHitmask(TileMask target, TileMask rawTileMask)
   {
     int GetHitMask(int target, int rawTileMask)
       => (target == rawTileMask || rawTileMask == wildcardId) ? rawTileMask : -1;
@@ -84,22 +108,19 @@ public class TileMaskSearcher
     return TileMask.StripCorners(parsedTarget);
   }
 
-  private static Dictionary<int, List<int>>[] GetAssignedIndexes(
-    ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items, int wildcardId)
+  private Dictionary<int, List<int>>[] GetAssignedIndexes()
   {
     var tileIdToItemIndexesTemp = new Dictionary<int, List<int>>[8];
     for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
       tileIdToItemIndexesTemp[fieldIndex] = [];
 
-    AssignIndexes(items, tileIdToItemIndexesTemp);
-    AssignWildcards(items, tileIdToItemIndexesTemp, wildcardId);
+    AssignIndexes(tileIdToItemIndexesTemp);
+    AssignWildcards(tileIdToItemIndexesTemp);
 
     return tileIdToItemIndexesTemp;
   }
 
-  private static void AssignIndexes(
-    ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items,
-    Dictionary<int, List<int>>[] tileIdToItemIndexesTemp)
+  private void AssignIndexes(Dictionary<int, List<int>>[] tileIdToItemIndexesTemp)
   {
     for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
     {
@@ -107,6 +128,11 @@ public class TileMaskSearcher
       for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
       {
         var tileId = tileMask.GetTileIdByIndex(fieldIndex);
+
+        // Since all ids in a connection group are treated as the same id
+        if (connectionGroupTileIds.Count > 0 && connectionGroupTileIds.Contains(tileId))
+          tileId = connectionGroupRepresentativeId;
+
         var dict = tileIdToItemIndexesTemp[fieldIndex];
         if (!dict.TryGetValue(tileId, out var list))
         {
@@ -118,10 +144,7 @@ public class TileMaskSearcher
     }
   }
 
-  private static void AssignWildcards(
-    ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items,
-    Dictionary<int, List<int>>[] tileIdToItemIndexesTemp,
-    int wildcardId)
+  private void AssignWildcards(Dictionary<int, List<int>>[] tileIdToItemIndexesTemp)
   {
     for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
     {

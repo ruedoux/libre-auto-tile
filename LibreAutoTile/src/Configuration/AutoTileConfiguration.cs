@@ -5,7 +5,7 @@ using Qwaitumin.LibreAutoTile.Configuration.Models;
 
 namespace Qwaitumin.LibreAutoTile.Configuration;
 
-public sealed class AutoTileConfiguration
+public class AutoTileConfiguration
 {
   public uint? WildcardId { get; private set; }
   public uint TileSize { get; private set; }

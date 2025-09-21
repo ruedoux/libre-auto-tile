@@ -56,7 +56,7 @@ public partial class EditorTiles : MarginContainer, IState
   public void InitializeState()
     => Show();
 
-  public void AddTile(int tileId, string tileName, Color color)
+  public void AddTile(int tileId, string tileName, Color color, uint? connectionGroup)
   {
     if (CreatedTiles.Any(guiTile => guiTile.TileId == tileId))
       GodotLogger.LogErrorAndThrow($"Cannot create tile with already taken id: '{tileId}'");
@@ -70,11 +70,13 @@ public partial class EditorTiles : MarginContainer, IState
     tileInstance.TileName = tileName;
     tileInstance.TileNameEdit.Text = tileName;
     tileInstance.TileIdEdit.Text = tileId.ToString();
+    tileInstance.ConnectionGroupEdit.Text = Converter.NullableToString(connectionGroup);
     tileInstance.ColorPickerButton.Color = color;
 
     tileInstance.TryDeleteNotifier.AddObserver(RemoveTile);
     tileInstance.TryChangeTileNameNotifier.AddObserver(TryChangeTileName);
     tileInstance.TryChangeTileIdNotifier.AddObserver(TryChangeTileId);
+    tileInstance.TryChangeConnectionGroupNotifier.AddObserver(TryChangeConnectionGroup);
     tileInstance.SelectActiveTileNotifier.AddObserver(ChangeActiveTile);
     tileInstance.ColorPickerButton.ColorChanged += TileColorChanged.NotifyObservers;
 
@@ -86,13 +88,14 @@ public partial class EditorTiles : MarginContainer, IState
   {
     Random random = new();
     AddTile(
-      GetNextFreeTileId(),
-      GetNewTileName(new(CreatedTiles.Select(x => x.TileName))),
-      new Color(
+      tileId: GetNextFreeTileId(),
+      tileName: GetNewTileName(new(CreatedTiles.Select(x => x.TileName))),
+      color: new Color(
         r: (float)random.NextDouble(),
         g: (float)random.NextDouble(),
         b: (float)random.NextDouble(),
-        a: 0.7f));
+        a: 0.7f),
+      connectionGroup: null);
   }
 
   private void ChangeActiveTile(GuiTile tile)
@@ -129,7 +132,6 @@ public partial class EditorTiles : MarginContainer, IState
     GuiTile tile = tileAndName.Item1;
     int newId = InputSanitizer.SanitizeInt(tileAndName.Item2);
     int oldId = tile.TileId;
-
     if (newId < 0)
       newId = 0;
 
@@ -137,14 +139,37 @@ public partial class EditorTiles : MarginContainer, IState
       CreatedTiles.ToDictionary(guiTile => guiTile.TileId, guiTile => guiTile));
     if (tileIdsToGuiTiles.ContainsKey(newId))
     {
-      if (tileIdsToGuiTiles[newId] == tile) return;
+      if (tileIdsToGuiTiles[newId] == tile)
+      {
+        tile.TileIdEdit.Text = newId.ToString();
+        return;
+      }
+
       newId = GetNextFreeTileId();
     }
 
     tile.TileId = newId;
     tile.TileIdEdit.Text = newId.ToString();
     TileIdChanged.NotifyObservers(new(newId, oldId));
-    GodotLogger.Logger.Log($"Changed tile id from {newId} to {oldId}");
+    GodotLogger.Logger.Log($"Changed tile id from {oldId} to {newId}");
+  }
+
+  private void TryChangeConnectionGroup(Tuple<GuiTile, string> tileAndName)
+  {
+    GuiTile tile = tileAndName.Item1;
+    int? sanitized = InputSanitizer.SanitizeInt(tileAndName.Item2, -1);
+    if (sanitized < 0) sanitized = null;
+    uint? newConnectionGroup = (uint?)sanitized;
+
+    if (newConnectionGroup == tile.ConnectionGroup)
+    {
+      tile.ConnectionGroupEdit.Text = Converter.NullableToString(newConnectionGroup);
+      return;
+    }
+
+    tile.ConnectionGroup = (uint?)newConnectionGroup;
+    tile.ConnectionGroupEdit.Text = Converter.NullableToString(newConnectionGroup);
+    GodotLogger.Logger.Log($"Changed connection group to '{newConnectionGroup}' for tile id '{tile.TileId}'");
   }
 
   private void RemoveTile(string tileName)

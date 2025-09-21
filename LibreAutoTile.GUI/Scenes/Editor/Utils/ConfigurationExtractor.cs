@@ -39,7 +39,11 @@ public static class ConfigurationExtractor
     bitmaskContainer.TileDatabase.Clear();
 
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
-      editorTiles.AddTile((int)tileId, tileDefinition.Name, GodotTypeMapper.Map(tileDefinition.Color));
+      editorTiles.AddTile(
+        tileId: (int)tileId,
+        tileName: tileDefinition.Name,
+        color: GodotTypeMapper.Map(tileDefinition.Color),
+        connectionGroup: tileDefinition.ConnectionGroup);
 
     Dictionary<string, Dictionary<Configuration.Models.Vector3, GuiTileData>> imageFileNameToMappedTileData = [];
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
@@ -85,7 +89,8 @@ public static class ConfigurationExtractor
       var tileDefinition = TileDefinition.Construct(
         GetImageFileNameToTileMaskDefinition(editorContext, guiTile.TileId),
         name: guiTile.TileName,
-        color: tileColor);
+        color: tileColor,
+        connectionGroup: guiTile.ConnectionGroup);
       tileDefinitions[(uint)guiTile.TileId] = tileDefinition;
     }
 
