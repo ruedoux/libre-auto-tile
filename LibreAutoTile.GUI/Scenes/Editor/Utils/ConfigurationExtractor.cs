@@ -153,7 +153,7 @@ public static class ConfigurationExtractor
     {
       foreach (var (atlasPosition, tileMask) in tileMaskDefinition.AtlasPositionToTileMasks)
       {
-        if (TileMask.FromArray(tileMask.SelectMany(e => e).ToArray()) == defaultMask)
+        if (TileMask.FromArray([.. tileMask.SelectMany(e => e)]) == defaultMask)
           return new(atlasPosition, imageFileName);
         latestMatch = new(atlasPosition, imageFileName);
       }

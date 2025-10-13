@@ -68,6 +68,7 @@ public partial class EditorTiles : MarginContainer, IState
 
     tileInstance.TileId = tileId;
     tileInstance.TileName = tileName;
+    tileInstance.ConnectionGroup = connectionGroup;
     tileInstance.TileNameEdit.Text = tileName;
     tileInstance.TileIdEdit.Text = tileId.ToString();
     tileInstance.ConnectionGroupEdit.Text = Converter.NullableToString(connectionGroup);

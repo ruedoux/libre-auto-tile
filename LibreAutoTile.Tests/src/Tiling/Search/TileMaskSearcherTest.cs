@@ -137,7 +137,7 @@ public class TileMaskSearcherTest
     TileAtlas tileAtlas = new(new(0, 0), "a");
     TileMask target = new(topLeft: 0, top: 0);
     Random random = new(8008);
-    List<(TileMask, TileAtlas)> items = Enumerable.Range(0, 1000)
+    List<(TileMask, TileAtlas)> items = [.. Enumerable.Range(0, 1000)
       .Select(_ => (
         new TileMask(
           topLeft: 0,
@@ -150,7 +150,7 @@ public class TileMaskSearcherTest
           left: random.Next(-100, 100)
         ),
         new TileAtlas(new(0, 1), "b")
-      )).ToList();
+      ))];
 
     items.Add(new(target, tileAtlas));
     TileMaskSearcher tileMaskSearcher = new(items, []);
@@ -163,6 +163,7 @@ public class TileMaskSearcherTest
     Assertions.AssertEqual(target, resultTileMask);
   }
 
+  // TODO this is working, corners get stripped!!!
   [SimpleTestMethod]
   public void FindBestMatch_ShouldFindBestResult_WhenGivenConnectionGroupIds()
   {
@@ -170,24 +171,24 @@ public class TileMaskSearcherTest
     int connectionGroupId1 = 0;
     int connectionGroupId2 = 1;
     TileAtlas TileAtlas = new(new(0, 0), "a");
-    TileMask target = new(topLeft: connectionGroupId1, top: connectionGroupId2);
+    TileMask target = new(top: connectionGroupId1, right: connectionGroupId2);
     TileMaskSearcher tileMaskSearcher = new([
       new(target, TileAtlas),
-      new(new(topLeft:connectionGroupId1, top:-1), new(new(0, 1), "b")),
-      new(new(topLeft:-1, top:connectionGroupId1), new(new(0, 2), "c")),
-      new(new(topLeft:connectionGroupId2, top:-1), new(new(0, 3), "d")),
-      new(new(topLeft:-1, top:connectionGroupId2), new(new(0, 4), "e"))],
-      [connectionGroupId1, connectionGroupId2]);
+      new(new(top:connectionGroupId1, right:-1), new(new(0, 1), "b")),
+      new(new(top:-1, right:connectionGroupId1), new(new(0, 2), "c")),
+      new(new(top:connectionGroupId2, right:-1), new(new(0, 3), "d")),
+      new(new(top:-1, right:connectionGroupId2), new(new(0, 4), "e"))],
+      connectionGroupTileIds: [connectionGroupId1, connectionGroupId2]);
 
     // When
     var (resultTileMask1, resultTileAtlas1) = tileMaskSearcher.FindBestMatch(
-      new(topLeft: connectionGroupId1, top: connectionGroupId2));
+      new(top: connectionGroupId1, right: connectionGroupId2));
     var (resultTileMask2, resultTileAtlas2) = tileMaskSearcher.FindBestMatch(
-      new(topLeft: connectionGroupId1, top: connectionGroupId1));
+      new(top: connectionGroupId1, right: connectionGroupId1));
     var (resultTileMask3, resultTileAtlas3) = tileMaskSearcher.FindBestMatch(
-      new(topLeft: connectionGroupId2, top: connectionGroupId2));
+      new(top: connectionGroupId2, right: connectionGroupId2));
     var (resultTileMask4, resultTileAtlas4) = tileMaskSearcher.FindBestMatch(
-      new(topLeft: connectionGroupId2, top: connectionGroupId1));
+      new(top: connectionGroupId2, right: connectionGroupId1));
 
     // Then
     Assertions.AssertEqual(TileAtlas, resultTileAtlas1);

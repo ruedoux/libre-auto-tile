@@ -1,15 +1,16 @@
 using System.Collections.Frozen;
+using System.Collections.Immutable;
 
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
 internal class IndexSearcher(
-  int itemCount, FrozenDictionary<int, List<int>>[] tileIdToItemIndexes)
+  int itemCount, FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes)
 {
   const int TOP_SCORE = 3;
-  const int LOW_SCORE = 2;
-  const int NO_SCORE = 1;
+  const int MID_SCORE = 2;
+  const int LOW_SCORE = 1;
 
-  private readonly FrozenDictionary<int, List<int>>[] tileIdToItemIndexes = tileIdToItemIndexes;
+  private readonly FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes = tileIdToItemIndexes;
   public readonly int[] ResultIndexToItemIndex = new int[itemCount];
 
   private readonly int[] itemIndexToBestScore = new int[itemCount];
@@ -24,12 +25,13 @@ internal class IndexSearcher(
     lock (_lock)
     {
       for (int i = 0; i < tileScore.Length; i++)
-        tileScore[i] = i % 2 == 0 ? LOW_SCORE : TOP_SCORE; // default score 2 for not corner ids
+        tileScore[i] = i % 2 == 0 ? MID_SCORE : TOP_SCORE;
 
-      tileScore[(int)TileMask.SurroundingDirection.TopLeft] = target.IsTopLeftConnected() ? TOP_SCORE : NO_SCORE;
-      tileScore[(int)TileMask.SurroundingDirection.TopRight] = target.IsTopRightConnected() ? TOP_SCORE : NO_SCORE;
-      tileScore[(int)TileMask.SurroundingDirection.BottomLeft] = target.IsBottomLeftConnected() ? TOP_SCORE : NO_SCORE;
-      tileScore[(int)TileMask.SurroundingDirection.BottomRight] = target.IsBottomRightConnected() ? TOP_SCORE : NO_SCORE;
+      // TODO: This needs to be aware of connection groups?
+      tileScore[(int)TileMask.SurroundingDirection.TopLeft] = target.IsTopLeftConnected() ? TOP_SCORE : LOW_SCORE;
+      tileScore[(int)TileMask.SurroundingDirection.TopRight] = target.IsTopRightConnected() ? TOP_SCORE : LOW_SCORE;
+      tileScore[(int)TileMask.SurroundingDirection.BottomLeft] = target.IsBottomLeftConnected() ? TOP_SCORE : LOW_SCORE;
+      tileScore[(int)TileMask.SurroundingDirection.BottomRight] = target.IsBottomRightConnected() ? TOP_SCORE : LOW_SCORE;
 
       IncrementGeneration();
       int resultMaxIndex = -1;
@@ -38,11 +40,14 @@ internal class IndexSearcher(
       {
         // Get list of items that match template for current side id
         int tileId = target.GetTileIdByIndex(fieldIndex);
-        if (!tileIdToItemIndexes[fieldIndex].TryGetValue(tileId, out var itemIndexList) &&
-            !tileIdToItemIndexes[fieldIndex].TryGetValue(wildcardId, out itemIndexList))
-        {
+
+        ImmutableArray<int> itemIndexList =
+          tileIdToItemIndexes[fieldIndex].TryGetValue(tileId, out var find1) ? find1 :
+          tileIdToItemIndexes[fieldIndex].TryGetValue(wildcardId, out var find2) ? find2 :
+          default;
+
+        if (itemIndexList.IsDefaultOrEmpty)
           continue;
-        }
 
         // Iterate over items that have tileId on a given field
         foreach (var itemIndex in itemIndexList)

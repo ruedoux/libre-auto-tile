@@ -13,10 +13,9 @@ public class TileMaskSearcher
 
   public readonly FrozenDictionary<TileMask, TileAtlas> ExistingMasks;
   private readonly ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items;
-  private readonly FrozenSet<int> connectionGroupTileIds;
-  private readonly int connectionGroupRepresentativeId = int.MinValue;
   private readonly IndexSearcher indexSearcher;
   private readonly int wildcardId;
+  private readonly HashSet<int> connectionGroupTileIds;
 
   public TileMaskSearcher(
     IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> rawItems,
@@ -24,17 +23,16 @@ public class TileMaskSearcher
     uint? wildcardId = null)
   {
     this.wildcardId = (int?)wildcardId ?? DEFAULT_WILDCARD_ID;
-    this.connectionGroupTileIds = (connectionGroupTileIds ?? []).ToFrozenSet();
-    connectionGroupRepresentativeId = this.connectionGroupTileIds.FirstOrDefault(int.MinValue);
+    this.connectionGroupTileIds = connectionGroupTileIds ?? [];
     ExistingMasks = rawItems
       .GroupBy(item => item.TileMask)
       .Select(g => g.First())
       .ToDictionary(item => item.TileMask, item => item.TileAtlas)
       .ToFrozenDictionary();
-    items = ExistingMasks
-      .Select(kvp => (TileMask: kvp.Key, TileAtlas: kvp.Value)).ToImmutableArray();
+    items = [.. ExistingMasks.Select(kvp => (TileMask: kvp.Key, TileAtlas: kvp.Value))];
+
     indexSearcher = new(
-      items.Length, GetAssignedIndexes().Select(d => d.ToFrozenDictionary()).ToArray());
+      items.Length, [.. GetAssignedIndexes().Select(d => d.ToFrozenDictionary())]);
   }
 
   /// <summary>
@@ -44,8 +42,6 @@ public class TileMaskSearcher
   {
     if (ExistingMasks.TryGetValue(target, out var tileAtlas))
       return (target, tileAtlas);
-
-    target = ParseTargetConnectionGroup(target);
 
     // Could probably iterate over results that have same best score
     // and decide the best fit? For now pick last best score
@@ -69,31 +65,13 @@ public class TileMaskSearcher
     return bestIndex != -1 ? items[bestIndex] : GetDefaultItem();
   }
 
-  private TileMask ParseTargetConnectionGroup(TileMask target)
-  {
-    int MergeConnectionGroup(int targetId)
-      => connectionGroupTileIds.Contains(targetId) ? connectionGroupRepresentativeId : targetId;
-
-    if (connectionGroupTileIds.Count == 0)
-      return target;
-
-    // Merge tileIds in connection group
-    int tl = MergeConnectionGroup(target.TopLeft);
-    int tt = MergeConnectionGroup(target.Top);
-    int tr = MergeConnectionGroup(target.TopRight);
-    int rr = MergeConnectionGroup(target.Right);
-    int br = MergeConnectionGroup(target.BottomRight);
-    int bb = MergeConnectionGroup(target.Bottom);
-    int bl = MergeConnectionGroup(target.BottomLeft);
-    int ll = MergeConnectionGroup(target.Left);
-
-    return new(tl, tt, tr, rr, br, bb, bl, ll);
-  }
-
   private TileMask ParseTargetHitmask(TileMask target, TileMask rawTileMask)
   {
     int GetHitMask(int target, int rawTileMask)
-      => (target == rawTileMask || rawTileMask == wildcardId) ? rawTileMask : -1;
+      => (target == rawTileMask
+        || rawTileMask == wildcardId
+        || (connectionGroupTileIds.Contains(target) && connectionGroupTileIds.Contains(rawTileMask)))
+        ? rawTileMask : -1;
 
     int h0 = GetHitMask(target.TopLeft, rawTileMask.TopLeft);
     int h1 = GetHitMask(target.Top, rawTileMask.Top);
@@ -108,43 +86,25 @@ public class TileMaskSearcher
     return TileMask.StripCorners(parsedTarget);
   }
 
-  private Dictionary<int, List<int>>[] GetAssignedIndexes()
+  private Dictionary<int, ImmutableArray<int>>[] GetAssignedIndexes()
   {
-    var tileIdToItemIndexesTemp = new Dictionary<int, List<int>>[8];
+    var tileIdToItemIndexesTemp = new Dictionary<int, HashSet<int>>[8];
     for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
       tileIdToItemIndexesTemp[fieldIndex] = [];
 
     AssignIndexes(tileIdToItemIndexesTemp);
-    AssignWildcards(tileIdToItemIndexesTemp);
 
-    return tileIdToItemIndexesTemp;
-  }
-
-  private void AssignIndexes(Dictionary<int, List<int>>[] tileIdToItemIndexesTemp)
-  {
-    for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
+    var result = new Dictionary<int, ImmutableArray<int>>[8];
+    for (int i = 0; i < 8; i++)
     {
-      var tileMask = items[itemIndex].TileMask;
-      for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
-      {
-        var tileId = tileMask.GetTileIdByIndex(fieldIndex);
-
-        // Since all ids in a connection group are treated as the same id
-        if (connectionGroupTileIds.Count > 0 && connectionGroupTileIds.Contains(tileId))
-          tileId = connectionGroupRepresentativeId;
-
-        var dict = tileIdToItemIndexesTemp[fieldIndex];
-        if (!dict.TryGetValue(tileId, out var list))
-        {
-          list = [];
-          dict[tileId] = list;
-        }
-        list.Add(itemIndex);
-      }
+      result[i] = [];
+      foreach (var kvp in tileIdToItemIndexesTemp[i])
+        result[i][kvp.Key] = [.. kvp.Value];
     }
+    return result;
   }
 
-  private void AssignWildcards(Dictionary<int, List<int>>[] tileIdToItemIndexesTemp)
+  private void AssignIndexes(Dictionary<int, HashSet<int>>[] tileIdToItemIndexesTemp)
   {
     for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
     {
@@ -153,11 +113,23 @@ public class TileMaskSearcher
       {
         var tileId = tileMask.GetTileIdByIndex(fieldIndex);
         var dict = tileIdToItemIndexesTemp[fieldIndex];
-        if (tileId == wildcardId)
-          foreach (var keyTileId in dict.Keys)
-            dict[keyTileId].Add(itemIndex);
+        AddSetValueToDict(dict, tileId, itemIndex);
+        if (connectionGroupTileIds.Contains(tileId))
+          foreach (var groupId in connectionGroupTileIds)
+            AddSetValueToDict(dict, groupId, itemIndex);
       }
     }
+  }
+
+  private static void AddSetValueToDict<K, V>(Dictionary<K, HashSet<V>> dict, K key, V value)
+    where K : notnull
+  {
+    if (!dict.TryGetValue(key, out var itemIndexes))
+    {
+      itemIndexes = [];
+      dict[key] = itemIndexes;
+    }
+    itemIndexes.Add(value);
   }
 
   private (TileMask TileMask, TileAtlas TileAtlas) GetDefaultItem()
