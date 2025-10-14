@@ -9,12 +9,12 @@ namespace Qwaitumin.LibreAutoTile.Tests.Tiling;
 [SimpleTestClass]
 public class AutoTilerTest
 {
-  private string jsonString = "";
+  //private string jsonString = "";
 
   [SimpleBeforeAll]
   public void BeforeAll()
   {
-    jsonString = File.ReadAllText("../resources/configurations/ExampleConfigurationTransient.json");
+    //jsonString = File.ReadAllText("../resources/configurations/ExampleConfigurationTransient.json");
   }
 
   [SimpleTestMethod]

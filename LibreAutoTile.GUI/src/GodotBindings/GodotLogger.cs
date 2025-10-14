@@ -7,7 +7,7 @@ namespace Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
 public static class GodotLogger
 {
-  public readonly static Logger Logger = null!;
+  public static readonly Logger LOGGER = null!;
 
   static GodotLogger()
   {
@@ -16,14 +16,14 @@ public static class GodotLogger
       logFilePath = "./guilog.txt";
 
     MessageFileWriter messageFileWriter = new(logFilePath);
-    Logger = new([(msg) => GD.PrintRich(msg), (msg) => messageFileWriter.Write(msg)], new(ColorType: ColorType.BBCODE));
-    Logger.Log($"Logs are written to: '{logFilePath}'");
+    LOGGER = new([(msg) => GD.PrintRich(msg), (msg) => messageFileWriter.Write(msg)], new(ColorType: ColorType.BBCODE));
+    LOGGER.Log($"Logs are written to: '{logFilePath}'");
   }
 
   [System.Diagnostics.CodeAnalysis.DoesNotReturn]
   public static void LogErrorAndThrow(string message)
   {
-    Logger.LogError(message);
+    LOGGER.LogError(message);
     throw new ArgumentException(message);
   }
 }

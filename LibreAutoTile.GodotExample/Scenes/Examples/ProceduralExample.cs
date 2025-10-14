@@ -9,10 +9,10 @@ namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
 
 public partial class ProceduralExample : Node2D
 {
-  enum TILES { GRASS = 0, WATER = 1 }
+  private enum TILES { GRASS = 0, WATER = 1 }
 
-  const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
-  const int LAYER = 0;
+  private const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
+  private const int LAYER = 0;
 
   public override void _Ready()
   {

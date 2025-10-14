@@ -13,7 +13,7 @@ namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Preview;
 
 public partial class EditorPreview : MarginContainer, IState
 {
-  private static readonly PackedScene tileMapTileScene = ResourceLoader.Load<PackedScene>(
+  private static readonly PackedScene TILE_MAP_TILE_SCENE = ResourceLoader.Load<PackedScene>(
     "uid://bagpwruhxb7ka");
 
   public readonly EventNotifier<bool> EnteredPreview = new();
@@ -49,7 +49,7 @@ public partial class EditorPreview : MarginContainer, IState
         Image.CreateEmpty(1, 1, false, Image.Format.Rgba8));
       if (!tileIdToImageLocation.TryGetValue((uint)guiTile.TileId, out var imageAtlasToImageName))
       {
-        GodotLogger.Logger.LogWarning($"Could not get texture for tile id: {guiTile.TileId}");
+        GodotLogger.LOGGER.LogWarning($"Could not get texture for tile id: {guiTile.TileId}");
       }
       else
       {
@@ -64,7 +64,7 @@ public partial class EditorPreview : MarginContainer, IState
           new((int)tileSize, (int)tileSize));
       }
 
-      var tileMapTile = tileMapTileScene.Instantiate<TileMapTile>();
+      var tileMapTile = TILE_MAP_TILE_SCENE.Instantiate<TileMapTile>();
       tileList.AddChild(tileMapTile);
 
       tileMapTile.TileSelected.AddObserver(ChangeActiveTile);
@@ -101,6 +101,6 @@ public partial class EditorPreview : MarginContainer, IState
       ActiveTile.SelectButton.Modulate = Colors.White;
     tileMapTile.SelectButton.Modulate = new(r: 0, g: 2, b: 0);
     ActiveTile = tileMapTile;
-    GodotLogger.Logger.Log($"Changed active tile: {tileMapTile.NameLabel.Text}");
+    GodotLogger.LOGGER.Log($"Changed active tile: {tileMapTile.NameLabel.Text}");
   }
 }

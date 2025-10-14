@@ -8,8 +8,8 @@ namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
 
 public partial class LibreAutoTileCompare : Node2D
 {
-  const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
-  const int LAYER = 0;
+  private const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
+  private const int LAYER = 0;
 
   public override void _Ready()
   {

@@ -6,8 +6,8 @@ namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
 
 public partial class BuiltInCompare : Node2D
 {
-  Vector2I mapSize = new(512, 512);
-  const int TERRAIN_SET = 0;
+  private Vector2I mapSize = new(512, 512);
+  private const int TERRAIN_SET = 0;
 
   public override void _Ready()
   {

@@ -8,6 +8,8 @@
     <NoWarn>NU1605;IDE0130</NoWarn>
     <IsAotCompatible>true</IsAotCompatible>
     <RootNamespace>Qwaitumin.LibreAutoTile</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <NoWarn>$(NoWarn);EnableGenerateDocumentationFile</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

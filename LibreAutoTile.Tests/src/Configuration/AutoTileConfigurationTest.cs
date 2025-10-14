@@ -8,13 +8,13 @@ namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
 [SimpleTestClass]
 public class AutoTileConfigurationTest
 {
-  const uint TILE_SIZE = 16;
-  const string AUTOTILE_MOCK_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
+  private const uint TILE_SIZE = 16;
+  private const string AUTOTILE_MOCK_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
 
-  readonly int[][] DEFAULT_TILEMASK = [[0, 0, 0, 0, 0, 0, 0, 0]];
-  readonly TileDefinition DEFAULT_TILE_DEFINITION;
+  private static readonly int[][] DEFAULT_TILEMASK = [[0, 0, 0, 0, 0, 0, 0, 0]];
+  private static readonly TileDefinition DEFAULT_TILE_DEFINITION;
 
-  public AutoTileConfigurationTest()
+  static AutoTileConfigurationTest()
   {
     DEFAULT_TILE_DEFINITION = TileDefinition.Construct(
       new() { { "resources/mock.jpg", TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }) } });

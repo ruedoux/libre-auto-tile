@@ -6,8 +6,8 @@ namespace Qwaitumin.LibreAutoTile.GUI;
 
 public interface IState
 {
-  public void InitializeState();
-  public void EndState();
+  void InitializeState();
+  void EndState();
 }
 
 public class StateMachine<StateEnum>

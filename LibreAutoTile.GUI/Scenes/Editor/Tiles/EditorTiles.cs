@@ -9,7 +9,7 @@ namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
 
 public partial class EditorTiles : MarginContainer, IState
 {
-  private static readonly PackedScene tileScene = ResourceLoader.Load<PackedScene>(
+  private static readonly PackedScene TILE_SCENE = ResourceLoader.Load<PackedScene>(
     "uid://1pokk3kl6wjp");
 
   public readonly GodotInputListener InputListener = new();
@@ -38,11 +38,11 @@ public partial class EditorTiles : MarginContainer, IState
 
   public void ClearAll()
   {
-    GodotLogger.Logger.Log("> Starting clearing tiles");
+    GodotLogger.LOGGER.Log("> Starting clearing tiles");
     foreach (var guiTile in CreatedTiles)
       RemoveTile(guiTile.TileName);
     ActiveTile = null;
-    GodotLogger.Logger.Log("> Finished clearing tiles");
+    GodotLogger.LOGGER.Log("> Finished clearing tiles");
   }
 
   public Dictionary<string, Color> GetTileNamesToColors()
@@ -63,7 +63,7 @@ public partial class EditorTiles : MarginContainer, IState
     if (CreatedTiles.Any(guiTile => guiTile.TileName == tileName))
       GodotLogger.LogErrorAndThrow($"Cannot create tile with already taken name: '{tileName}'");
 
-    GuiTile tileInstance = tileScene.Instantiate<GuiTile>();
+    GuiTile tileInstance = TILE_SCENE.Instantiate<GuiTile>();
     tileList.AddChild(tileInstance);
 
     tileInstance.TileId = tileId;
@@ -82,7 +82,7 @@ public partial class EditorTiles : MarginContainer, IState
     tileInstance.ColorPickerButton.ColorChanged += TileColorChanged.NotifyObservers;
 
     CreatedTiles.Add(tileInstance);
-    GodotLogger.Logger.Log($"Added new tile: {tileName}");
+    GodotLogger.LOGGER.Log($"Added new tile: {tileName}");
   }
 
   private void AddTile()
@@ -106,7 +106,7 @@ public partial class EditorTiles : MarginContainer, IState
     tile.SelectButton.Modulate = new(r: 0, g: 2, b: 0);
     ActiveTile = tile;
     ChangedActiveTile.NotifyObservers(tile);
-    GodotLogger.Logger.Log($"Changed active tile: {tile.TileName}");
+    GodotLogger.LOGGER.Log($"Changed active tile: {tile.TileName}");
   }
 
   private void TryChangeTileName(Tuple<GuiTile, string> tileAndName)
@@ -125,7 +125,7 @@ public partial class EditorTiles : MarginContainer, IState
 
     tile.TileName = newTileName;
     tile.TileNameEdit.Text = newTileName;
-    GodotLogger.Logger.Log($"Changed tile name from {oldTileName} to {newTileName}");
+    GodotLogger.LOGGER.Log($"Changed tile name from {oldTileName} to {newTileName}");
   }
 
   private void TryChangeTileId(Tuple<GuiTile, string> tileAndName)
@@ -152,7 +152,7 @@ public partial class EditorTiles : MarginContainer, IState
     tile.TileId = newId;
     tile.TileIdEdit.Text = newId.ToString();
     TileIdChanged.NotifyObservers(new(newId, oldId));
-    GodotLogger.Logger.Log($"Changed tile id from {oldId} to {newId}");
+    GodotLogger.LOGGER.Log($"Changed tile id from {oldId} to {newId}");
   }
 
   private void TryChangeConnectionGroup(Tuple<GuiTile, string> tileAndName)
@@ -168,9 +168,9 @@ public partial class EditorTiles : MarginContainer, IState
       return;
     }
 
-    tile.ConnectionGroup = (uint?)newConnectionGroup;
+    tile.ConnectionGroup = newConnectionGroup;
     tile.ConnectionGroupEdit.Text = Converter.NullableToString(newConnectionGroup);
-    GodotLogger.Logger.Log($"Changed connection group to '{newConnectionGroup}' for tile id '{tile.TileId}'");
+    GodotLogger.LOGGER.Log($"Changed connection group to '{newConnectionGroup}' for tile id '{tile.TileId}'");
   }
 
   private void RemoveTile(string tileName)
@@ -187,7 +187,7 @@ public partial class EditorTiles : MarginContainer, IState
 
     if (tileToDelete == ActiveTile)
       ActiveTile = null;
-    GodotLogger.Logger.Log($"Removed tile {tileName}");
+    GodotLogger.LOGGER.Log($"Removed tile {tileName}");
   }
 
   private int GetNextFreeTileId()

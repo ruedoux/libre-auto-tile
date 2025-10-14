@@ -1,7 +1,6 @@
 using Qwaitumin.SimpleTest;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 using Qwaitumin.LibreAutoTile.Configuration;
-using System.Numerics;
 using Godot;
 
 namespace LibreAutoTile.GodotBindings.Tests;
@@ -9,8 +8,8 @@ namespace LibreAutoTile.GodotBindings.Tests;
 [SimpleTestClass]
 public class AutoTileMapTest
 {
-  enum TILES { GRASS = 0, WATER = 1 }
-  const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
+  private enum TILES { GRASS = 0, WATER = 1 }
+  private const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
 
 
   [SimpleTestMethod]

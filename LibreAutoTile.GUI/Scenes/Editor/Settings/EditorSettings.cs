@@ -1,5 +1,4 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Settings;

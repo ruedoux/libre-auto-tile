@@ -5,16 +5,16 @@ namespace Qwaitumin.LibreAutoTile.GodotBindings;
 
 public static class GodotTypeMapper
 {
-  public static Godot.Vector2I Map(Configuration.Models.Vector2 v)
+  public static Vector2I Map(Configuration.Models.Vector2 v)
     => new(v.X, v.Y);
 
-  public static Godot.Vector3I Map(Configuration.Models.Vector3 v)
+  public static Vector3I Map(Configuration.Models.Vector3 v)
     => new(v.X, v.Y, v.Z);
 
-  public static Configuration.Models.Vector2 Map(Godot.Vector2I v)
+  public static Configuration.Models.Vector2 Map(Vector2I v)
     => new(v.X, v.Y);
 
-  public static Configuration.Models.Vector3 Map(Godot.Vector3I v)
+  public static Configuration.Models.Vector3 Map(Vector3I v)
     => new(v.X, v.Y, v.Z);
 
   public static Configuration.Models.Vector2 Map(Godot.Vector2 v)

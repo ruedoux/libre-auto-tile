@@ -6,9 +6,9 @@ namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 internal class IndexSearcher(
   int itemCount, FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes)
 {
-  const int TOP_SCORE = 3;
-  const int MID_SCORE = 2;
-  const int LOW_SCORE = 1;
+  private const int TOP_SCORE = 3;
+  private const int MID_SCORE = 2;
+  private const int LOW_SCORE = 1;
 
   private readonly FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes = tileIdToItemIndexes;
   public readonly int[] ResultIndexToItemIndex = new int[itemCount];
@@ -16,13 +16,13 @@ internal class IndexSearcher(
   private readonly int[] itemIndexToBestScore = new int[itemCount];
   private readonly int[] itemIndexToSeenGeneration = new int[itemCount];
   private readonly int[] tileScore = new int[8];
-  private readonly object _lock = new();
+  private readonly object searchLock = new();
   private int currentGeneration = 1;
 
 
   public (int ResultCount, int BestScore) Search(TileMask target, int wildcardId)
   {
-    lock (_lock)
+    lock (searchLock)
     {
       for (int i = 0; i < tileScore.Length; i++)
         tileScore[i] = i % 2 == 0 ? MID_SCORE : TOP_SCORE;

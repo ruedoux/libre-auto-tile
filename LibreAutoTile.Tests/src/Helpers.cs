@@ -1,6 +1,4 @@
-using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling;
 
 namespace Qwaitumin.LibreAutoTile.Tests;
 

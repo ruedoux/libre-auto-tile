@@ -29,7 +29,7 @@ public partial class BitmaskContainer : Node2D
     TileDatabase.Clear();
     TileSetBitmaskDrawer.RedrawBitmask([]);
     TileSetBitmaskDrawer.ClearAllDrawn();
-    GodotLogger.Logger.Log("Cleared all Bitmasks");
+    GodotLogger.LOGGER.Log("Cleared all Bitmasks");
   }
 
   public void RedrawBitmask(

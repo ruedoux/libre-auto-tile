@@ -11,5 +11,7 @@
     <NoWarn>IDE0130;NU1605</NoWarn>
     <PublishAOT>true</PublishAOT>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <NoWarn>$(NoWarn);EnableGenerateDocumentationFile</NoWarn>
   </PropertyGroup>
 </Project>

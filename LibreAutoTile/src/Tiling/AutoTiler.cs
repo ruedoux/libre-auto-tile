@@ -16,7 +16,7 @@ public class AutoTiler
 
   private readonly FrozenDictionary<int, TileMaskSearcher> tileIdToTileMaskSearcher;
   private readonly Dictionary<Vector2, TileData>[] data;
-  private readonly ReaderWriterLockSlim _lock = new();
+  private readonly ReaderWriterLockSlim readWriteLock = new();
 
   public AutoTiler(uint layerCount, AutoTileConfiguration autoTileConfiguration)
     : this(layerCount, BuildTileIdToTileMaskSearcher(autoTileConfiguration)) { }
@@ -68,7 +68,7 @@ public class AutoTiler
 
   public void Clear()
   {
-    _lock.EnterWriteLock();
+    readWriteLock.EnterWriteLock();
     try
     {
       for (int i = 0; i < data.Length; i++)
@@ -76,7 +76,7 @@ public class AutoTiler
     }
     finally
     {
-      _lock.ExitWriteLock();
+      readWriteLock.ExitWriteLock();
     }
   }
 
@@ -86,28 +86,28 @@ public class AutoTiler
   public Vector2[] GetAllPositions(int layer)
   {
     ValidateLayer(layer);
-    _lock.EnterReadLock();
+    readWriteLock.EnterReadLock();
     try
     {
       return [.. data[layer].Keys];
     }
     finally
     {
-      _lock.ExitReadLock();
+      readWriteLock.ExitReadLock();
     }
   }
 
   public TileData GetTile(int layer, Vector2 position)
   {
     ValidateLayer(layer);
-    _lock.EnterReadLock();
+    readWriteLock.EnterReadLock();
     try
     {
       return GetTileDataAt(layer, position);
     }
     finally
     {
-      _lock.ExitReadLock();
+      readWriteLock.ExitReadLock();
     }
   }
 
@@ -116,7 +116,7 @@ public class AutoTiler
     ValidateLayer(layer);
     ValidateTileId(tileId);
 
-    _lock.EnterWriteLock();
+    readWriteLock.EnterWriteLock();
     try
     {
       if (tileId < 0)
@@ -142,7 +142,7 @@ public class AutoTiler
     }
     finally
     {
-      _lock.ExitWriteLock();
+      readWriteLock.ExitWriteLock();
     }
   }
 

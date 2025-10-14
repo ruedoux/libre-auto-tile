@@ -1,6 +1,5 @@
 using System.IO;
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
 
@@ -90,6 +89,6 @@ public partial class EditorOptions : MarginContainer
     Rect2I imageSize = new(Vector2I.Zero, new(image.GetWidth(), image.GetHeight()));
     ImageRectangleObservable.ChangeValueAndNotifyObservers(imageSize);
     ImageFileObservable.ChangeValueAndNotifyObservers(relativePath);
-    GodotLogger.Logger.Log($"Changed image to: {relativePath}");
+    GodotLogger.LOGGER.Log($"Changed image to: {relativePath}");
   }
 }

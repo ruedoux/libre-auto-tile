@@ -24,7 +24,7 @@ public class ObservableVariable<T>
   }
 
   public void AddObserver(Action<T> observer)
-    => this.observers.Add(observer);
+    => observers.Add(observer);
 
   public void AddObservers(IEnumerable<Action<T>> observers)
     => this.observers.AddRange(observers);

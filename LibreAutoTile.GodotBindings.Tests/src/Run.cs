@@ -5,7 +5,7 @@ namespace LibreAutoTile.GodotBindings.Tests;
 
 public partial class Run : Node2D
 {
-  Task task = null!;
+  private Task task = null!;
 
   public override void _Ready()
   {

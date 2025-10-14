@@ -9,7 +9,7 @@ public class TileDefinition(
   TileColor color = default,
   uint? connectionGroup = default)
 {
-  const string DEFAULT_STRING = "<NONE>";
+  private const string DEFAULT_STRING = "<NONE>";
 
   public readonly ImmutableDictionary<string, TileMaskDefinition> ImageFileNameToTileMaskDefinition = imageFileNameToTileMaskDefinition;
   public readonly string Name = name;

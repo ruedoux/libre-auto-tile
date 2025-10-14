@@ -14,6 +14,8 @@
     <NoWarn>NU1605;IDE0130</NoWarn>
     <IsAotCompatible>true</IsAotCompatible>
     <RootNamespace>Qwaitumin.LibreAutoTile.Tests</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <NoWarn>$(NoWarn);EnableGenerateDocumentationFile</NoWarn>
   </PropertyGroup>
 
 </Project>

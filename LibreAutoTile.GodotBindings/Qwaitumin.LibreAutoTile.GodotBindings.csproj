@@ -8,6 +8,8 @@
     <NoWarn>IDE0130;NU1605</NoWarn>
     <IsAotCompatible>true</IsAotCompatible>
     <RootNamespace>Qwaitumin.LibreAutoTile.GodotBingings</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <NoWarn>$(NoWarn);EnableGenerateDocumentationFile</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

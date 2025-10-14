@@ -32,7 +32,7 @@ public class AutoTileMap : Node2D
     tileSize = autoTileConfiguration.TileSize;
   }
 
-  public Vector2I WorldToMap(Godot.Vector2 worldPosition)
+  public Vector2I WorldToMap(Vector2 worldPosition)
   {
     int tileXScaledDown = (int)Math.Floor(worldPosition.X / tileSize);
     int tileYScaledDown = (int)Math.Floor(worldPosition.Y / tileSize);

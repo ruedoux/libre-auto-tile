@@ -6,7 +6,7 @@ namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
 [SimpleTestClass]
 public class TileMaskDefinitionTest
 {
-  readonly int[][] DEFAULT_TILEMASK = [[0, 0, 0, 0, 0, 0, 0, 0]];
+  private static readonly int[][] DEFAULT_TILEMASK = [[0, 0, 0, 0, 0, 0, 0, 0]];
 
   [SimpleTestMethod]
   public void VerifyEquality()

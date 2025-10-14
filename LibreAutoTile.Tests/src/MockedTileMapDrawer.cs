@@ -3,7 +3,7 @@ using Qwaitumin.LibreAutoTile.Tiling;
 
 namespace Qwaitumin.LibreAutoTile.Tests;
 
-class MockedTileMapDrawer : ITileMapDrawer
+internal class MockedTileMapDrawer : ITileMapDrawer
 {
   public Dictionary<Vector2, TileData>[] Data;
 

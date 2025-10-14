@@ -8,8 +8,8 @@ namespace Qwaitumin.LibreAutoTile;
 /// </summary>
 public interface ITileMapDrawer
 {
-  public void Clear();
-  public void DrawTiles(int tileLayer, IEnumerable<(Vector2 Position, TileData TileData)> positionsToTileData);
+  void Clear();
+  void DrawTiles(int tileLayer, IEnumerable<(Vector2 Position, TileData TileData)> positionsToTileData);
 }
 
 /// <summary>

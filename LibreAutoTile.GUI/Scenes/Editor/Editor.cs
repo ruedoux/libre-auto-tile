@@ -24,7 +24,7 @@ public partial class Editor : Control
   private readonly EditorTileDrawer tileDrawer;
   private readonly MouseLabel mouseLabel;
   private readonly BitmaskContainer bitmaskContainer;
-  private readonly List<Control> UiElements = [];
+  private readonly List<Control> uiElements = [];
 
   private StateMachine<EditorTools> toolsStateMachine = null!;
   private Settings.EditorSettings editorSettings = null!;
@@ -51,7 +51,7 @@ public partial class Editor : Control
     messageDisplay = GetNode<MessageDisplay>("CanvasLayer/Window/Workspace/MessageDisplay");
     editorLayer = GetNode<EditorLayer>("CanvasLayer/Window/Workspace/V/H/MarginContainer/EditorLayer");
     editorPreview = GetNode<EditorPreview>("CanvasLayer/Window/Tools/V/EditorPreview");
-    UiElements.AddRange([GetNode<Control>("CanvasLayer/Window/Tools"), editorLayer]);
+    uiElements.AddRange([GetNode<Control>("CanvasLayer/Window/Tools"), editorLayer]);
 
     toolsStateMachine = new(
       EditorTools.Tiles,
@@ -87,7 +87,7 @@ public partial class Editor : Control
     editorOptions.ConfigurationSaved.AddObserver(SaveConfiguration);
     editorOptions.ImageFileObservable.AddObservers([
       (_) => UpdateBitmask(),
-      (_) => {cameraControl.Position = Godot.Vector2.Zero;}]);
+      (_) => {cameraControl.Position = Vector2.Zero;}]);
     editorOptions.ConfigurationCleared.AddObserver((_) => ClearBitmasks());
     editorOptions.ConfigurationLoaded.AddObserver(LoadConfiguration);
 
@@ -108,7 +108,7 @@ public partial class Editor : Control
 
   public override void _Input(InputEvent @event)
   {
-    if (!GodotApi.IsMouseOnElements([.. UiElements]))
+    if (!GodotApi.IsMouseOnElements([.. uiElements]))
     {
       inputListener.ListenToInput(@event);
       tileDrawer.ShowSelectedTile();
@@ -125,11 +125,11 @@ public partial class Editor : Control
 
   private void ClearBitmasks()
   {
-    GodotLogger.Logger.Log("> Starting clearing editor state");
+    GodotLogger.LOGGER.Log("> Starting clearing editor state");
     editorTiles.ClearAll();
     bitmaskContainer.Clear();
     UpdateBitmask();
-    GodotLogger.Logger.Log("> Finished clearing editor state");
+    GodotLogger.LOGGER.Log("> Finished clearing editor state");
   }
 
   private void AutoTileMapInput(InputEventMouse inputEventMouse)
@@ -195,7 +195,7 @@ public partial class Editor : Control
     var configuration = ExtractAutoTileConfiguration();
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
-    GodotLogger.Logger.Log($"Saved configuration to: {filePath}");
+    GodotLogger.LOGGER.Log($"Saved configuration to: {filePath}");
     messageDisplay.DisplayText($"[color=green]Saved configuration to: {filePath}[/color]");
   }
 
@@ -204,7 +204,7 @@ public partial class Editor : Control
     ConfigurationExtractor.LoadConfiguration(filePath, editorTiles, bitmaskContainer);
     UpdateBitmask();
     messageDisplay.DisplayText($"[color=green]Loaded configuration from: {filePath}[/color]");
-    GodotLogger.Logger.Log($"Loaded configuration from: {filePath}");
+    GodotLogger.LOGGER.Log($"Loaded configuration from: {filePath}");
   }
 
   private AutoTileConfiguration ExtractAutoTileConfiguration()
@@ -231,7 +231,7 @@ public partial class Editor : Control
       editorSettings.GridColorObservable.Value,
       editorSettings.ScaledTileSizeObservable.Value);
 
-  private void UpdateSelectedTile(Godot.Vector2 mousePosition)
+  private void UpdateSelectedTile(Vector2 mousePosition)
   {
     if (toolsStateMachine.CurrentState == editorTiles)
     {
@@ -258,14 +258,14 @@ public partial class Editor : Control
     editorOptions.ImageUiContainer.Hide();
     editorOptions.ConfigurationUiContainer.Hide();
     cameraControl.View = new(-int.MaxValue / 2, -int.MaxValue / 2, int.MaxValue, int.MaxValue);
-    cameraControl.Position = Godot.Vector2.Zero;
+    cameraControl.Position = Vector2.Zero;
     AutoTileConfiguration autoTileConfiguration = ExtractAutoTileConfiguration();
     editorPreview.InitializeTileMap(autoTileConfiguration);
     editorPreview.AddCreatedTiles(editorTiles.CreatedTiles, autoTileConfiguration);
     AddChild(editorPreview.AutoTileMap);
     if (editorPreview.AutoTileMap is not null)
       editorPreview.AutoTileMap.Scale = new(IMAGE_SCALING, IMAGE_SCALING);
-    GodotLogger.Logger.Log($"Entered preview and loaded AutoTileMap");
+    GodotLogger.LOGGER.Log($"Entered preview and loaded AutoTileMap");
   }
 
   private void ExitEditorPreview()
@@ -281,6 +281,6 @@ public partial class Editor : Control
     UpdateBitmask();
 
     RemoveChild(editorPreview.AutoTileMap);
-    GodotLogger.Logger.Log($"Exited preview and unloaded AutoTileMap");
+    GodotLogger.LOGGER.Log($"Exited preview and unloaded AutoTileMap");
   }
 }

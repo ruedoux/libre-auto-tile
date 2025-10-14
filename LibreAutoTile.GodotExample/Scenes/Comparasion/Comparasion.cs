@@ -6,7 +6,7 @@ namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
 
 public static class Comparasion
 {
-  public readonly static Vector2I MAP_SIZE = new(512, 512);
+  public static readonly Vector2I MAP_SIZE = new(512, 512);
   public enum TILES { GRASS = 0, WATER = 1 }
 
   public static Dictionary<Vector2I, int> GetPositionToTileId()
