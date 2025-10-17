@@ -10,22 +10,22 @@ public class TilingStateVerifier(AutoTiler autoTiler, AutoTileConfiguration auto
 {
   private readonly AutoTiler autoTiler = autoTiler;
   private readonly AutoTileConfiguration autoTileConfiguration = autoTileConfiguration;
-  private readonly Dictionary<Vector2, (int TileId, TileMask TileMask)> expectedMasks = [];
+  private readonly Dictionary<Vector2, (int TileId, TileMask TileMask)> mappedExpectedTileMasks = [];
 
-  public void UpdateTile(int tileId, Vector2 position, TileMask tileMask)
+  public void UpdateTile(int tileId, Vector2 position, TileMask expectedTileMask)
   {
-    expectedMasks[position] = new(tileId, tileMask);
+    mappedExpectedTileMasks[position] = new(tileId, expectedTileMask);
   }
 
-  public void AddTile(int tileId, Vector2 position, TileMask tileMask)
+  public void AddTile(int tileId, Vector2 position, TileMask expectedTileMask)
   {
     autoTiler.PlaceTile(0, position, tileId);
-    expectedMasks[position] = new(tileId, tileMask);
+    mappedExpectedTileMasks[position] = new(tileId, expectedTileMask);
   }
 
   public void Verify()
   {
-    foreach (var (position, maskPacked) in expectedMasks)
+    foreach (var (position, maskPacked) in mappedExpectedTileMasks)
     {
       TileData resultTileData = autoTiler.GetTile(0, position);
       var shouldBeMaskAndAtlas = GetAtlasAndMaskFromConfiguration(maskPacked.TileId, maskPacked.TileMask);

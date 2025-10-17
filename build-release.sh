@@ -3,12 +3,16 @@
 set -euo pipefail
 shopt -s globstar
 
+RED_COLOR='\033[0;31m'
+BLUE_COLOR='\033[0;34m'
+NO_COLOR='\033[0m'
+
 info() {
-  echo "[INFO] - $@" 
+  echo -e "${BLUE_COLOR}[INFO]${NO_COLOR} $@"
 }
 
 error() {
-  echo "[ERRO] - $@" >&2
+  echo -e "${RED_COLOR}[ERROR]${NO_COLOR} $@"
 }
 
 build_gui() {

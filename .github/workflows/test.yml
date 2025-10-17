@@ -27,7 +27,7 @@ jobs:
 
   ### Delays the build substantially on github
   # test-godot:
-  #   runs-on: barichello/godot-ci:mono-4.4.1
+  #   runs-on: barichello/godot-ci:mono-4.5.1
   #   needs: test-native
   #   steps:
   #     - uses: actions/checkout@v4

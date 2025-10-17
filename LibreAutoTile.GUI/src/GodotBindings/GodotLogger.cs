@@ -7,7 +7,7 @@ namespace Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
 public static class GodotLogger
 {
-  public static readonly Logger LOGGER = null!;
+  public static readonly Logging.Logger LOGGER = null!;
 
   static GodotLogger()
   {

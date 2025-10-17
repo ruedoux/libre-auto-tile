@@ -11,7 +11,7 @@ trim_trailing_whitespace = true
 # https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/
 dotnet_diagnostic.IDE0001.severity = error # Simplify names
 dotnet_diagnostic.IDE0002.severity = error # Simplify member access
-dotnet_diagnostic.IDE0003.severity = error # Remove qualification
+dotnet_diagnostic.IDE0003.severity = warning # Remove qualification
 dotnet_diagnostic.IDE0004.severity = error # Remove unnecessary cast
 dotnet_diagnostic.IDE0005.severity = error # Remove unnecessary imports
 dotnet_diagnostic.IDE0036.severity = error # Sort modifiers
@@ -20,7 +20,6 @@ dotnet_diagnostic.IDE0049.severity = error # Use keyword for type name
 dotnet_diagnostic.IDE0055.severity = error # Fix formatting
 dotnet_diagnostic.IDE0051.severity = warning # Private method is unused
 dotnet_diagnostic.IDE0052.severity = warning # Private member is unused
-dotnet_diagnostic.IDE0073.severity = error # File header
 dotnet_diagnostic.IDE0130.severity = error # Namespace mismatch with folder
 dotnet_diagnostic.IDE1006.severity = error # Naming style
 
