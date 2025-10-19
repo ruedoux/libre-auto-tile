@@ -71,6 +71,8 @@ build_libs() {
 }
 
 publish() {
+    info "Attempting to publish version $PACKAGE_VERSION"
+
     if [[ -z "$NUGET_API_KEY" ]]; then
         error "NUGET_API_KEY is not set."
         exit 1

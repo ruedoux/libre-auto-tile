@@ -6,9 +6,9 @@ using Qwaitumin.LibreAutoTile.Tiling.Search;
 namespace Qwaitumin.LibreAutoTile.Benchmark;
 
 
-static class TileMaskSearcherItemSetup
+internal static class TileMaskSearcherItemSetup
 {
-  const int MAX_TILE_ID = 1000;
+  private const int MAX_TILE_ID = 1000;
 
   public static List<(TileMask TileMask, TileAtlas tileAtlas)> GetItems(int n)
   {
@@ -42,11 +42,11 @@ public class TileMaskSearcherBenchmark
   [Params(1_000, 10_000)]
   public int N;
 
-  TileMaskSearcher tileMaskSearcher = null!;
+  private TileMaskSearcher tileMaskSearcher = null!;
 
-  List<(TileMask TileMask, TileAtlas tileAtlas)> items = [];
-  List<(TileMask TileMask, TileAtlas tileAtlas)> itemsToMatch = [];
-  (TileMask TileMask, TileAtlas tileAtlas) randomTileMask;
+  private List<(TileMask TileMask, TileAtlas tileAtlas)> items = [];
+  private List<(TileMask TileMask, TileAtlas tileAtlas)> itemsToMatch = [];
+  private (TileMask TileMask, TileAtlas tileAtlas) randomTileMask;
 
   [GlobalSetup]
   public void GlobalSetup()

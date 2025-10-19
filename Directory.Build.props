@@ -1,0 +1,18 @@
+<Project>
+
+  <PropertyGroup Condition="!$(MSBuildProjectDirectory.Contains('modules'))">
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <NoWarn>EnableGenerateDocumentationFile;NU1605;IDE0130</NoWarn>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BenchmarkDotNetVersion>0.14.0</BenchmarkDotNetVersion>
+    <GodotSharpVersion>4.5.1</GodotSharpVersion>
+  </PropertyGroup>
+
+</Project>
