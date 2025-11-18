@@ -14,7 +14,8 @@ public class AutoTileDrawerTest
   {
     // Given
     Vector2[] positions = Helpers.GetVector2Rectangle(Vector2.Zero, new(16, 16));
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([], []) } }); MockedTileMapDrawer testTileMapDrawer = new(1);
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new([], []), new([])) } });
+    MockedTileMapDrawer testTileMapDrawer = new(1);
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);
 
     // When
@@ -32,7 +33,7 @@ public class AutoTileDrawerTest
     // Given
     Vector2[] positions = Helpers.GetVector2Rectangle(Vector2.Zero, new(16, 16));
 
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([], []) } });
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new([], []), new([])) } });
     MockedTileMapDrawer testTileMapDrawer = new(1);
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);
 
@@ -54,7 +55,8 @@ public class AutoTileDrawerTest
     // Given
     Vector2[] positions = Helpers.GetVector2Rectangle(Vector2.Zero, new(16, 16));
 
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileMaskSearcher>() { { 0, new([], []) } }); MockedTileMapDrawer testTileMapDrawer = new(1);
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new([], []), new([])) } });
+    MockedTileMapDrawer testTileMapDrawer = new(1);
     AutoTileDrawer autoTileDrawer = new(testTileMapDrawer, autoTiler);
 
     // When

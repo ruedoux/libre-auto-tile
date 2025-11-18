@@ -6,6 +6,7 @@
 
   <PropertyGroup>
     <RootNamespace>Qwaitumin.LibreAutoTile.GUI</RootNamespace>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
 </Project>

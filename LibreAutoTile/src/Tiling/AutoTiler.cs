@@ -14,14 +14,16 @@ public class AutoTiler
   public static readonly Vector2[] CELL_SURROUNDING_DIRECTIONS = [
       Vector2.TopLeft, Vector2.Top, Vector2.TopRight, Vector2.Right, Vector2.BottomRight, Vector2.Bottom, Vector2.BottomLeft, Vector2.Left ];
 
-  private readonly FrozenDictionary<int, TileMaskSearcher> tileIdToTileMaskSearcher;
-  private readonly Dictionary<Vector2, TileData>[] data;
+  private readonly FrozenDictionary<int, TileSearcher> tileIdToTileMaskSearcher;
+  private readonly Dictionary<Vector2, TileData>[] data; // TODO, maybe give option to make 2D array?
   private readonly ReaderWriterLockSlim readWriteLock = new();
+  private readonly int[] tileMaskArray; // Assuming this is accessed only with lock!
+
 
   public AutoTiler(uint layerCount, AutoTileConfiguration autoTileConfiguration)
     : this(layerCount, BuildTileIdToTileMaskSearcher(autoTileConfiguration)) { }
 
-  public AutoTiler(uint layerCount, Dictionary<int, TileMaskSearcher> tileIdToTileMaskSearcher)
+  public AutoTiler(uint layerCount, Dictionary<int, TileSearcher> tileIdToTileMaskSearcher)
   {
     if (layerCount < 1)
       throw new ArgumentException($"Layer count must be higher than 1, given: {layerCount}");
@@ -31,9 +33,10 @@ public class AutoTiler
       data[layer] = [];
 
     this.tileIdToTileMaskSearcher = tileIdToTileMaskSearcher.ToFrozenDictionary();
+    tileMaskArray = new TileMask().ToArray();
   }
 
-  private static Dictionary<int, TileMaskSearcher> BuildTileIdToTileMaskSearcher(
+  private static Dictionary<int, TileSearcher> BuildTileIdToTileMaskSearcher(
     AutoTileConfiguration autoTileConfiguration)
   {
     var connectionGroupToTileIds = autoTileConfiguration.TileDefinitions
@@ -44,26 +47,26 @@ public class AutoTiler
           g => new HashSet<int>(g.Select(td => (int)td.Key))
       );
 
-    Dictionary<int, TileMaskSearcher> tileIdToTileMaskSearcher = [];
+    Dictionary<int, TileSearcher> tileIdToTileSearcher = [];
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {
-      List<(TileMask, TileAtlas)> tileMaskSearcherItems = [];
+      List<(TileMask TileMask, TileAtlas TileAtlas)> items = [];
       foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
         foreach (var (position, tileMaskArrays) in tileMaskDefinition.AtlasPositionToTileMasks)
           foreach (var tileMaskArray in tileMaskArrays)
-            tileMaskSearcherItems.Add(
+            items.Add(
               new(FromArray([.. tileMaskArray]), new(position.ToVector2(), imageFileName)));
 
       HashSet<int>? connectionGroupArray = null;
       if (tileDefinition.ConnectionGroup is not null)
         connectionGroupArray = connectionGroupToTileIds[(uint)tileDefinition.ConnectionGroup];
 
-      tileIdToTileMaskSearcher.Add(
-        (int)tileId,
-        new TileMaskSearcher(
-          tileMaskSearcherItems, connectionGroupArray, autoTileConfiguration.WildcardId));
+      TileMaskSearcher tileMaskSearcher = new(
+        items.Select(x => x.TileMask), connectionGroupArray, autoTileConfiguration.WildcardId);
+      TileAtlasResolver tileAtlasResolver = new(items);
+      tileIdToTileSearcher.Add((int)tileId, new(tileMaskSearcher, tileAtlasResolver));
     }
-    return tileIdToTileMaskSearcher;
+    return tileIdToTileSearcher;
   }
 
   public void Clear()
@@ -123,7 +126,6 @@ public class AutoTiler
         data[layer].Remove(position, out _);
       else
       {
-        int[] tileMaskArray = new int[8];
         for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
         {
           var surroundingTileData = GetTileDataAt(layer, position + CELL_SURROUNDING_DIRECTIONS[i]);

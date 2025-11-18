@@ -3,30 +3,37 @@ using System.Collections.Immutable;
 
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
-internal class IndexSearcher(
-  int itemCount, FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes)
+internal class IndexSearcher
 {
   private const int TOP_SCORE = 3;
   private const int MID_SCORE = 2;
   private const int LOW_SCORE = 1;
 
-  private readonly FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes = tileIdToItemIndexes;
-  public readonly int[] ResultIndexToItemIndex = new int[itemCount];
+  public readonly int[] ResultIndexToItemIndex;
 
-  private readonly int[] itemIndexToBestScore = new int[itemCount];
-  private readonly int[] itemIndexToSeenGeneration = new int[itemCount];
+  private readonly FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes;
+  private readonly int[] itemIndexToBestScore;
+  private readonly int[] itemIndexToSeenGeneration;
   private readonly int[] tileScore = new int[8];
   private readonly object searchLock = new();
   private int currentGeneration = 1;
+
+  public IndexSearcher(int itemCount, FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes)
+  {
+    this.tileIdToItemIndexes = tileIdToItemIndexes;
+    ResultIndexToItemIndex = new int[itemCount];
+    itemIndexToBestScore = new int[itemCount];
+    itemIndexToSeenGeneration = new int[itemCount];
+
+    for (int i = 0; i < tileScore.Length; i++)
+      tileScore[i] = i % 2 == 0 ? MID_SCORE : TOP_SCORE;
+  }
 
 
   public (int ResultCount, int BestScore) Search(TileMask target, int wildcardId)
   {
     lock (searchLock)
     {
-      for (int i = 0; i < tileScore.Length; i++)
-        tileScore[i] = i % 2 == 0 ? MID_SCORE : TOP_SCORE;
-
       // TODO: This needs to be aware of connection groups?
       tileScore[(int)TileMask.SurroundingDirection.TopLeft] = target.IsTopLeftConnected() ? TOP_SCORE : LOW_SCORE;
       tileScore[(int)TileMask.SurroundingDirection.TopRight] = target.IsTopRightConnected() ? TOP_SCORE : LOW_SCORE;

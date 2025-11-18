@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Godot;
 
 namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;

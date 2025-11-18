@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.GodotBindings;

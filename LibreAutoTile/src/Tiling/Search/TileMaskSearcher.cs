@@ -5,57 +5,51 @@ using System.Data;
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
 /// <summary>
-/// Finds best fitting atlas for a provided mask. Thread safe.
+/// Finds best fitting mask. Thread safe.
 /// </summary>
 public class TileMaskSearcher
 {
   public const int DEFAULT_WILDCARD_ID = -2;
 
-  public readonly FrozenDictionary<TileMask, TileAtlas> ExistingMasks;
-  private readonly ImmutableArray<(TileMask TileMask, TileAtlas TileAtlas)> items;
+  public readonly FrozenSet<TileMask> ExistingMasks;
+  private readonly ImmutableArray<TileMask> items;
   private readonly IndexSearcher indexSearcher;
   private readonly int wildcardId;
   private readonly HashSet<int> connectionGroupTileIds;
 
   public TileMaskSearcher(
-    IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> rawItems,
+    IEnumerable<TileMask> tileMasks,
     HashSet<int>? connectionGroupTileIds = null,
     uint? wildcardId = null)
   {
     this.wildcardId = (int?)wildcardId ?? DEFAULT_WILDCARD_ID;
     this.connectionGroupTileIds = connectionGroupTileIds ?? [];
-    ExistingMasks = rawItems
-      .GroupBy(item => item.TileMask)
-      .Select(g => g.First())
-      .ToDictionary(item => item.TileMask, item => item.TileAtlas)
-      .ToFrozenDictionary();
-    items = [.. ExistingMasks.Select(kvp => (TileMask: kvp.Key, TileAtlas: kvp.Value))];
+    ExistingMasks = tileMasks.ToFrozenSet();
+    items = [.. tileMasks];
 
     indexSearcher = new(
       items.Length, [.. GetAssignedIndexes().Select(d => d.ToFrozenDictionary())]);
   }
 
   /// <summary>
-  /// If no field has a match returns first item (random tile)
+  /// If no field has a match returns random item
   /// </summary>
-  public (TileMask TileMask, TileAtlas TileAtlas) FindBestMatch(TileMask target)
+  public TileMask FindBestMatch(TileMask target)
   {
-    if (ExistingMasks.TryGetValue(target, out var tileAtlas))
-      return (target, tileAtlas);
+    if (ExistingMasks.Contains(target))
+      return target;
 
-    // Could probably iterate over results that have same best score
-    // and decide the best fit? For now pick last best score
     (int resultMaxIndex, int _) = indexSearcher.Search(target, wildcardId);
     TileMask parsedTarget = new();
     if (resultMaxIndex != -1)
     {
       int rawBestIndex = indexSearcher.ResultIndexToItemIndex[resultMaxIndex];
-      var rawTileMask = rawBestIndex != -1 ? items[rawBestIndex].TileMask : new();
+      var rawTileMask = rawBestIndex != -1 ? items[rawBestIndex] : new();
       parsedTarget = ParseTargetHitmask(target, rawTileMask);
     }
 
-    if (ExistingMasks.TryGetValue(parsedTarget, out var atlas))
-      return (parsedTarget, atlas);
+    if (ExistingMasks.Contains(parsedTarget))
+      return parsedTarget;
 
     (int trimmedResultMaxIndex, int _) = indexSearcher.Search(target, wildcardId);
     if (trimmedResultMaxIndex == -1)
@@ -108,7 +102,7 @@ public class TileMaskSearcher
   {
     for (int itemIndex = 0; itemIndex < items.Length; itemIndex++)
     {
-      var tileMask = items[itemIndex].TileMask;
+      var tileMask = items[itemIndex];
       for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
       {
         var tileId = tileMask.GetTileIdByIndex(fieldIndex);
@@ -132,6 +126,6 @@ public class TileMaskSearcher
     itemIndexes.Add(value);
   }
 
-  private (TileMask TileMask, TileAtlas TileAtlas) GetDefaultItem()
-    => items.Length > 0 ? items[0] : new(new(), new());
+  private TileMask GetDefaultItem()
+    => items.Length > 0 ? items[0] : new();
 }

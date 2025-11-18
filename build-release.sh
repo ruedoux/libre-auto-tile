@@ -70,8 +70,14 @@ build_libs() {
   tar -czvf "$EXPORT_OUTPUT"/libs.tar.gz -C "$LIB_TEMP" . > /dev/null
 }
 
+run_benchmark() {
+  info "Running benchamrks"
+  (cd LibreAutoTile.Benchmarks && dotnet run -c Release --filter '*')
+}
+
 publish() {
     info "Attempting to publish version $PACKAGE_VERSION"
+    info "Meant only for maintainers use"
 
     if [[ -z "$NUGET_API_KEY" ]]; then
         error "NUGET_API_KEY is not set."
@@ -80,6 +86,11 @@ publish() {
 
     if [[ ! -f release-notes.md ]]; then
         error "release-notes.md not found."
+        exit 1
+    fi
+
+    if ! gh auth status &> /dev/null; then
+        error "GitHub CLI (gh) not authenticated."
         exit 1
     fi
 
@@ -135,6 +146,7 @@ case "$1" in
         mkdir -p "$EXPORT_OUTPUT"
         build_libs
         build_gui
+        run_benchmark
 
         if [[ "${CI:-}" == "true" ]]; then
             # CI detected, skip prompts

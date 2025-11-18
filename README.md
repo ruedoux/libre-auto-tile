@@ -2,7 +2,7 @@
 
 Implementation of an autotile algorithm for tilemaps with JSON configuration, supporting various tile ID terrain transitions.
 
-![GUI Demo](https://github.com/ruedoux/libre-auto-tile/blob/main/resources/gui.gif?raw=true)
+![GUI Demo](resources/gui.gif)
 
 ## Features
 
@@ -10,16 +10,16 @@ Implementation of an autotile algorithm for tilemaps with JSON configuration, su
 - Fully async-compatible
 - Dedicated GUI for configuration
 - Game engine-agnostic core library
-- [High performance](https://github.com/ruedoux/libre-auto-tile/blob/main/LibreAutoTile.Benchmarks/README.md)
+- [High performance](LibreAutoTile.Benchmarks/README.md)
 
 ## Usage
 
 For documentation, see `README.md` files in subdirectories:
 
-- [Core library](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAutoTile)
-- [Godot bindings](https://github.com/ruedoux/libre-auto-tile/blob/main/LibreAutoTile.GodotBindings/README.md)
+- [Core library](LibreAutoTile)
+- [Godot bindings](LibreAutoTile.GodotBindings/README.md)
 
-A dedicated [GUI](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAutoTile.GUI) is available. Compiled binaries are in [Releases](https://github.com/ruedoux/libre-auto-tile/releases).
+A dedicated [GUI](LibreAutoTile.GUI) is available. Compiled binaries are in [Releases](https://github.com/ruedoux/libre-auto-tile/releases).
 
 ## Installation
 
@@ -53,9 +53,9 @@ Use the `build-release.sh` script. On Windows use WSL or compile each project ma
 
 Currently, only Godot engine bindings are supported. Contributions for other game engine bindings are welcome.
 
-Example usage in a live project [here](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAutoTile.GodotExample/Scenes/Examples).
+Example usage in a live project [here](LibreAutoTile.GodotExample/Scenes/Examples).
 
-Library bindings draw terrains [10x](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAutoTile.GodotExample/Scenes/Comparasion) faster than godot terrain implementation.
+Library bindings draw terrains [10x](LibreAutoTile.GodotExample/Scenes/Comparasion) faster than godot terrain implementation.
 
 ## Contributions
 

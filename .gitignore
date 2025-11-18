@@ -1,3 +1,4 @@
 .vscode
 build
 rcedit-x64.exe
+BenchmarkDotNet.Artifacts

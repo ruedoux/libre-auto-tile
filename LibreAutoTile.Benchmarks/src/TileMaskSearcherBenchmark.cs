@@ -1,38 +1,9 @@
 using BenchmarkDotNet.Attributes;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.Tiling;
 using Qwaitumin.LibreAutoTile.Tiling.Search;
 
 namespace Qwaitumin.LibreAutoTile.Benchmark;
 
-
-internal static class TileMaskSearcherItemSetup
-{
-  private const int MAX_TILE_ID = 1000;
-
-  public static List<(TileMask TileMask, TileAtlas tileAtlas)> GetItems(int n)
-  {
-    List<(TileMask TileMask, TileAtlas tileAtlas)> items = [];
-    Random random = new();
-    for (int i = 0; i < n; i++)
-    {
-      TileMask tileMask = new(
-        random.Next(0, MAX_TILE_ID),
-        random.Next(0, MAX_TILE_ID),
-        random.Next(0, MAX_TILE_ID),
-        random.Next(0, MAX_TILE_ID),
-        random.Next(0, MAX_TILE_ID),
-        random.Next(0, MAX_TILE_ID),
-        random.Next(0, MAX_TILE_ID),
-        random.Next(0, MAX_TILE_ID)
-      );
-      Vector2 atlasPosition = new(i, i);
-      items.Add(new(tileMask, new(atlasPosition, "")));
-    }
-
-    return items;
-  }
-}
 
 [MemoryDiagnoser]
 [ShortRunJob]
@@ -40,21 +11,21 @@ public class TileMaskSearcherBenchmark
 {
 
   [Params(1_000, 10_000)]
-  public int N;
+  public int TileMaskCount;
 
   private TileMaskSearcher tileMaskSearcher = null!;
 
-  private List<(TileMask TileMask, TileAtlas tileAtlas)> items = [];
-  private List<(TileMask TileMask, TileAtlas tileAtlas)> itemsToMatch = [];
-  private (TileMask TileMask, TileAtlas tileAtlas) randomTileMask;
+  private TileMask[] items = [];
+  private TileMask[] itemsToMatch = [];
+  private TileMask randomTileMask;
 
   [GlobalSetup]
   public void GlobalSetup()
   {
-    items = TileMaskSearcherItemSetup.GetItems(N);
-    itemsToMatch = TileMaskSearcherItemSetup.GetItems(N);
-    tileMaskSearcher = new(items, []);
-    randomTileMask = items[new Random(123).Next(0, items.Count)];
+    items = Helper.GetRandomTileMasks(TileMaskCount);
+    itemsToMatch = Helper.GetRandomTileMasks(TileMaskCount);
+    tileMaskSearcher = new(items);
+    randomTileMask = items[new Random(123).Next(0, items.Length)];
   }
 
   /// <summary>
@@ -63,7 +34,7 @@ public class TileMaskSearcherBenchmark
   /// </summary>
   [Benchmark]
   public void FindBestMatchSingle_BestCaseScenario()
-    => tileMaskSearcher.FindBestMatch(randomTileMask.TileMask);
+    => tileMaskSearcher.FindBestMatch(randomTileMask);
 
   /// <summary>
   /// Find a singular closest match of a TileMask, no 1:1 match
@@ -81,7 +52,7 @@ public class TileMaskSearcherBenchmark
   public void FindBestMatchBatch_BestCaseScenario()
   {
     foreach (var item in items)
-      tileMaskSearcher.FindBestMatch(item.TileMask);
+      tileMaskSearcher.FindBestMatch(item);
   }
 
   /// <summary>
@@ -92,6 +63,6 @@ public class TileMaskSearcherBenchmark
   public void FindBestMatchBatch_WorstCaseScenario()
   {
     foreach (var item in itemsToMatch)
-      tileMaskSearcher.FindBestMatch(item.TileMask);
+      tileMaskSearcher.FindBestMatch(item);
   }
 }
