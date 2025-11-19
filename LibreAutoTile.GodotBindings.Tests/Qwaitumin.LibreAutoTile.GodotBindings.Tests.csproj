@@ -1,7 +1,7 @@
 <Project Sdk="Godot.NET.Sdk/4.5.1">
   <PropertyGroup>
     <RootNamespace>Qwaitumin.LibreAutoTile.GodotBingings.Tests</RootNamespace>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
