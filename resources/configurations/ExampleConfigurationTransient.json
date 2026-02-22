@@ -120,7 +120,8 @@
             "(2,3,0)": [[0, 0, 1, 0, 1, 0, 0, 0]],
             "(5,5,0)": [[0, 0, 1, 0, 1, 1, 1, 0]],
             "(9,9,0)": [[0, 0, 0, 0, -1, -1, -1, 0]]
-          }
+          },
+          "AtlasPositionToChance": {}
         }
       },
       "Name": "Ground",
@@ -131,7 +132,8 @@
         "../resources/Water.png": {
           "AtlasPositionToTileMasks": {
             "(0,0,0)": [[-1, -1, -1, -1, -1, -1, -1, -1]]
-          }
+          },
+          "AtlasPositionToChance": {}
         },
         "../resources/GrassHillsWater.png": { "AtlasPositionToTileMasks": {} }
       },

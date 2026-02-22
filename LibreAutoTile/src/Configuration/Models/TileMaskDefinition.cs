@@ -6,11 +6,14 @@ namespace Qwaitumin.LibreAutoTile.Configuration.Models;
 public class TileMaskDefinition
 {
   public readonly ImmutableDictionary<Vector3, ImmutableArray<ImmutableArray<int>>> AtlasPositionToTileMasks;
+  public readonly ImmutableDictionary<Vector3, int> AtlasPositionToChance;
 
   public TileMaskDefinition(
-    ImmutableDictionary<Vector3, ImmutableArray<ImmutableArray<int>>> atlasPositionToTileMasks)
+    ImmutableDictionary<Vector3, ImmutableArray<ImmutableArray<int>>> atlasPositionToTileMasks,
+    ImmutableDictionary<Vector3, int> atlasPositionToChance)
   {
     AtlasPositionToTileMasks = atlasPositionToTileMasks;
+    AtlasPositionToChance = atlasPositionToChance;
     foreach (var (_, tileMasks) in atlasPositionToTileMasks)
       foreach (var tileMask in tileMasks)
         if (tileMask.Length != 8)
@@ -18,14 +21,17 @@ public class TileMaskDefinition
   }
 
   public static TileMaskDefinition Construct(
-    Dictionary<Vector3, int[][]> atlasPositionToTileMasks)
+    Dictionary<Vector3, int[][]> atlasPositionToTileMasks,
+    Dictionary<Vector3, int> atlasPositionToChance)
   {
     var immutableAtlasPositionToTileMasks = atlasPositionToTileMasks.ToImmutableDictionary(
       kvp => kvp.Key,
       kvp => kvp.Value
         .Select(innerArray => innerArray.ToImmutableArray())
         .ToImmutableArray());
-    return new(atlasPositionToTileMasks: immutableAtlasPositionToTileMasks);
+    return new(
+      atlasPositionToTileMasks: immutableAtlasPositionToTileMasks,
+      atlasPositionToChance: atlasPositionToChance.ToImmutableDictionary());
   }
 
   public static TileMaskDefinition? FromJsonString(string jsonString)

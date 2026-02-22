@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 
 namespace Qwaitumin.LibreAutoTile.GUI;
@@ -12,6 +11,13 @@ public static class InputSanitizer
     if (float.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out float result))
       return result;
 
+    return defaultValue;
+  }
+
+  public static double SanitizeDouble(string input, double defaultValue = 0d)
+  {
+    if (double.TryParse(input, out double result))
+      return result;
     return defaultValue;
   }
 

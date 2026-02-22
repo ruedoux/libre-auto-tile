@@ -6,5 +6,6 @@
   <PropertyGroup>
     <RootNamespace>Qwaitumin.LibreAutoTile.GodotExample</RootNamespace>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 </Project>

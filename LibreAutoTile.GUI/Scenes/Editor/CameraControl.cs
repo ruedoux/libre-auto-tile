@@ -1,7 +1,7 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor;
 
 public partial class CameraControl : Camera2D
 {

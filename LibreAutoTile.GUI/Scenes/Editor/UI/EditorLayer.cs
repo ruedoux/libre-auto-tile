@@ -1,7 +1,7 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI;
 
 public partial class EditorLayer : HBoxContainer
 {

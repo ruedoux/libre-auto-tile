@@ -3,23 +3,18 @@ using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
+using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet.Data;
+using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Tiles;
 using Qwaitumin.LibreAutoTile.Tiling;
 
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
-
-public record EditorContext(
-  int TileSize,
-  HashSet<GuiTile> CreatedTiles,
-  GuiTileDatabase TileDatabase
-);
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor;
 
 public static class ConfigurationExtractor
 {
   public static void LoadConfiguration(
-    string filePath, EditorTiles editorTiles, BitmaskContainer bitmaskContainer)
+    string filePath, EditorTiles editorTiles, TileSetContainer bitmaskContainer)
   {
     if (!File.Exists(filePath))
       GodotLogger.LogErrorAndThrow($"File doesnt exist: '{filePath}'");
@@ -33,7 +28,7 @@ public static class ConfigurationExtractor
       GodotLogger.LogErrorAndThrow("To load you need at least one tile definition");
 
     editorTiles.ClearAll();
-    bitmaskContainer.TileDatabase.Clear();
+    bitmaskContainer.BitmaskDatabase.Clear();
 
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
       editorTiles.AddTile(
@@ -42,7 +37,7 @@ public static class ConfigurationExtractor
         color: GodotTypeMapper.Map(tileDefinition.Color),
         connectionGroup: tileDefinition.ConnectionGroup);
 
-    Dictionary<string, Dictionary<Configuration.Models.Vector3, GuiTileData>> imageFileNameToMappedTileData = [];
+    Dictionary<string, Dictionary<Configuration.Models.Vector3, BitmaskData>> imageFileNameToMappedTileData = [];
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {
       foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
@@ -70,40 +65,41 @@ public static class ConfigurationExtractor
 
     foreach (var (imageFileName, mappedTileData) in imageFileNameToMappedTileData)
       foreach (var (position, guiTileData) in mappedTileData)
-        bitmaskContainer.TileDatabase.SetPackedTileData(
+        bitmaskContainer.BitmaskDatabase.SetPackedTileData(
           imageFileName, GodotTypeMapper.Map(position.ToVector2()), guiTileData);
   }
 
-  public static AutoTileConfiguration GetAsAutoTileConfiguration(EditorContext editorContext)
+  public static AutoTileConfiguration GetAsAutoTileConfiguration(
+    HashSet<GuiTile> createdTiles, BitmaskDatabase tileDatabase, int tileSize)
   {
     Dictionary<uint, TileDefinition> tileDefinitions = [];
-    foreach (var guiTile in editorContext.CreatedTiles)
+    foreach (var guiTile in createdTiles)
     {
       Color color = guiTile.ColorPickerButton.Color;
       TileColor tileColor = new(
         r: (byte)color.R8, g: (byte)color.G8, b: (byte)color.B8, a: (byte)color.A8);
 
       var tileDefinition = TileDefinition.Construct(
-        GetImageFileNameToTileMaskDefinition(editorContext, guiTile.TileId),
+        GetImageFileNameToTileMaskDefinition(tileDatabase, guiTile.TileId),
         name: guiTile.TileName,
         color: tileColor,
         connectionGroup: guiTile.ConnectionGroup);
       tileDefinitions[(uint)guiTile.TileId] = tileDefinition;
     }
 
-    return AutoTileConfiguration.Construct((uint)editorContext.TileSize, tileDefinitions);
+    return AutoTileConfiguration.Construct((uint)tileSize, tileDefinitions);
   }
 
   private static Dictionary<string, TileMaskDefinition> GetImageFileNameToTileMaskDefinition(
-    EditorContext editorContext, int tileId)
+    BitmaskDatabase tileDatabase, int tileId)
   {
     Dictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition = [];
-    foreach (var (fileName, positionToTileData) in editorContext.TileDatabase.GetAll())
+    foreach (var (fileName, positionToBitmaskData) in tileDatabase.GetAll())
     {
       Dictionary<Configuration.Models.Vector3, List<int[]>> positionsToTileMaskDefinitions = [];
-      foreach (var (position, tileData) in positionToTileData)
+      foreach (var (position, bitmaskData) in positionToBitmaskData)
       {
-        foreach (var (layer, fullTileMask) in tileData.LayerFullTileMask)
+        foreach (var (layer, fullTileMask) in bitmaskData.GetAll())
         {
           var centreTileId = fullTileMask.CentreTileId;
           var tileMask = fullTileMask.TileMask;
@@ -121,7 +117,7 @@ public static class ConfigurationExtractor
       }
 
       imageFileNameToTileMaskDefinition[Path.GetRelativePath(".", fileName)] = TileMaskDefinition.Construct(
-        positionsToTileMaskDefinitions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray()));
+        positionsToTileMaskDefinitions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray()), []);
     }
 
     return imageFileNameToTileMaskDefinition;
@@ -142,7 +138,8 @@ public static class ConfigurationExtractor
     return tileIdToImageLocation;
   }
 
-  private static (Configuration.Models.Vector3, string)? FindBestImageLocation(TileDefinition tileDefinition)
+  private static (Configuration.Models.Vector3, string)? FindBestImageLocation(
+    TileDefinition tileDefinition)
   {
     var defaultMask = TileMask.FromArray([-1, -1, -1, -1, -1, -1, -1, -1]);
     (Configuration.Models.Vector3, string)? latestMatch = null;

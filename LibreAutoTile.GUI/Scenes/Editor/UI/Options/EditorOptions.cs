@@ -1,9 +1,8 @@
-using System.IO;
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Options;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Options;
 
 public partial class EditorOptions : MarginContainer
 {

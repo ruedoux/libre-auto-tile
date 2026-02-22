@@ -1,7 +1,6 @@
-using System;
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Tiles;
 
 public partial class GuiTile : PanelContainer
 {

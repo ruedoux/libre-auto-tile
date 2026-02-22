@@ -1,14 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Preview;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Preview;
 
 
 public partial class EditorPreview : MarginContainer, IState
@@ -29,7 +25,7 @@ public partial class EditorPreview : MarginContainer, IState
   }
 
   public void AddCreatedTiles(
-    HashSet<GuiTile> CreatedTiles, AutoTileConfiguration autoTileConfiguration)
+    HashSet<(int TileId, string TileName)> CreatedTiles, AutoTileConfiguration autoTileConfiguration)
   {
     if (AutoTileMap is null)
       GodotLogger.LogErrorAndThrow("AutoTileMap is null");
@@ -43,13 +39,13 @@ public partial class EditorPreview : MarginContainer, IState
 
     var tileIdToImageLocation = ConfigurationExtractor.GetTileIdToImageLocation(
       autoTileConfiguration);
-    foreach (var guiTile in CreatedTiles)
+    foreach (var (TileId, TileName) in CreatedTiles)
     {
       Texture2D texture = ImageTexture.CreateFromImage(
         Image.CreateEmpty(1, 1, false, Image.Format.Rgba8));
-      if (!tileIdToImageLocation.TryGetValue((uint)guiTile.TileId, out var imageAtlasToImageName))
+      if (!tileIdToImageLocation.TryGetValue((uint)TileId, out var imageAtlasToImageName))
       {
-        GodotLogger.LOGGER.LogWarning($"Could not get texture for tile id: {guiTile.TileId}");
+        GodotLogger.LOGGER.LogWarning($"Could not get texture for tile id: {TileId}");
       }
       else
       {
@@ -68,8 +64,8 @@ public partial class EditorPreview : MarginContainer, IState
       tileList.AddChild(tileMapTile);
 
       tileMapTile.TileSelected.AddObserver(ChangeActiveTile);
-      tileMapTile.NameLabel.Text = guiTile.TileName;
-      tileMapTile.TileId = guiTile.TileId;
+      tileMapTile.NameLabel.Text = TileName;
+      tileMapTile.TileId = TileId;
       tileMapTile.TextureRectangle.Texture = texture;
     }
 

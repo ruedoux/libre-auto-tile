@@ -1,16 +1,10 @@
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
 
-public class TileSearcher
+public class TileSearcher(TileMaskSearcher tileMaskSearcher, TileAtlasResolver tileAtlasResolver)
 {
-  private readonly TileMaskSearcher tileMaskSearcher;
-  private readonly TileAtlasResolver tileAtlasResolver;
-
-  public TileSearcher(TileMaskSearcher tileMaskSearcher, TileAtlasResolver tileAtlasResolver)
-  {
-    this.tileMaskSearcher = tileMaskSearcher;
-    this.tileAtlasResolver = tileAtlasResolver;
-  }
+  private readonly TileMaskSearcher tileMaskSearcher = tileMaskSearcher;
+  private readonly TileAtlasResolver tileAtlasResolver = tileAtlasResolver;
 
   public (TileMask TileMask, TileAtlas TileAtlas) FindBestMatch(TileMask target)
   {

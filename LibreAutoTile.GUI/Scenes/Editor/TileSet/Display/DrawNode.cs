@@ -1,17 +1,10 @@
 using Godot;
-using System;
-using System.Collections.Generic;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet.Display;
 
 public partial class DrawNode : Node2D
 {
   private readonly Queue<Action> drawQueue = new();
-
-  public DrawNode()
-  {
-    ZIndex = (int)RenderingServer.CanvasItemZMax;
-  }
 
   public void DrawRectangle(
     Rect2I rectangle, Color color, bool filled = false, int width = 1)

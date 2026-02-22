@@ -1,18 +1,20 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Settings;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Settings;
 
 public partial class EditorSettings : Control, IState
 {
   public ColorPickerButton SelectionColorPickerButton { private set; get; } = null!;
   public ColorPickerButton GridColorPickerButton { private set; get; } = null!;
   public ColorPickerButton BackgroundColorPickerButton { private set; get; } = null!;
+  public ColorPickerButton PropabilityColorPickerButton { private set; get; } = null!;
   public LineEdit TileSizeLineEdit { private set; get; } = null!;
 
   public readonly ObservableVariable<Color> SelectionColorObservable = new(Colors.White);
   public readonly ObservableVariable<Color> GridColorObservable = new(Colors.Orange);
   public readonly ObservableVariable<Color> BackgroundColorObservable = new(Colors.DarkSlateGray);
+  public readonly ObservableVariable<Color> PropabilityColorObservable = new(Colors.White);
   public readonly ObservableVariable<int> TileSizeObservable = new(16);
   public readonly ObservableVariable<int> ScaledTileSizeObservable = new(1);
 
@@ -21,15 +23,19 @@ public partial class EditorSettings : Control, IState
     SelectionColorPickerButton = GetNode<ColorPickerButton>("V/SelectionColor/ColorPickerButton");
     GridColorPickerButton = GetNode<ColorPickerButton>("V/GridColor/ColorPickerButton");
     BackgroundColorPickerButton = GetNode<ColorPickerButton>("V/BackgroundColor/ColorPickerButton");
+    PropabilityColorPickerButton = GetNode<ColorPickerButton>("V/ProbabilityColor/ColorPickerButton");
     TileSizeLineEdit = GetNode<LineEdit>("V/TileSize/LineEdit");
 
-    SelectionColorPickerButton.ColorChanged += ChangeSelectionColor;
-    GridColorPickerButton.ColorChanged += ChangeGridColor;
-    BackgroundColorPickerButton.ColorChanged += ChangeBackgroundColor;
+    SelectionColorPickerButton.ColorChanged += SelectionColorObservable.ChangeValueAndNotifyObservers;
+    GridColorPickerButton.ColorChanged += GridColorObservable.ChangeValueAndNotifyObservers;
+    BackgroundColorPickerButton.ColorChanged += BackgroundColorObservable.ChangeValueAndNotifyObservers;
+    PropabilityColorPickerButton.ColorChanged += PropabilityColorObservable.ChangeValueAndNotifyObservers;
     TileSizeLineEdit.TextSubmitted += ChangeTileSize;
 
     BackgroundColorObservable.AddObserver(RenderingServer.SetDefaultClearColor);
-    TileSizeObservable.AddObserver(UpdateScaledTileSize);
+    TileSizeObservable.AddObserver(
+      (tileSize) => ScaledTileSizeObservable.ChangeValueAndNotifyObservers(tileSize * Editor.IMAGE_SCALING)
+    );
 
     SelectionColorPickerButton.Color = SelectionColorObservable.Value;
     GridColorPickerButton.Color = GridColorObservable.Value;
@@ -39,9 +45,6 @@ public partial class EditorSettings : Control, IState
     BackgroundColorObservable.NotifyObservers();
   }
 
-  private void UpdateScaledTileSize(int tileSize)
-    => ScaledTileSizeObservable.ChangeValueAndNotifyObservers(tileSize * Editor.IMAGE_SCALING);
-
   private void ChangeTileSize(string text)
   {
     var tileSize = InputSanitizer.SanitizeInt(text);
@@ -49,15 +52,6 @@ public partial class EditorSettings : Control, IState
       TileSizeObservable.ChangeValueAndNotifyObservers(tileSize);
     TileSizeLineEdit.Text = TileSizeObservable.Value.ToString();
   }
-
-  private void ChangeBackgroundColor(Color color)
-    => BackgroundColorObservable.ChangeValueAndNotifyObservers(color);
-
-  private void ChangeSelectionColor(Color color)
-    => SelectionColorObservable.ChangeValueAndNotifyObservers(color);
-
-  private void ChangeGridColor(Color color)
-    => GridColorObservable.ChangeValueAndNotifyObservers(color);
 
   public void InitializeState()
     => Show();

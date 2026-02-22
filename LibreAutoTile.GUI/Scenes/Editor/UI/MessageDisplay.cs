@@ -1,11 +1,8 @@
-using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils.UI;
 
 public partial class MessageDisplay : MarginContainer
 {

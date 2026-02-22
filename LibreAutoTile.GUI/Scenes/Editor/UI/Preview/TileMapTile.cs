@@ -1,7 +1,7 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Preview;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Preview;
 
 public partial class TileMapTile : PanelContainer
 {

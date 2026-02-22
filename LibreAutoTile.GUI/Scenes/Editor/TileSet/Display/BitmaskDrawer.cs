@@ -1,18 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet.Display;
 
-public partial class TileSetBitmaskDrawer : Node2D
+public partial class BitmaskDrawer : Node2D
 {
   private readonly DrawNode bitmaskDrawNode;
   private readonly DrawNode bitmaskGhostDrawNode;
 
-  public TileSetBitmaskDrawer()
+  public BitmaskDrawer()
   {
     bitmaskDrawNode = GodotApi.AddChild<DrawNode>(this, new());
     bitmaskGhostDrawNode = GodotApi.AddChild<DrawNode>(this, new());

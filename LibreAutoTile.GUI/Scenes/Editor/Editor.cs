@@ -1,15 +1,12 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Options;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Preview;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
+using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI;
+using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Options;
+using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Preview;
+using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Tiles;
+using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils.UI;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor;
 
@@ -21,37 +18,41 @@ public partial class Editor : Control
 
   private readonly GodotInputListener inputListener = new();
   private readonly CameraControl cameraControl;
-  private readonly EditorTileDrawer tileDrawer;
+
   private readonly MouseLabel mouseLabel;
-  private readonly BitmaskContainer bitmaskContainer;
+  private readonly TileSetContainer tileSetContainer;
   private readonly List<Control> uiElements = [];
 
   private StateMachine<EditorTools> toolsStateMachine = null!;
-  private Settings.EditorSettings editorSettings = null!;
+  private UI.Settings.EditorSettings editorSettings = null!;
   private EditorOptions editorOptions = null!;
   private EditorTiles editorTiles = null!;
   private MessageDisplay messageDisplay = null!;
   private EditorLayer editorLayer = null!;
   private EditorPreview editorPreview = null!;
+  private Button probabilityButton = null!;
 
   public Editor()
   {
     cameraControl = GodotApi.AddChild<CameraControl>(this, new());
-    tileDrawer = GodotApi.AddChild<EditorTileDrawer>(this, new());
-    mouseLabel = GodotApi.AddChild(this, ResourceLoader.Load<PackedScene>("res://Scenes/Utils/MouseLabel.tscn").Instantiate<MouseLabel>());
-    bitmaskContainer = GodotApi.AddChild<BitmaskContainer>(this, new());
+    mouseLabel = GodotApi.AddChild(this, ResourceLoader.Load<PackedScene>("res://Scenes/Editor/MouseLabel.tscn").Instantiate<MouseLabel>());
+    tileSetContainer = GodotApi.AddChild<TileSetContainer>(this, new());
     mouseLabel.Hide();
   }
 
   public override void _Ready()
   {
-    editorSettings = GetNode<Settings.EditorSettings>("CanvasLayer/Window/Tools/V/EditorSettings");
+    editorSettings = GetNode<UI.Settings.EditorSettings>("CanvasLayer/Window/Tools/V/EditorSettings");
     editorOptions = GetNode<EditorOptions>("CanvasLayer/Window/Tools/V/EditorOptions");
     editorTiles = GetNode<EditorTiles>("CanvasLayer/Window/Tools/V/EditorTiles");
     messageDisplay = GetNode<MessageDisplay>("CanvasLayer/Window/Workspace/MessageDisplay");
     editorLayer = GetNode<EditorLayer>("CanvasLayer/Window/Workspace/V/H/MarginContainer/EditorLayer");
     editorPreview = GetNode<EditorPreview>("CanvasLayer/Window/Tools/V/EditorPreview");
+    probabilityButton = GetNode<Button>("CanvasLayer/Window/Tools/V/EditorTiles/V/Probability");
     uiElements.AddRange([GetNode<Control>("CanvasLayer/Window/Tools"), editorLayer]);
+
+    probabilityButton.Pressed += SwitchProbabilityVisibility;
+    SwitchProbabilityVisibility();
 
     toolsStateMachine = new(
       EditorTools.Tiles,
@@ -67,22 +68,23 @@ public partial class Editor : Control
     editorSettings.ScaledTileSizeObservable.AddObservers([
       (_) => UpdateBitmask(),
       (_) => UpdateGrid()]);
+    editorSettings.PropabilityColorObservable.AddObserver(
+      tileSetContainer.TileProbability.UpdateFontColor);
 
     editorTiles.ChangedActiveTile.AddObserver(
       (_) => UpdateBitmask());
     editorTiles.TileColorChanged.AddObserver((_) => UpdateBitmask());
     editorTiles.TileDeleted.AddObservers([
-      (guiTile) => bitmaskContainer.RemoveTileId(guiTile.TileId),
+      (guiTile) => tileSetContainer.RemoveTileId(guiTile.TileId),
       (_) => UpdateBitmask()]);
     editorTiles.TileIdChanged.AddObservers([
-      (x) => bitmaskContainer.ChangeTileId(x.newId, x.oldId),
+      (x) => tileSetContainer.ChangeTileId(x.newId, x.oldId),
       (_) => UpdateBitmask()]);
 
     editorOptions.ImageRectangleObservable.AddObservers([
       (imageSize) => cameraControl.View = imageSize,
       (_) => UpdateGrid()]);
-    editorOptions.ImageTextureObservable.AddObservers([
-      (texture) => bitmaskContainer.TileSetTexture.Texture = texture]);
+    editorOptions.ImageTextureObservable.AddObserver(tileSetContainer.SetNewTexture);
     editorOptions.ToolHasChanged.AddObserver(toolsStateMachine.SwitchStateTo);
     editorOptions.ConfigurationSaved.AddObserver(SaveConfiguration);
     editorOptions.ImageFileObservable.AddObservers([
@@ -104,30 +106,23 @@ public partial class Editor : Control
     inputListener.AddInputMouseMotionAction(BitmaskInput);
     inputListener.AddInputMouseButtonAction(AutoTileMapInput);
     inputListener.AddInputMouseMotionAction(AutoTileMapInput);
+    inputListener.AddInputAction(ChangeProbability);
   }
 
   public override void _Input(InputEvent @event)
   {
-    if (!GodotApi.IsMouseOnElements([.. uiElements]))
-    {
+    var isMouseOnUI = GodotApi.IsMouseOnElements([.. uiElements]);
+    tileSetContainer.UpdateSelectedTileVisibility(!isMouseOnUI);
+    mouseLabel.Visible = !isMouseOnUI;
+    if (!isMouseOnUI)
       inputListener.ListenToInput(@event);
-      tileDrawer.ShowSelectedTile();
-      mouseLabel.Show();
-      bitmaskContainer.TileSetBitmaskDrawer.ShowBitmaskGhost();
-    }
-    else
-    {
-      tileDrawer.HideSelectedTile();
-      mouseLabel.Hide();
-      bitmaskContainer.TileSetBitmaskDrawer.HideBitmaskGhost();
-    }
   }
 
   private void ClearBitmasks()
   {
     GodotLogger.LOGGER.Log("> Starting clearing editor state");
     editorTiles.ClearAll();
-    bitmaskContainer.Clear();
+    tileSetContainer.Clear();
     UpdateBitmask();
     GodotLogger.LOGGER.Log("> Finished clearing editor state");
   }
@@ -174,13 +169,13 @@ public partial class Editor : Control
     var mouseRightClicked = inputEventMouse.ButtonMask == MouseButtonMask.Right;
     var mouseLeftClicked = inputEventMouse.ButtonMask == MouseButtonMask.Left;
     if (mouseRightClicked)
-      bitmaskContainer.RemoveBitmask(
+      tileSetContainer.RemoveBitmask(
         (int)editorLayer.LayerObservable.Value,
         editorOptions.ImageFileObservable.Value,
         mousePositionInt,
         editorSettings.ScaledTileSizeObservable.Value);
     if (mouseLeftClicked && editorTiles.ActiveTile is not null)
-      bitmaskContainer.PlaceBitmask(
+      tileSetContainer.AddBitmask(
         (int)editorLayer.LayerObservable.Value,
         editorTiles.ActiveTile.TileId,
         editorOptions.ImageFileObservable.Value,
@@ -188,6 +183,40 @@ public partial class Editor : Control
         editorSettings.ScaledTileSizeObservable.Value);
     if (mouseRightClicked || mouseLeftClicked)
       UpdateBitmask();
+  }
+
+  private void SwitchProbabilityVisibility()
+  {
+    bool visible = tileSetContainer.TileProbability.Visible =
+      !tileSetContainer.TileProbability.Visible;
+    probabilityButton.Text = visible ? "Hide Probability" : "Show Probability";
+  }
+
+  private void ChangeProbability(InputEvent inputEvent)
+  {
+    if (toolsStateMachine.CurrentState != editorTiles)
+      return;
+    if (!tileSetContainer.TileProbability.Visible)
+      return;
+    if (inputEvent is not InputEventKey)
+      return;
+
+    var mousePosition = GetGlobalMousePosition();
+    var mousePositionInt = new Vector2I((int)mousePosition.X, (int)mousePosition.Y);
+    if (Input.IsKeyPressed(Key.Q))
+      tileSetContainer.AddProbability(
+        (int)editorLayer.LayerObservable.Value,
+        editorOptions.ImageFileObservable.Value,
+        mousePositionInt,
+        1,
+        editorSettings.ScaledTileSizeObservable.Value);
+    if (Input.IsKeyPressed(Key.W))
+      tileSetContainer.AddProbability(
+        (int)editorLayer.LayerObservable.Value,
+        editorOptions.ImageFileObservable.Value,
+        mousePositionInt,
+        -1,
+        editorSettings.ScaledTileSizeObservable.Value);
   }
 
   private void SaveConfiguration(string filePath)
@@ -201,7 +230,7 @@ public partial class Editor : Control
 
   private void LoadConfiguration(string filePath)
   {
-    ConfigurationExtractor.LoadConfiguration(filePath, editorTiles, bitmaskContainer);
+    ConfigurationExtractor.LoadConfiguration(filePath, editorTiles, tileSetContainer);
     UpdateBitmask();
     messageDisplay.DisplayText($"[color=green]Loaded configuration from: {filePath}[/color]");
     GodotLogger.LOGGER.Log($"Loaded configuration from: {filePath}");
@@ -209,16 +238,14 @@ public partial class Editor : Control
 
   private AutoTileConfiguration ExtractAutoTileConfiguration()
   {
-    EditorContext editorContext = new(
-      editorSettings.TileSizeObservable.Value,
+    return ConfigurationExtractor.GetAsAutoTileConfiguration(
       editorTiles.CreatedTiles,
-      bitmaskContainer.TileDatabase);
-
-    return ConfigurationExtractor.GetAsAutoTileConfiguration(editorContext);
+      tileSetContainer.BitmaskDatabase,
+      editorSettings.TileSizeObservable.Value);
   }
 
   private void UpdateBitmask()
-    => bitmaskContainer.RedrawBitmask(
+    => tileSetContainer.Redraw(
       editorOptions.ImageFileObservable.Value,
       (int)editorLayer.LayerObservable.Value,
       editorTiles.CreatedTiles.ToDictionary(x => x.TileId, x => x.TileName),
@@ -226,7 +253,7 @@ public partial class Editor : Control
       editorSettings.ScaledTileSizeObservable.Value);
 
   private void UpdateGrid()
-    => tileDrawer.RedrawGrid(
+    => tileSetContainer.UpdateGrid(
       editorOptions.ImageRectangleObservable.Value,
       editorSettings.GridColorObservable.Value,
       editorSettings.ScaledTileSizeObservable.Value);
@@ -235,17 +262,18 @@ public partial class Editor : Control
   {
     if (toolsStateMachine.CurrentState == editorTiles)
     {
-      bitmaskContainer.RedrawBitmaskGhost(
+      tileSetContainer.RedrawBitmaskGhost(
         mousePosition,
         editorSettings.ScaledTileSizeObservable.Value,
         new(r: 255f, g: 255f, b: 255f, a: 0.5f));
     }
 
-    tileDrawer.RedrawTile(
+    tileSetContainer.TileDrawer.RedrawTile(
       mousePosition,
       editorSettings.SelectionColorObservable.Value,
       editorSettings.ScaledTileSizeObservable.Value);
-    var tilePosition = TileSetMath.ScaleDownTilePosition(mousePosition, editorSettings.ScaledTileSizeObservable.Value);
+    var tilePosition = TileSetMath.ScaleDownTilePosition(
+      mousePosition, editorSettings.ScaledTileSizeObservable.Value);
     mouseLabel.DisplayText(tilePosition.ToString());
     mouseLabel.MoveOnMousePosition();
   }
@@ -253,15 +281,17 @@ public partial class Editor : Control
   private void EnterEditorPreview()
   {
     editorLayer.Hide();
-    bitmaskContainer.Hide();
-    tileDrawer.GridDrawNode.Hide();
+    tileSetContainer.Hide();
+    tileSetContainer.TileDrawer.GridDrawNode.Hide();
     editorOptions.ImageUiContainer.Hide();
     editorOptions.ConfigurationUiContainer.Hide();
     cameraControl.View = new(-int.MaxValue / 2, -int.MaxValue / 2, int.MaxValue, int.MaxValue);
     cameraControl.Position = Vector2.Zero;
     AutoTileConfiguration autoTileConfiguration = ExtractAutoTileConfiguration();
     editorPreview.InitializeTileMap(autoTileConfiguration);
-    editorPreview.AddCreatedTiles(editorTiles.CreatedTiles, autoTileConfiguration);
+    editorPreview.AddCreatedTiles(
+      [.. editorTiles.CreatedTiles.Select(t => (t.TileId, t.TileName))],
+      autoTileConfiguration);
     AddChild(editorPreview.AutoTileMap);
     if (editorPreview.AutoTileMap is not null)
       editorPreview.AutoTileMap.Scale = new(IMAGE_SCALING, IMAGE_SCALING);
@@ -271,8 +301,8 @@ public partial class Editor : Control
   private void ExitEditorPreview()
   {
     editorLayer.Show();
-    bitmaskContainer.Show();
-    tileDrawer.GridDrawNode.Show();
+    tileSetContainer.Show();
+    tileSetContainer.TileDrawer.GridDrawNode.Show();
     editorOptions.ImageUiContainer.Show();
     editorOptions.ConfigurationUiContainer.Show();
     cameraControl.View = editorOptions.ImageRectangleObservable.Value;

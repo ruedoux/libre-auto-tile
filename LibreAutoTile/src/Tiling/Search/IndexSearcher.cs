@@ -6,91 +6,83 @@ namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 internal class IndexSearcher
 {
   private const int TOP_SCORE = 3;
-  private const int MID_SCORE = 2;
   private const int LOW_SCORE = 1;
 
-  public readonly int[] ResultIndexToItemIndex;
-
   private readonly FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes;
-  private readonly int[] itemIndexToBestScore;
-  private readonly int[] itemIndexToSeenGeneration;
-  private readonly int[] tileScore = new int[8];
+  private readonly ImmutableArray<int>[] wildcardLists;
+  private readonly uint[] itemIndexToSeenGeneration;
+  private readonly int[] itemIndexToScore;
+  private readonly int[] cornerWeight = new int[8];
   private readonly object searchLock = new();
-  private int currentGeneration = 1;
+  private uint currentGeneration = 0;
 
-  public IndexSearcher(int itemCount, FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes)
+  public IndexSearcher(int itemCount, FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes, int wildcardId)
   {
     this.tileIdToItemIndexes = tileIdToItemIndexes;
-    ResultIndexToItemIndex = new int[itemCount];
-    itemIndexToBestScore = new int[itemCount];
-    itemIndexToSeenGeneration = new int[itemCount];
+    itemIndexToSeenGeneration = new uint[itemCount];
+    itemIndexToScore = new int[itemCount];
 
-    for (int i = 0; i < tileScore.Length; i++)
-      tileScore[i] = i % 2 == 0 ? MID_SCORE : TOP_SCORE;
+    wildcardLists = new ImmutableArray<int>[8];
+    for (int f = 0; f < 8; f++)
+      wildcardLists[f] = tileIdToItemIndexes[f].TryGetValue(wildcardId, out var w) ? w : default;
+
+    for (int i = 0; i < cornerWeight.Length; i++)
+      cornerWeight[i] = TOP_SCORE;
   }
 
-
-  public (int ResultCount, int BestScore) Search(TileMask target, int wildcardId)
+  // The con of this implementation is that best score can be assigned to multiple items
+  // For simplicity it just picks last best score it finds
+  public (int BestIndex, int BestScore) Search(TileMask target)
   {
     lock (searchLock)
     {
-      // TODO: This needs to be aware of connection groups?
-      tileScore[(int)TileMask.SurroundingDirection.TopLeft] = target.IsTopLeftConnected() ? TOP_SCORE : LOW_SCORE;
-      tileScore[(int)TileMask.SurroundingDirection.TopRight] = target.IsTopRightConnected() ? TOP_SCORE : LOW_SCORE;
-      tileScore[(int)TileMask.SurroundingDirection.BottomLeft] = target.IsBottomLeftConnected() ? TOP_SCORE : LOW_SCORE;
-      tileScore[(int)TileMask.SurroundingDirection.BottomRight] = target.IsBottomRightConnected() ? TOP_SCORE : LOW_SCORE;
+      cornerWeight[(int)TileMask.SurroundingDirection.TopLeft] = target.IsTopLeftConnected() ? TOP_SCORE : LOW_SCORE;
+      cornerWeight[(int)TileMask.SurroundingDirection.TopRight] = target.IsTopRightConnected() ? TOP_SCORE : LOW_SCORE;
+      cornerWeight[(int)TileMask.SurroundingDirection.BottomLeft] = target.IsBottomLeftConnected() ? TOP_SCORE : LOW_SCORE;
+      cornerWeight[(int)TileMask.SurroundingDirection.BottomRight] = target.IsBottomRightConnected() ? TOP_SCORE : LOW_SCORE;
 
       IncrementGeneration();
-      int resultMaxIndex = -1;
-      int bestScore = 0;
+
+      int bestIndex = -1, bestScore = 0;
       for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
       {
-        // Get list of items that match template for current side id
         int tileId = target.GetTileIdByIndex(fieldIndex);
 
         ImmutableArray<int> itemIndexList =
-          tileIdToItemIndexes[fieldIndex].TryGetValue(tileId, out var find1) ? find1 :
-          tileIdToItemIndexes[fieldIndex].TryGetValue(wildcardId, out var find2) ? find2 :
-          default;
+          tileIdToItemIndexes[fieldIndex].TryGetValue(tileId, out var exactList)
+            ? exactList
+            : wildcardLists[fieldIndex];
 
         if (itemIndexList.IsDefaultOrEmpty)
           continue;
 
-        // Iterate over items that have tileId on a given field
-        foreach (var itemIndex in itemIndexList)
+        int weightToAdd = cornerWeight[fieldIndex];
+        for (int i = 0; i < itemIndexList.Length; i++)
         {
-          // Reset score if in new generation
+          int itemIndex = itemIndexList[i];
           if (itemIndexToSeenGeneration[itemIndex] != currentGeneration)
           {
             itemIndexToSeenGeneration[itemIndex] = currentGeneration;
-            itemIndexToBestScore[itemIndex] = 0;
+            itemIndexToScore[itemIndex] = 0;
           }
 
-          // Increase score for item
-          itemIndexToBestScore[itemIndex] += tileScore[fieldIndex];
-          var itemScore = itemIndexToBestScore[itemIndex];
-          if (itemScore > bestScore)
+          int updatedScore = itemIndexToScore[itemIndex] += weightToAdd;
+          if (updatedScore > bestScore)
           {
-            bestScore = itemScore;
-            resultMaxIndex = 0;
-            ResultIndexToItemIndex[resultMaxIndex] = itemIndex;
-          }
-          else if (itemScore == bestScore)
-          {
-            bestScore = itemScore;
-            ResultIndexToItemIndex[++resultMaxIndex] = itemIndex;
+            bestScore = updatedScore;
+            bestIndex = itemIndex;
           }
         }
       }
 
-      return (resultMaxIndex, bestScore);
+      return (bestIndex, bestScore);
     }
   }
 
   private void IncrementGeneration()
   {
     currentGeneration++;
-    if (currentGeneration < 0)
+    if (currentGeneration == 0)
     {
       Array.Clear(itemIndexToSeenGeneration, 0, itemIndexToSeenGeneration.Length);
       currentGeneration = 1;

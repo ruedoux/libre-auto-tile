@@ -2,7 +2,6 @@ using System.Collections.Frozen;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.Tiling.Search;
-using static Qwaitumin.LibreAutoTile.Tiling.TileMask;
 
 namespace Qwaitumin.LibreAutoTile.Tiling;
 
@@ -52,10 +51,18 @@ public class AutoTiler
     {
       List<(TileMask TileMask, TileAtlas TileAtlas)> items = [];
       foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
+      {
         foreach (var (position, tileMaskArrays) in tileMaskDefinition.AtlasPositionToTileMasks)
+        {
           foreach (var tileMaskArray in tileMaskArrays)
-            items.Add(
-              new(FromArray([.. tileMaskArray]), new(position.ToVector2(), imageFileName)));
+          {
+            TileMask tileMask = TileMask.FromArray([.. tileMaskArray]);
+            int tileAtlasChance = tileMaskDefinition.AtlasPositionToChance.TryGetValue(position, out var chance) ? chance : int.MaxValue;
+            TileAtlas tileAtlas = new(position.ToVector2(), imageFileName, tileAtlasChance);
+            items.Add(new(tileMask, tileAtlas));
+          }
+        }
+      }
 
       HashSet<int>? connectionGroupArray = null;
       if (tileDefinition.ConnectionGroup is not null)
@@ -133,14 +140,14 @@ public class AutoTiler
           tileMaskArray[i] = surroundingTileId;
         }
 
-        TileMask tileMask = FromArray(tileMaskArray);
+        TileMask tileMask = TileMask.FromArray(tileMaskArray);
         var bestMatch = tileIdToTileMaskSearcher[tileId].FindBestMatch(tileMask);
         data[layer][position] = new(
           tileId, tileMask, bestMatch.TileAtlas);
       }
 
       for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
-        UpdateTileRelative(layer, position, (SurroundingDirection)i);
+        UpdateTileRelative(layer, position, (TileMask.SurroundingDirection)i);
     }
     finally
     {
@@ -150,12 +157,12 @@ public class AutoTiler
 
 
   private void UpdateTileRelative(
-    int layer, Vector2 centerPosition, SurroundingDirection updateDirection)
+    int layer, Vector2 centerPosition, TileMask.SurroundingDirection updateDirection)
   {
     Vector2 updatePosition = centerPosition - CELL_SURROUNDING_DIRECTIONS[(int)updateDirection];
     TileData tileDataToUpdate = GetTileDataAt(layer, updatePosition);
     TileData centerTileData = GetTileDataAt(layer, centerPosition);
-    TileMask updatedTileMask = ConstructModified(
+    TileMask updatedTileMask = TileMask.ConstructModified(
       tileDataToUpdate.TileMask,
       updateDirection,
       centerTileData.CentreTileId);

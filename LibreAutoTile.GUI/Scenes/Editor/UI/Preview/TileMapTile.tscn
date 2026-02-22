@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bagpwruhxb7ka"]
 
 [ext_resource type="FontFile" uid="uid://2cika1jlvtuc" path="res://resources/SpaceMono-Regular.ttf" id="1_i1lex"]
-[ext_resource type="Script" uid="uid://bt7i3jyoojp1a" path="res://Scenes/Editor/Preview/TileMapTile.cs" id="1_u018q"]
+[ext_resource type="Script" uid="uid://bt7i3jyoojp1a" path="res://Scenes/Editor/UI/Preview/TileMapTile.cs" id="1_u018q"]
 
 [node name="TileMapTile" type="PanelContainer"]
 offset_right = 186.0

@@ -1,11 +1,8 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Signals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Tiles;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.UI.Tiles;
 
 public partial class EditorTiles : MarginContainer, IState
 {
@@ -17,8 +14,9 @@ public partial class EditorTiles : MarginContainer, IState
   public readonly EventNotifier<GuiTile> TileDeleted = new();
   public readonly EventNotifier<(int newId, int oldId)> TileIdChanged = new();
   public readonly EventNotifier<Color> TileColorChanged = new();
-  public GuiTile? ActiveTile { private set; get; } = null;
   public readonly HashSet<GuiTile> CreatedTiles = [];
+
+  public GuiTile? ActiveTile { private set; get; } = null;
 
   private Control tileList = null!;
   private Button addTileButton = null!;
@@ -90,7 +88,7 @@ public partial class EditorTiles : MarginContainer, IState
     Random random = new();
     AddTile(
       tileId: GetNextFreeTileId(),
-      tileName: GetNewTileName(new(CreatedTiles.Select(x => x.TileName))),
+      tileName: GetNewTileName([.. CreatedTiles.Select(x => x.TileName)]),
       color: new Color(
         r: (float)random.NextDouble(),
         g: (float)random.NextDouble(),
@@ -120,7 +118,7 @@ public partial class EditorTiles : MarginContainer, IState
     if (tileNamesToGuiTiles.ContainsKey(newTileName))
     {
       if (tileNamesToGuiTiles[newTileName] == tile) return;
-      newTileName = GetNewTileName(new(tileNamesToGuiTiles.Keys), newTileName + "-copy");
+      newTileName = GetNewTileName([.. tileNamesToGuiTiles.Keys], newTileName + "-copy");
     }
 
     tile.TileName = newTileName;

@@ -5,7 +5,6 @@ namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
 
 public partial class BuiltInCompare : Node2D
 {
-  private Vector2I mapSize = new(512, 512);
   private const int TERRAIN_SET = 0;
 
   public override void _Ready()
@@ -39,6 +38,6 @@ public partial class BuiltInCompare : Node2D
     Stopwatch stopwatch = Stopwatch.StartNew();
     tileMapLayer.SetCellsTerrainConnect(positionsGrass, TERRAIN_SET, (int)Comparasion.TILES.GRASS);
     tileMapLayer.SetCellsTerrainConnect(positionsWater, TERRAIN_SET, (int)Comparasion.TILES.WATER);
-    GD.Print($"Rendering the map took: {stopwatch.ElapsedMilliseconds}ms");
+    GD.Print($"Rendering {Comparasion.MAP_SIZE} map took: {stopwatch.ElapsedMilliseconds}ms");
   }
 }

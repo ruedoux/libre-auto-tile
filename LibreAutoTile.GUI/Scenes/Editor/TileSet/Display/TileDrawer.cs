@@ -1,17 +1,15 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
-using Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.Utils;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet.Display;
 
-public partial class EditorTileDrawer : Node2D
+public partial class TileDrawer : Node2D
 {
   public readonly DrawNode TileDrawNode;
   public readonly DrawNode GridDrawNode;
   public readonly DrawNode BitmaskOutlineDrawNode;
 
-  public EditorTileDrawer()
+  public TileDrawer()
   {
     GridDrawNode = GodotApi.AddChild<DrawNode>(this, new());
     TileDrawNode = GodotApi.AddChild<DrawNode>(this, new());

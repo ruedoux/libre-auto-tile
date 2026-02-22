@@ -13,7 +13,7 @@ public class TileDefinitionTest
 
   static TileDefinitionTest()
   {
-    DEFAULT_TILEMASK_DEFINITION = TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } });
+    DEFAULT_TILEMASK_DEFINITION = TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }, []);
     DEFAULT_FILE_TO_TILEMASK = new() { { "a", DEFAULT_TILEMASK_DEFINITION } };
   }
 

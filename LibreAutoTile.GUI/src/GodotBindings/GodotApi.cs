@@ -1,4 +1,3 @@
-using System;
 using Godot;
 
 namespace Qwaitumin.LibreAutoTile.GUI.GodotBindings;

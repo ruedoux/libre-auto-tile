@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using Godot;
 using Qwaitumin.Logging;
 
@@ -16,7 +14,7 @@ public static class GodotLogger
       logFilePath = "./guilog.txt";
 
     MessageFileWriter messageFileWriter = new(logFilePath);
-    LOGGER = new([(msg) => GD.PrintRich(msg), (msg) => messageFileWriter.Write(msg)], new(ColorType: ColorType.BBCODE));
+    LOGGER = new([(msg) => GD.PrintRich(msg), messageFileWriter.Write], new(ColorType: ColorType.BBCODE));
     LOGGER.Log($"Logs are written to: '{logFilePath}'");
   }
 

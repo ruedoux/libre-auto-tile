@@ -28,7 +28,7 @@ public class TileMaskSearcher
     items = [.. tileMasks];
 
     indexSearcher = new(
-      items.Length, [.. GetAssignedIndexes().Select(d => d.ToFrozenDictionary())]);
+      items.Length, [.. GetAssignedIndexes().Select(d => d.ToFrozenDictionary())], this.wildcardId);
   }
 
   /// <summary>
@@ -39,24 +39,21 @@ public class TileMaskSearcher
     if (ExistingMasks.Contains(target))
       return target;
 
-    (int resultMaxIndex, int _) = indexSearcher.Search(target, wildcardId);
+    (int bestIndex, int _) = indexSearcher.Search(target);
     TileMask parsedTarget = new();
-    if (resultMaxIndex != -1)
+    if (bestIndex != -1)
     {
-      int rawBestIndex = indexSearcher.ResultIndexToItemIndex[resultMaxIndex];
-      var rawTileMask = rawBestIndex != -1 ? items[rawBestIndex] : new();
+      var rawTileMask = items[bestIndex];
       parsedTarget = ParseTargetHitmask(target, rawTileMask);
     }
 
     if (ExistingMasks.Contains(parsedTarget))
       return parsedTarget;
 
-    (int trimmedResultMaxIndex, int _) = indexSearcher.Search(target, wildcardId);
-    if (trimmedResultMaxIndex == -1)
+    (int trimmedBestIndex, int _) = indexSearcher.Search(target);
+    if (trimmedBestIndex == -1)
       return GetDefaultItem();
-
-    int bestIndex = indexSearcher.ResultIndexToItemIndex[trimmedResultMaxIndex];
-    return bestIndex != -1 ? items[bestIndex] : GetDefaultItem();
+    return trimmedBestIndex != -1 ? items[trimmedBestIndex] : GetDefaultItem();
   }
 
   private TileMask ParseTargetHitmask(TileMask target, TileMask rawTileMask)

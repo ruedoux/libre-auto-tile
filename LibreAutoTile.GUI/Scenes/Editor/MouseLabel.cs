@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Utils;
+namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor;
 
 
 public partial class MouseLabel : CanvasLayer
