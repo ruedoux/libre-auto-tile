@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.Tiling.Search;
+using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
 namespace Qwaitumin.LibreAutoTile.Tiling;
 
@@ -20,7 +21,7 @@ public class AutoTiler
 
 
   public AutoTiler(uint layerCount, AutoTileConfiguration autoTileConfiguration)
-    : this(layerCount, BuildTileIdToTileMaskSearcher(autoTileConfiguration)) { }
+    : this(layerCount, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration)) { }
 
   public AutoTiler(uint layerCount, Dictionary<int, TileSearcher> tileIdToTileMaskSearcher)
   {
@@ -33,47 +34,6 @@ public class AutoTiler
 
     this.tileIdToTileMaskSearcher = tileIdToTileMaskSearcher.ToFrozenDictionary();
     tileMaskArray = new TileMask().ToArray();
-  }
-
-  private static Dictionary<int, TileSearcher> BuildTileIdToTileMaskSearcher(
-    AutoTileConfiguration autoTileConfiguration)
-  {
-    var connectionGroupToTileIds = autoTileConfiguration.TileDefinitions
-      .Where(td => td.Value.ConnectionGroup != null)
-      .GroupBy(td => td.Value.ConnectionGroup!.Value)
-      .ToDictionary(
-          g => g.Key,
-          g => new HashSet<int>(g.Select(td => (int)td.Key))
-      );
-
-    Dictionary<int, TileSearcher> tileIdToTileSearcher = [];
-    foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
-    {
-      List<(TileMask TileMask, TileAtlas TileAtlas)> items = [];
-      foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
-      {
-        foreach (var (position, tileMaskArrays) in tileMaskDefinition.AtlasPositionToTileMasks)
-        {
-          foreach (var tileMaskArray in tileMaskArrays)
-          {
-            TileMask tileMask = TileMask.FromArray([.. tileMaskArray]);
-            int tileAtlasChance = tileMaskDefinition.AtlasPositionToChance.TryGetValue(position, out var chance) ? chance : int.MaxValue;
-            TileAtlas tileAtlas = new(position.ToVector2(), imageFileName, tileAtlasChance);
-            items.Add(new(tileMask, tileAtlas));
-          }
-        }
-      }
-
-      HashSet<int>? connectionGroupArray = null;
-      if (tileDefinition.ConnectionGroup is not null)
-        connectionGroupArray = connectionGroupToTileIds[(uint)tileDefinition.ConnectionGroup];
-
-      TileMaskSearcher tileMaskSearcher = new(
-        items.Select(x => x.TileMask), connectionGroupArray, autoTileConfiguration.WildcardId);
-      TileAtlasResolver tileAtlasResolver = new(items);
-      tileIdToTileSearcher.Add((int)tileId, new(tileMaskSearcher, tileAtlasResolver));
-    }
-    return tileIdToTileSearcher;
   }
 
   public void Clear()

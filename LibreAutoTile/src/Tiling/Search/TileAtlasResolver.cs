@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
@@ -13,30 +14,26 @@ public class TileAtlasResolver
 
   public TileAtlasResolver(IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> items)
   {
-    var groups = items
-    .GroupBy(x => x.TileMask)
-    .ToDictionary(
-        g => g.Key,
-        g =>
-        {
-          List<TileAtlas> atlases = [];
-          foreach (var x in g.OrderBy(x => x.TileAtlas.Chance))
-            atlases.Add(x.TileAtlas);
-          // Force last .Chance to int.MaxValue to guarantee coverage
-          atlases[^1] = atlases[^1] with { Chance = int.MaxValue };
-          return atlases;
-        }
-    );
+    var grouped = new Dictionary<TileMask, List<TileAtlas>>();
+
+    foreach (var (tileMask, tileAtlas) in items)
+    {
+      if (!grouped.TryGetValue(tileMask, out var list))
+      {
+        list = [];
+        grouped[tileMask] = list;
+      }
+      list.Add(tileAtlas);
+    }
 
     var atlasList = new List<TileAtlas>();
-    var mapBuilder = new Dictionary<TileMask, (int Offset, int Count)>();
+    var mapBuilder = new Dictionary<TileMask, (int Offset, int Count)>(grouped.Count);
 
-    foreach (var kv in groups)
+    foreach (var (mask, list) in grouped)
     {
       int offset = atlasList.Count;
-      atlasList.AddRange(kv.Value);
-      int count = kv.Value.Count;
-      mapBuilder[kv.Key] = (offset, count);
+      atlasList.AddRange(list);
+      mapBuilder[mask] = (offset, list.Count);
     }
 
     atlasArray = [.. atlasList];
@@ -47,19 +44,28 @@ public class TileAtlasResolver
   {
     if (!indexMap.TryGetValue(tileMask, out var index))
       return new TileAtlas();
-    int randomNumber = Random.Shared.Next();
-    int start = index.Offset;
-    int count = index.Count;
-    int end = start + count;
-    int low = start, high = end - 1;
-    while (low < high)
+
+    if (index.Count == 1)
+      return atlasArray[index.Offset];
+
+    ulong totalChance = 0;
+    for (int i = index.Offset; i < index.Offset + index.Count; i++)
+      totalChance = unchecked(totalChance + atlasArray[i].Chance);
+
+    if (totalChance == 0)
+      return atlasArray[index.Offset];
+
+    ulong randomNumber = (ulong)Random.Shared.NextInt64((long)totalChance);
+    randomNumber = ulong.Clamp(randomNumber, 0, totalChance - 1);
+
+    ulong currentChance = 0;
+    for (int i = index.Offset; i < index.Offset + index.Count; i++)
     {
-      int mid = low + ((high - low) >> 1);
-      if (atlasArray[mid].Chance > randomNumber)
-        high = mid;
-      else
-        low = mid + 1;
+      currentChance = unchecked(currentChance + atlasArray[i].Chance);
+      if (randomNumber < currentChance)
+        return atlasArray[i];
     }
-    return atlasArray[low];
+
+    return atlasArray[index.Offset + index.Count - 1];
   }
 }

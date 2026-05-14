@@ -37,33 +37,36 @@ public static class ConfigurationExtractor
         color: GodotTypeMapper.Map(tileDefinition.Color),
         connectionGroup: tileDefinition.ConnectionGroup);
 
-    Dictionary<string, Dictionary<Configuration.Models.Vector3, BitmaskData>> imageFileNameToMappedTileData = [];
+    Dictionary<string, Dictionary<Configuration.Models.Vector3, BitmaskData>> imageFileNameToMappedBitmaskData = [];
     foreach (var (tileId, tileDefinition) in autoTileConfiguration.TileDefinitions)
     {
       foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
       {
-        if (!imageFileNameToMappedTileData.TryGetValue(imageFileName, out var positionToTileData))
+        if (!imageFileNameToMappedBitmaskData.TryGetValue(imageFileName, out var positionToTileData))
         {
           positionToTileData = [];
-          imageFileNameToMappedTileData[imageFileName] = positionToTileData;
+          imageFileNameToMappedBitmaskData[imageFileName] = positionToTileData;
         }
 
-        foreach (var (position, tileMasks) in tileMaskDefinition.AtlasPositionToTileMasks)
+        foreach (var (position, tileMasksAndChance) in tileMaskDefinition.AtlasPositionToTileMaskAndChance)
         {
-          if (!positionToTileData.TryGetValue(position, out var guiTileData))
+          if (!positionToTileData.TryGetValue(position, out var bitmaskData))
           {
-            guiTileData = new();
-            positionToTileData[position] = guiTileData;
+            bitmaskData = new();
+            positionToTileData[position] = bitmaskData;
           }
 
-          guiTileData.SetCentreTileId(position.Z, (int)tileId);
-          foreach (var tileMask in tileMasks)
-            guiTileData.AddTileMask(position.Z, TileMask.FromArray([.. tileMask]));
+          bitmaskData.SetCentreTileId(position.Z, (int)tileId);
+          foreach (var (tileMask, chance) in tileMasksAndChance)
+          {
+            bitmaskData.AddTileMask(position.Z, TileMask.FromArray([.. tileMask]));
+            bitmaskData.SetProbability(position.Z, chance);
+          }
         }
       }
     }
 
-    foreach (var (imageFileName, mappedTileData) in imageFileNameToMappedTileData)
+    foreach (var (imageFileName, mappedTileData) in imageFileNameToMappedBitmaskData)
       foreach (var (position, guiTileData) in mappedTileData)
         bitmaskContainer.BitmaskDatabase.SetPackedTileData(
           imageFileName, GodotTypeMapper.Map(position.ToVector2()), guiTileData);
@@ -96,7 +99,7 @@ public static class ConfigurationExtractor
     Dictionary<string, TileMaskDefinition> imageFileNameToTileMaskDefinition = [];
     foreach (var (fileName, positionToBitmaskData) in tileDatabase.GetAll())
     {
-      Dictionary<Configuration.Models.Vector3, List<int[]>> positionsToTileMaskDefinitions = [];
+      Dictionary<Configuration.Models.Vector3, List<TileMaskData>> positionsToTileMaskDefinitions = [];
       foreach (var (position, bitmaskData) in positionToBitmaskData)
       {
         foreach (var (layer, fullTileMask) in bitmaskData.GetAll())
@@ -112,12 +115,14 @@ public static class ConfigurationExtractor
             tileMasks = [];
             positionsToTileMaskDefinitions[positionWithLayer] = tileMasks;
           }
-          tileMasks.Add(tileMask.ToArray());
+          tileMasks.Add(TileMaskData.Construct(
+            tileMask.ToArray(),
+            bitmaskData.GetProbability(layer)));
         }
       }
 
       imageFileNameToTileMaskDefinition[Path.GetRelativePath(".", fileName)] = TileMaskDefinition.Construct(
-        positionsToTileMaskDefinitions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray()), []);
+        positionsToTileMaskDefinitions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToArray()));
     }
 
     return imageFileNameToTileMaskDefinition;
@@ -145,9 +150,9 @@ public static class ConfigurationExtractor
     (Configuration.Models.Vector3, string)? latestMatch = null;
     foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
     {
-      foreach (var (atlasPosition, tileMask) in tileMaskDefinition.AtlasPositionToTileMasks)
+      foreach (var (atlasPosition, tileMaskDatas) in tileMaskDefinition.AtlasPositionToTileMaskAndChance)
       {
-        if (TileMask.FromArray([.. tileMask.SelectMany(e => e)]) == defaultMask)
+        if (tileMaskDatas.Any(tileMaskData => TileMask.FromArray([.. tileMaskData.Mask]) == defaultMask))
           return new(atlasPosition, imageFileName);
         latestMatch = new(atlasPosition, imageFileName);
       }

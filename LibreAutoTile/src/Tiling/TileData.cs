@@ -1,4 +1,4 @@
-using Qwaitumin.LibreAutoTile.Tiling.Search;
+using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
 namespace Qwaitumin.LibreAutoTile.Tiling;
 

@@ -7,7 +7,7 @@ namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet.Data;
 
 public class BitmaskData
 {
-  private readonly Dictionary<int, (TileMask TileMask, int CentreTileId, double Propability)>
+  private readonly Dictionary<int, (TileMask TileMask, int CentreTileId, uint Propability)>
     layerToFullTileMask = [];
 
   public void AddTileMask(int layer, TileMask tileMask)
@@ -44,7 +44,7 @@ public class BitmaskData
     layerToFullTileMask[layer] = new(tileMask, fullTileMask.CentreTileId, fullTileMask.Propability);
   }
 
-  public void SetProbability(int layer, double probability)
+  public void SetProbability(int layer, uint probability)
   {
     if (!layerToFullTileMask.TryGetValue(layer, out var fullTileMask))
       return;
@@ -74,7 +74,7 @@ public class BitmaskData
       layerToFullTileMask.Remove(layer);
   }
 
-  public KeyValuePair<int, (TileMask TileMask, int CentreTileId, double Propability)>[] GetAll()
+  public KeyValuePair<int, (TileMask TileMask, int CentreTileId, uint Propability)>[] GetAll()
     => [.. layerToFullTileMask];
 
   public int GetCentreTileId(int layer)
@@ -91,10 +91,10 @@ public class BitmaskData
     return fullTileMask.TileMask;
   }
 
-  public double GetProbability(int layer)
+  public uint GetProbability(int layer)
   {
     if (!layerToFullTileMask.TryGetValue(layer, out var fullTileMask))
-      return -1;
+      return 0;
     return fullTileMask.Propability;
   }
 

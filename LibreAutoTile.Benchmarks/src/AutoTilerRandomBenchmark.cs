@@ -5,7 +5,7 @@ namespace Qwaitumin.LibreAutoTile.Benchmark;
 
 [MemoryDiagnoser]
 [ShortRunJob]
-public class AutoTilerBenchmark
+public class AutoTilerRandomBenchmark
 {
   private const int MAX_TILE_ID = 100;
 
@@ -16,7 +16,7 @@ public class AutoTilerBenchmark
   private AutoTiler autoTiler = null!;
 
 
-  public AutoTilerBenchmark()
+  public AutoTilerRandomBenchmark()
   {
     positionsWithIds100x100 = Helper.GetPositionsWithIds(100, 100, MAX_TILE_ID);
   }
@@ -24,12 +24,11 @@ public class AutoTilerBenchmark
   [GlobalSetup]
   public void GlobalSetup()
   {
-
     autoTiler = new(1, Helper.GetIdsToRandomTileSearchers(MAX_TILE_ID, TileMaskCount));
   }
 
   [Benchmark]
-  public void PlaceTile_SingleLayer_100x100()
+  public void PlaceTile_SingleLayer_100x100_Random()
   {
     foreach (var (position, tileId) in positionsWithIds100x100)
       autoTiler.PlaceTile(0, position, tileId);

@@ -1,15 +1,14 @@
 using BenchmarkDotNet.Attributes;
-using Qwaitumin.LibreAutoTile.Tiling;
 using Qwaitumin.LibreAutoTile.Tiling.Search;
+using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
 namespace Qwaitumin.LibreAutoTile.Benchmark;
 
 
 [MemoryDiagnoser]
 [ShortRunJob]
-public class TileMaskSearcherBenchmark
+public class TileMaskSearcherRandomizedBenchmark
 {
-
   [Params(1_000, 10_000)]
   public int TileMaskCount;
 
@@ -18,6 +17,7 @@ public class TileMaskSearcherBenchmark
   private TileMask[] items = [];
   private TileMask[] itemsToMatch = [];
   private TileMask randomTileMask;
+  private TileMask sink;
 
   [GlobalSetup]
   public void GlobalSetup()
@@ -33,7 +33,7 @@ public class TileMaskSearcherBenchmark
   /// Best case scenario.
   /// </summary>
   [Benchmark]
-  public void FindBestMatchSingle_BestCaseScenario()
+  public TileMask FindBestMatchSingle_Random_BestCaseScenario()
     => tileMaskSearcher.FindBestMatch(randomTileMask);
 
   /// <summary>
@@ -41,7 +41,7 @@ public class TileMaskSearcherBenchmark
   /// Worst case scenario.
   /// </summary>
   [Benchmark]
-  public void FindBestMatchSingle_WorstCaseScenario()
+  public TileMask FindBestMatchSingle_Random_WorstCaseScenario()
     => tileMaskSearcher.FindBestMatch(new TileMask());
 
   /// <summary>
@@ -49,10 +49,11 @@ public class TileMaskSearcherBenchmark
   /// Best case scenario.
   /// </summary>
   [Benchmark]
-  public void FindBestMatchBatch_BestCaseScenario()
+  public TileMask FindBestMatchBatch_Random_BestCaseScenario()
   {
     foreach (var item in items)
-      tileMaskSearcher.FindBestMatch(item);
+      sink = tileMaskSearcher.FindBestMatch(item);
+    return sink;
   }
 
   /// <summary>
@@ -60,9 +61,10 @@ public class TileMaskSearcherBenchmark
   /// Worst case scenario.
   /// </summary>
   [Benchmark]
-  public void FindBestMatchBatch_WorstCaseScenario()
+  public TileMask FindBestMatchBatch_Random_WorstCaseScenario()
   {
     foreach (var item in itemsToMatch)
-      tileMaskSearcher.FindBestMatch(item);
+      sink = tileMaskSearcher.FindBestMatch(item);
+    return sink;
   }
 }

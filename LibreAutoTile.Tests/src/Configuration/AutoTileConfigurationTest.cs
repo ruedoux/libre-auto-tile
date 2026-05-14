@@ -17,7 +17,13 @@ public class AutoTileConfigurationTest
   static AutoTileConfigurationTest()
   {
     DEFAULT_TILE_DEFINITION = TileDefinition.Construct(
-      new() { { "resources/mock.jpg", TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }, []) } });
+      new()
+      {
+        {
+          "resources/mock.jpg",
+          TileMaskDefinition.Construct(new() {{ Vector3.Zero, [TileMaskData.Construct(DEFAULT_TILEMASK[0], 1)] }})
+        }
+      });
   }
 
   [SimpleTestMethod]

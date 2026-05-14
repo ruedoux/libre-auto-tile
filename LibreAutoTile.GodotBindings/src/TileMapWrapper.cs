@@ -56,7 +56,7 @@ internal class TileMapWrapper
     {
       foreach (var (ImageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
       {
-        foreach (var (atlasPosition, _) in tileMaskDefinition.AtlasPositionToTileMasks)
+        foreach (var (atlasPosition, _) in tileMaskDefinition.AtlasPositionToTileMaskAndChance)
         {
           if (!imageFileNamesToAtlasPositions.TryGetValue(ImageFileName, out var atlasPositions))
           {

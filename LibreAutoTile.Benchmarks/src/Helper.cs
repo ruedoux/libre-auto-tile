@@ -1,6 +1,6 @@
 using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling;
 using Qwaitumin.LibreAutoTile.Tiling.Search;
+using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
 namespace Qwaitumin.LibreAutoTile.Benchmark;
 
@@ -65,5 +65,19 @@ internal static class Helper
     }
 
     return idsToTileMaskSearchers;
+  }
+
+  public static TileMask MutateTileMask(TileMask tileMask)
+  {
+    Random random = new();
+    return new(
+      topLeft: random.Next(),
+      top: tileMask.Top,
+      topRight: tileMask.TopRight,
+      right: tileMask.Right,
+      bottomRight: tileMask.BottomRight,
+      bottom: tileMask.Bottom,
+      bottomLeft: tileMask.BottomLeft,
+      left: tileMask.Left);
   }
 }

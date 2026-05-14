@@ -1,8 +1,8 @@
 using Qwaitumin.LibreAutoTile.Configuration.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tiling.Search;
+namespace Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
-public readonly struct TileAtlas(Vector2 position, string imageFileName, int chance = int.MaxValue)
+public readonly struct TileAtlas(Vector2 position, string imageFileName, uint chance = 0)
 {
   public readonly Vector2 Position { get; init; } = position;
   public readonly string ImageFileName { get; init; } = imageFileName;
@@ -11,7 +11,7 @@ public readonly struct TileAtlas(Vector2 position, string imageFileName, int cha
   /// Chance for this TileAtlas to appear if there are more than one.
   /// Should be caluculated as: 60% = int.MaxValue * 0.60
   /// </summary>
-  public readonly int Chance { get; init; } = chance;
+  public readonly uint Chance { get; init; } = chance;
 
   public bool Equals(TileAtlas other)
     => Position.Equals(other.Position)

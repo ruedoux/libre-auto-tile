@@ -6,14 +6,14 @@ namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
 [SimpleTestClass]
 public class TileDefinitionTest
 {
-  private static readonly int[][] DEFAULT_TILEMASK = [[0, 0, 0, 0, 0, 0, 0, 0]];
+  private static readonly int[][] DEFAULT_TILEMASKS = [[0, 0, 0, 0, 0, 0, 0, 0]];
   private static readonly TileMaskDefinition DEFAULT_TILEMASK_DEFINITION;
   private static readonly Dictionary<string, TileMaskDefinition> DEFAULT_FILE_TO_TILEMASK;
 
 
   static TileDefinitionTest()
   {
-    DEFAULT_TILEMASK_DEFINITION = TileMaskDefinition.Construct(new() { { Vector3.Zero, DEFAULT_TILEMASK } }, []);
+    DEFAULT_TILEMASK_DEFINITION = TileMaskDefinition.Construct(new() { { Vector3.Zero, [TileMaskData.Construct(DEFAULT_TILEMASKS[0], 1)] } });
     DEFAULT_FILE_TO_TILEMASK = new() { { "a", DEFAULT_TILEMASK_DEFINITION } };
   }
 

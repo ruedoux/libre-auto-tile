@@ -5,33 +5,29 @@ namespace Qwaitumin.LibreAutoTile.Configuration.Models;
 
 public class TileMaskDefinition
 {
-  public readonly ImmutableDictionary<Vector3, ImmutableArray<ImmutableArray<int>>> AtlasPositionToTileMasks;
-  public readonly ImmutableDictionary<Vector3, int> AtlasPositionToChance;
+  public readonly ImmutableDictionary<Vector3, ImmutableArray<TileMaskData>> AtlasPositionToTileMaskAndChance;
 
   public TileMaskDefinition(
-    ImmutableDictionary<Vector3, ImmutableArray<ImmutableArray<int>>> atlasPositionToTileMasks,
-    ImmutableDictionary<Vector3, int> atlasPositionToChance)
+    ImmutableDictionary<Vector3, ImmutableArray<TileMaskData>> atlasPositionToTileMaskAndChance)
   {
-    AtlasPositionToTileMasks = atlasPositionToTileMasks;
-    AtlasPositionToChance = atlasPositionToChance;
-    foreach (var (_, tileMasks) in atlasPositionToTileMasks)
-      foreach (var tileMask in tileMasks)
-        if (tileMask.Length != 8)
-          throw new ArgumentException($"Tile mask length must be 8, but is: {tileMask.Length}");
+    AtlasPositionToTileMaskAndChance = atlasPositionToTileMaskAndChance;
+    foreach (var (_, tileMasksAndChanceArray) in atlasPositionToTileMaskAndChance)
+      foreach (var (Mask, Chance) in tileMasksAndChanceArray)
+        if (Mask.Length != 8)
+          throw new ArgumentException($"Tile mask length must be 8, but is: {Mask.Length}");
   }
 
   public static TileMaskDefinition Construct(
-    Dictionary<Vector3, int[][]> atlasPositionToTileMasks,
-    Dictionary<Vector3, int> atlasPositionToChance)
+    Dictionary<Vector3, TileMaskData[]> atlasPositionToTileMaskAndChance)
   {
-    var immutableAtlasPositionToTileMasks = atlasPositionToTileMasks.ToImmutableDictionary(
-      kvp => kvp.Key,
-      kvp => kvp.Value
-        .Select(innerArray => innerArray.ToImmutableArray())
-        .ToImmutableArray());
-    return new(
-      atlasPositionToTileMasks: immutableAtlasPositionToTileMasks,
-      atlasPositionToChance: atlasPositionToChance.ToImmutableDictionary());
+    var immutableAtlasPositionToTileMaskAndChance =
+      atlasPositionToTileMaskAndChance.ToImmutableDictionary(
+        kvp => kvp.Key,
+        kvp => kvp.Value
+          .Select(x => new TileMaskData([.. x.Mask], x.Chance))
+          .ToImmutableArray());
+
+    return new TileMaskDefinition(immutableAtlasPositionToTileMaskAndChance);
   }
 
   public static TileMaskDefinition? FromJsonString(string jsonString)
@@ -50,19 +46,26 @@ public class TileMaskDefinition
     if (obj is not TileMaskDefinition other)
       return false;
 
-    bool dictsEqual = AtlasPositionToTileMasks.Count == other.AtlasPositionToTileMasks.Count;
+    bool dictsEqual = AtlasPositionToTileMaskAndChance.Count == other.AtlasPositionToTileMaskAndChance.Count;
     if (!dictsEqual)
       return false;
 
-    foreach (var (atlasPosition, tileMasks) in AtlasPositionToTileMasks)
+    foreach (var (atlasPosition, tileMasksAndChance) in AtlasPositionToTileMaskAndChance)
     {
-      if (!other.AtlasPositionToTileMasks.TryGetValue(atlasPosition, out var otherTileMasks))
+      if (!other.AtlasPositionToTileMaskAndChance.TryGetValue(atlasPosition, out var otherTileMasksAndChance))
         return false;
-      if (otherTileMasks.Length != tileMasks.Length)
+
+      if (otherTileMasksAndChance.Length != tileMasksAndChance.Length)
         return false;
-      for (int tileMasksIndex = 0; tileMasksIndex < tileMasks.Length; tileMasksIndex++)
-        if (!otherTileMasks[tileMasksIndex].SequenceEqual(tileMasks[tileMasksIndex]))
+
+      for (int i = 0; i < tileMasksAndChance.Length; i++)
+      {
+        if (tileMasksAndChance[i].Chance != otherTileMasksAndChance[i].Chance)
           return false;
+
+        if (!tileMasksAndChance[i].Mask.SequenceEqual(otherTileMasksAndChance[i].Mask))
+          return false;
+      }
     }
 
     return true;
@@ -71,12 +74,18 @@ public class TileMaskDefinition
   public override int GetHashCode()
   {
     var hash = new HashCode();
-    foreach (var kvp in AtlasPositionToTileMasks)
+
+    foreach (var kvp in AtlasPositionToTileMaskAndChance)
     {
       hash.Add(kvp.Key);
-      foreach (var array in kvp.Value)
-        foreach (var item in array)
+
+      foreach (var (Mask, Chance) in kvp.Value)
+      {
+        foreach (var item in Mask)
           hash.Add(item);
+
+        hash.Add(Chance);
+      }
     }
 
     return hash.ToHashCode();

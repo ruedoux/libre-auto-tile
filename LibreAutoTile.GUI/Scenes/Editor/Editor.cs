@@ -256,7 +256,9 @@ public partial class Editor : Control
     => tileSetContainer.UpdateGrid(
       editorOptions.ImageRectangleObservable.Value,
       editorSettings.GridColorObservable.Value,
-      editorSettings.ScaledTileSizeObservable.Value);
+      editorSettings.ScaledTileSizeObservable.Value,
+      (int)editorLayer.LayerObservable.Value,
+      editorOptions.ImageFileObservable.Value);
 
   private void UpdateSelectedTile(Vector2 mousePosition)
   {

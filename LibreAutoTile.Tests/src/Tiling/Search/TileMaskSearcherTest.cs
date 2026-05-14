@@ -1,5 +1,5 @@
-using Qwaitumin.LibreAutoTile.Tiling;
 using Qwaitumin.LibreAutoTile.Tiling.Search;
+using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 using Qwaitumin.SimpleTest;
 
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling.Search;
@@ -75,7 +75,6 @@ new(topLeft: 0, top: 0, topRight: 0));
   public void FindBestMatch_ShouldFindBestResult_WhenGivenAllWildCardTileMask()
   {
     // Given
-    TileAtlas TileAtlas = new(new(0, 0), "a");
     TileMask target = new(
       TileMaskSearcher.DEFAULT_WILDCARD_ID,
       TileMaskSearcher.DEFAULT_WILDCARD_ID,

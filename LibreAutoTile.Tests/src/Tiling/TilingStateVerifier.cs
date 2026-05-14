@@ -1,7 +1,7 @@
 using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.Tiling;
-using Qwaitumin.LibreAutoTile.Tiling.Search;
+using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 using Qwaitumin.SimpleTest;
 
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling;
@@ -28,31 +28,41 @@ public class TilingStateVerifier(AutoTiler autoTiler, AutoTileConfiguration auto
     foreach (var (position, maskPacked) in mappedExpectedTileMasks)
     {
       TileData resultTileData = autoTiler.GetTile(0, position);
-      var shouldBeMaskAndAtlas = GetAtlasAndMaskFromConfiguration(maskPacked.TileId, maskPacked.TileMask);
-      Assertions.AssertEqual(shouldBeMaskAndAtlas.TileAtlas, resultTileData.TileAtlas,
-        $"Mask at position {position} is {resultTileData.TileMask}, but should be: {shouldBeMaskAndAtlas.TileMask}");
+      var expectedState = GetAtlasesAndMaskFromConfiguration(maskPacked.TileId, maskPacked.TileMask);
+      bool isExpectedAtlas = expectedState.TileAtlases.Any(tileAtlas =>
+        tileAtlas.Position == resultTileData.TileAtlas.Position
+        && tileAtlas.ImageFileName == resultTileData.TileAtlas.ImageFileName);
+
+      Assertions.AssertTrue(isExpectedAtlas,
+        $"Mask at position {position} is {resultTileData.TileMask}, but should be: {expectedState.TileMask}, atlas should be one of: [{string.Join(", ", expectedState.TileAtlases)}] but is {resultTileData.TileAtlas}");
     }
   }
 
-  private (TileAtlas TileAtlas, TileMask TileMask) GetAtlasAndMaskFromConfiguration(
+  private (TileAtlas[] TileAtlases, TileMask TileMask) GetAtlasesAndMaskFromConfiguration(
     int tileId, TileMask tileMask)
   {
     var tileDefinition = autoTileConfiguration.TileDefinitions[(uint)tileId];
     TileAtlas defaultTileAtlas = new(new(), "<None>");
+    List<TileAtlas> matchingAtlases = [];
+
     foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
     {
-      foreach (var (atlasPosition, tileMasks) in tileMaskDefinition.AtlasPositionToTileMasks)
+      foreach (var (atlasPosition, tileMaskAndChanceArray) in tileMaskDefinition.AtlasPositionToTileMaskAndChance)
       {
-        foreach (var tileMaskArray in tileMasks)
+        foreach (var (mask, chance) in tileMaskAndChanceArray)
         {
-          var candidateTileMask = TileMask.FromArray([.. tileMaskArray]);
-          defaultTileAtlas = new(atlasPosition.ToVector2(), imageFileName);
+          var candidateTileMask = TileMask.FromArray([.. mask]);
+          defaultTileAtlas = new(atlasPosition.ToVector2(), imageFileName, chance);
+
           if (candidateTileMask == tileMask)
-            return (defaultTileAtlas, candidateTileMask);
+            matchingAtlases.Add(defaultTileAtlas);
         }
       }
     }
 
-    return (defaultTileAtlas, new(-999));
+    if (matchingAtlases.Count > 0)
+      return ([.. matchingAtlases], tileMask);
+
+    return ([defaultTileAtlas], new(-999));
   }
 }

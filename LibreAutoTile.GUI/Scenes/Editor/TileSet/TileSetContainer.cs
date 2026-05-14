@@ -25,7 +25,7 @@ public partial class TileSetContainer : Node2D
     TileProbability.ZIndex = 1;
   }
 
-  public void UpdateGrid(Rect2I size, Color color, int tileSize)
+  public void UpdateGrid(Rect2I size, Color color, int tileSize, int layer, string fileName)
   {
     TileDrawer.RedrawGrid(size, color, tileSize);
     TileProbability.Clear();
@@ -35,9 +35,17 @@ public partial class TileSetContainer : Node2D
     int endX = size.End.X;
     int endY = size.End.Y;
     for (int x = startX; x < endX; x += tileSize)
+    {
       for (int y = startY; y < endY; y += tileSize)
-        TileProbability.AddLabel(TileSetMath.ScaleDownTilePosition(new(x, y), tileSize), 1, tileSize);
+      {
+        var bitmaskData = BitmaskDatabase.GetBitmaskData(fileName, new(x, y));
+        GD.Print(bitmaskData);
+        uint probability = bitmaskData is null ? 1 : bitmaskData.GetProbability(layer);
+        TileProbability.AddLabel(TileSetMath.ScaleDownTilePosition(new(x, y), tileSize), probability, tileSize);
+      }
+    }
   }
+
 
   public void Clear()
   {
@@ -150,13 +158,16 @@ public partial class TileSetContainer : Node2D
   }
 
   public void AddProbability(
-    int layer, string fileName, Vector2I worldPosition, double value, int tileSize)
+  int layer, string fileName, Vector2I worldPosition, int value, int tileSize)
   {
     var scaledTilePosition = TileSetMath.ScaleDownTilePosition(worldPosition, tileSize);
     var bitmaskData = BitmaskDatabase.GetBitmaskData(fileName, scaledTilePosition);
     if (bitmaskData is null || bitmaskData.IsEmpty())
       return;
-    var newValue = Math.Clamp(bitmaskData.GetProbability(layer) + value, 0, double.MaxValue);
+
+    long currentValue = bitmaskData.GetProbability(layer);
+    uint newValue = (uint)Math.Clamp(currentValue + value, 0L, uint.MaxValue);
+
     bitmaskData.SetProbability(layer, newValue);
     TileProbability.ChangeLabelProbability(scaledTilePosition, newValue);
   }

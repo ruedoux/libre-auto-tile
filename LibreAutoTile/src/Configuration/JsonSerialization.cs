@@ -80,6 +80,23 @@ public class Vector3ImmutableDictionaryConverter<TValue> : JsonConverter<Immutab
     => JsonSerialization.Write(writer, value, options, (k) => k.ToString());
 }
 
+public sealed class Vector3TileMaskDataDictionaryConverter
+  : JsonConverter<ImmutableDictionary<Vector3, ImmutableArray<TileMaskData>>>
+{
+  public override ImmutableDictionary<Vector3, ImmutableArray<TileMaskData>> Read(
+    ref Utf8JsonReader reader,
+    Type typeToConvert,
+    JsonSerializerOptions options)
+    => JsonSerialization.ReadImmutableDictionary<
+      Vector3, ImmutableArray<TileMaskData>>(ref reader, options, Vector3.FromString);
+
+  public override void Write(
+    Utf8JsonWriter writer,
+    ImmutableDictionary<Vector3, ImmutableArray<TileMaskData>> value,
+    JsonSerializerOptions options)
+    => JsonSerialization.Write(writer, value, options, k => k.ToString());
+}
+
 public class TileColorConverter : JsonConverter<TileColor>
 {
   public override TileColor Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -101,7 +118,7 @@ public class TileColorConverter : JsonConverter<TileColor>
 [JsonSourceGenerationOptions(
   Converters = [
     typeof(Vector2Converter),
-    typeof(Vector3ImmutableDictionaryConverter<ImmutableArray<ImmutableArray<int>>>),
+    typeof(Vector3TileMaskDataDictionaryConverter),
     typeof(TileColorConverter),
     typeof(Vector3Converter),
   ],
@@ -110,6 +127,7 @@ public class TileColorConverter : JsonConverter<TileColor>
 [JsonSerializable(typeof(AutoTileConfiguration))]
 [JsonSerializable(typeof(TileDefinition))]
 [JsonSerializable(typeof(TileMaskDefinition))]
+[JsonSerializable(typeof(TileMaskData))]
 public partial class AutoTileJsonContext : JsonSerializerContext { }
 
 public static class JsonSerialization
