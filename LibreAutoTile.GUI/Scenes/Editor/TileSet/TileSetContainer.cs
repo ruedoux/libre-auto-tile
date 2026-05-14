@@ -2,7 +2,7 @@ using Godot;
 using Qwaitumin.LibreAutoTile.GUI.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet.Data;
 using Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet.Display;
-using Qwaitumin.LibreAutoTile.Tiling;
+using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Scenes.Editor.TileSet;
 
