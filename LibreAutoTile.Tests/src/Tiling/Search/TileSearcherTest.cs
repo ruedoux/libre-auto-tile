@@ -4,10 +4,10 @@ using Qwaitumin.SimpleTest;
 
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling.Search;
 
-[SimpleTestClass]
+[TestClass]
 public class TileSearcherTest
 {
-  [SimpleTestMethod]
+  [TestMethod]
   public void FindBestMatch_ShouldFindBestResult_WhenGivenExactTileMask()
   {
     // Given

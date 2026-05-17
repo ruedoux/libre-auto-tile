@@ -5,14 +5,14 @@ using Godot;
 
 namespace LibreAutoTile.GodotBindings.Tests;
 
-[SimpleTestClass]
+[TestClass]
 public class AutoTileMapTest
 {
   private enum TILES { GRASS = 0, WATER = 1 }
   private const string CONFIG_PATH = "../resources/configurations/ExampleConfigurationTransient.json";
 
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void DrawTiles_PlacesTileMapTile_WhenCalled()
   {
     // Given
@@ -30,7 +30,7 @@ public class AutoTileMapTest
     autoTileMap.QueueFree();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void DrawTilesAsync_PlacesTileMapTile_WhenCalled()
   {
     // Given
@@ -49,7 +49,7 @@ public class AutoTileMapTest
     autoTileMap.QueueFree();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void DrawTiles_RemovesTileMapTile_WhenCalled()
   {
     // Given
@@ -69,7 +69,7 @@ public class AutoTileMapTest
     autoTileMap.QueueFree();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void DrawTilesAsync_RemovesTileMapTile_WhenCalled()
   {
     // Given
@@ -91,7 +91,7 @@ public class AutoTileMapTest
     autoTileMap.QueueFree();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void Clear_RemovesAllTileMapTiles_WhenCalled()
   {
     // Given
@@ -111,11 +111,11 @@ public class AutoTileMapTest
     autoTileMap.QueueFree();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void GetLayerCount_GetsExactLayerCount_WhenCalled()
   {
     // Given
-    uint shouldBeLayerCount = 1;
+    int shouldBeLayerCount = 1;
     var autoTileConfiguration = AutoTileConfiguration.LoadFromFile(CONFIG_PATH);
     AutoTileMap autoTileMap = new(shouldBeLayerCount, autoTileConfiguration);
     GodotAccess.AddNodeToTree(autoTileMap);
@@ -124,7 +124,7 @@ public class AutoTileMapTest
     var layerCount = autoTileMap.GetLayerCount();
 
     // Then
-    Assertions.AssertEqual((int)shouldBeLayerCount, layerCount);
+    Assertions.AssertEqual(shouldBeLayerCount, layerCount);
     autoTileMap.QueueFree();
   }
 }

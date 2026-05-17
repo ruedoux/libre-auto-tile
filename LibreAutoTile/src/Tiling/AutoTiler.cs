@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using Qwaitumin.LibreAutoTile.Configuration;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.Tiling.Search;
 using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
@@ -11,146 +10,134 @@ namespace Qwaitumin.LibreAutoTile.Tiling;
 /// </summary>
 public class AutoTiler
 {
-  public static readonly Vector2[] CELL_SURROUNDING_DIRECTIONS = [
-      Vector2.TopLeft, Vector2.Top, Vector2.TopRight, Vector2.Right, Vector2.BottomRight, Vector2.Bottom, Vector2.BottomLeft, Vector2.Left ];
+  private static readonly Vector2[] CELL_SURROUNDING_DIRECTIONS = [
+    Vector2.TopLeft, Vector2.Top, Vector2.TopRight, Vector2.Right, Vector2.BottomRight, Vector2.Bottom, Vector2.BottomLeft, Vector2.Left];
 
-  private readonly FrozenDictionary<int, TileSearcher> tileIdToTileMaskSearcher;
-  private readonly Dictionary<Vector2, TileData>[] data; // TODO, maybe give option to make 2D array?
-  private readonly ReaderWriterLockSlim readWriteLock = new();
-  private readonly int[] tileMaskArray; // Assuming this is accessed only with lock!
+  private readonly FrozenDictionary<int, TileSearcher> tileSearcherById;
+  private readonly IAutoTilerData autoTilerData;
 
+  private readonly object[] layerToLock;
 
-  public AutoTiler(uint layerCount, AutoTileConfiguration autoTileConfiguration)
-    : this(layerCount, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration)) { }
-
-  public AutoTiler(uint layerCount, Dictionary<int, TileSearcher> tileIdToTileMaskSearcher)
+  /// <summary>
+  /// Leaving mapSize as default (0,0) makes the map dynamic (dictionary).
+  /// Passing a size makes the map static size (array).
+  /// </summary>
+  public AutoTiler(
+    int layerCount,
+    IReadOnlyDictionary<int, TileSearcher> tileIdToTileMaskSearcher,
+    Vector2 mapSize = default)
   {
     if (layerCount < 1)
-      throw new ArgumentException($"Layer count must be higher than 1, given: {layerCount}");
+      throw new ArgumentOutOfRangeException(nameof(layerCount), $"Layer count must be at least 1, given: {layerCount}");
 
-    data = new Dictionary<Vector2, TileData>[layerCount];
-    for (int layer = 0; layer < data.Length; layer++)
-      data[layer] = [];
+    if (mapSize == default)
+      autoTilerData = new AutoTilerDataDynamic(layerCount);
+    else
+      autoTilerData = new AutoTilerDataStatic(layerCount, mapSize);
 
-    this.tileIdToTileMaskSearcher = tileIdToTileMaskSearcher.ToFrozenDictionary();
-    tileMaskArray = new TileMask().ToArray();
+    tileSearcherById = tileIdToTileMaskSearcher.ToFrozenDictionary();
+    layerToLock = new object[layerCount];
+    for (int i = 0; i < layerCount; i++)
+      layerToLock[i] = new object();
   }
 
   public void Clear()
-  {
-    readWriteLock.EnterWriteLock();
-    try
-    {
-      for (int i = 0; i < data.Length; i++)
-        data[i].Clear();
-    }
-    finally
-    {
-      readWriteLock.ExitWriteLock();
-    }
-  }
+    => LockAllLayers(0, () => autoTilerData.Clear());
 
   public int GetLayerCount()
-    => data.Length;
+    => autoTilerData.LayerCount;
 
   public Vector2[] GetAllPositions(int layer)
   {
     ValidateLayer(layer);
-    readWriteLock.EnterReadLock();
-    try
+    lock (layerToLock[layer])
     {
-      return [.. data[layer].Keys];
-    }
-    finally
-    {
-      readWriteLock.ExitReadLock();
+      return autoTilerData.GetAllPositions(layer);
     }
   }
 
   public TileData GetTile(int layer, Vector2 position)
   {
     ValidateLayer(layer);
-    readWriteLock.EnterReadLock();
-    try
+    lock (layerToLock[layer])
     {
       return GetTileDataAt(layer, position);
     }
-    finally
-    {
-      readWriteLock.ExitReadLock();
-    }
   }
 
-  public void PlaceTile(int layer, Vector2 position, int tileId)
+  public Vector2[] PlaceTiles(int layer, IEnumerable<(Vector2 Position, int TileId)> tiles)
   {
     ValidateLayer(layer);
-    ValidateTileId(tileId);
+    var tileArray = tiles as (Vector2 Position, int TileId)[] ?? [.. tiles];
+    foreach (var (_, tileId) in tileArray)
+      ValidateTileId(tileId);
 
-    readWriteLock.EnterWriteLock();
-    try
+    lock (layerToLock[layer])
     {
-      if (tileId < 0)
-        data[layer].Remove(position, out _);
-      else
+      HashSet<Vector2> dirtyPositions = [];
+      foreach (var (position, tileId) in tileArray)
       {
-        for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
-        {
-          var surroundingTileData = GetTileDataAt(layer, position + CELL_SURROUNDING_DIRECTIONS[i]);
-          var surroundingTileId = surroundingTileData.CentreTileId;
-          tileMaskArray[i] = surroundingTileId;
-        }
+        if (tileId < 0)
+          autoTilerData.Remove(layer, position);
+        else
+          autoTilerData.Set(layer, position, new(tileId, default, default));
 
-        TileMask tileMask = TileMask.FromArray(tileMaskArray);
-        var bestMatch = tileIdToTileMaskSearcher[tileId].FindBestMatch(tileMask);
-        data[layer][position] = new(
-          tileId, tileMask, bestMatch.TileAtlas);
+        dirtyPositions.Add(position);
+        for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
+          dirtyPositions.Add(position + CELL_SURROUNDING_DIRECTIONS[i]);
       }
 
-      for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
-        UpdateTileRelative(layer, position, (TileMask.SurroundingDirection)i);
-    }
-    finally
-    {
-      readWriteLock.ExitWriteLock();
+      foreach (var position in dirtyPositions)
+        RecomputeTileAt(layer, position);
+
+      return [.. dirtyPositions];
     }
   }
 
-
-  private void UpdateTileRelative(
-    int layer, Vector2 centerPosition, TileMask.SurroundingDirection updateDirection)
+  private void RecomputeTileAt(int layer, Vector2 position)
   {
-    Vector2 updatePosition = centerPosition - CELL_SURROUNDING_DIRECTIONS[(int)updateDirection];
-    TileData tileDataToUpdate = GetTileDataAt(layer, updatePosition);
-    TileData centerTileData = GetTileDataAt(layer, centerPosition);
-    TileMask updatedTileMask = TileMask.ConstructModified(
-      tileDataToUpdate.TileMask,
-      updateDirection,
-      centerTileData.CentreTileId);
+    TileData tileData = GetTileDataAt(layer, position);
+    if (tileData.IsEmpty())
+    {
+      autoTilerData.Remove(layer, position);
+      return;
+    }
 
-    tileDataToUpdate.TileMask = updatedTileMask;
-    if (tileIdToTileMaskSearcher.TryGetValue(tileDataToUpdate.CentreTileId, out var tileMaskSearcher))
-      tileDataToUpdate.TileAtlas = tileMaskSearcher.FindBestMatch(updatedTileMask).TileAtlas;
-    else
-      tileDataToUpdate.TileAtlas = new();
-    data[layer][updatePosition] = tileDataToUpdate;
+    Span<int> tileMaskArray = stackalloc int[8];
+    for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
+      tileMaskArray[i] = GetTileDataAt(layer, position + CELL_SURROUNDING_DIRECTIONS[i]).CentreTileId;
+
+    TileMask tileMask = TileMask.FromArray(tileMaskArray);
+    var bestMatch = tileSearcherById[tileData.CentreTileId].FindBestMatch(tileMask);
+    autoTilerData.Set(layer, position, new(tileData.CentreTileId, tileMask, bestMatch.TileAtlas));
   }
 
   private TileData GetTileDataAt(int layer, Vector2 position)
-  {
-    if (data[layer].TryGetValue(position, out var tileData))
-      return tileData;
-    return new();
-  }
+    => autoTilerData.Get(layer, position);
 
   private void ValidateTileId(int tileId)
   {
-    if (!tileIdToTileMaskSearcher.ContainsKey(tileId) && tileId > -1)
+    if (!tileSearcherById.ContainsKey(tileId) && tileId > -1)
       throw new ArgumentException($"Tile of id does not exist: {tileId}");
   }
 
   private void ValidateLayer(int layer)
   {
-    if (data.Length < layer - 1 || layer < 0)
-      throw new ArgumentException($"AutoTiler does not contain layer: {layer}");
+    if (layer >= autoTilerData.LayerCount || layer < 0)
+      throw new ArgumentOutOfRangeException(nameof(layer), $"AutoTiler does not contain layer: {layer}");
+  }
+
+  private void LockAllLayers(int index, Action action)
+  {
+    if (index == layerToLock.Length)
+    {
+      action();
+      return;
+    }
+
+    lock (layerToLock[index])
+    {
+      LockAllLayers(index + 1, action);
+    }
   }
 }

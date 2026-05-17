@@ -3,7 +3,7 @@ using Qwaitumin.SimpleTest;
 
 namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
 
-[SimpleTestClass]
+[TestClass]
 public class TileDefinitionTest
 {
   private static readonly int[][] DEFAULT_TILEMASKS = [[0, 0, 0, 0, 0, 0, 0, 0]];
@@ -17,7 +17,7 @@ public class TileDefinitionTest
     DEFAULT_FILE_TO_TILEMASK = new() { { "a", DEFAULT_TILEMASK_DEFINITION } };
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void VerifyEquality()
   {
     SimpleEqualsVerifier.Verify(
@@ -34,7 +34,7 @@ public class TileDefinitionTest
       TileDefinition.Construct(imageFileNameToTileMaskDefinition: new() { { "b", DEFAULT_TILEMASK_DEFINITION } }));
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void Serialize_ShoudlKeepData_WhenDeserialized()
   {
     // Given

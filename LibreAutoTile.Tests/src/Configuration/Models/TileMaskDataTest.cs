@@ -3,12 +3,12 @@ using Qwaitumin.SimpleTest;
 
 namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
 
-[SimpleTestClass]
+[TestClass]
 public class TileMaskDataTest
 {
   private static readonly int[] DEFAULT_TILEMASK = [0, 0, 0, 0, 0, 0, 0, 0];
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void VerifyEquality()
   {
     SimpleEqualsVerifier.Verify(
@@ -21,7 +21,7 @@ public class TileMaskDataTest
       TileMaskData.Construct(DEFAULT_TILEMASK, 1));
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void Serialize_ShoudlKeepData_WhenDeserialized()
   {
     // Given

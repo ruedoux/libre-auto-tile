@@ -16,6 +16,7 @@ public class TileMaskSearcher
   private readonly FrozenSet<TileMask> existingMasks;
   private readonly ImmutableArray<TileMask> items;
   private readonly IndexSearcher indexSearcher;
+  private readonly TileMaskCache cache = new(1024);
 
   public TileMaskSearcher(
     IEnumerable<TileMask> tileMasks,
@@ -29,8 +30,6 @@ public class TileMaskSearcher
       [.. BuildTileIdToItemIndexes(connectionGroupTileIds ?? []).Select(static d => d.ToFrozenDictionary())],
       (int?)wildcardId ?? DEFAULT_WILDCARD_ID);
   }
-
-  private readonly TileMaskCache cache = new(1024);
 
   /// <summary>
   /// If no field has a match returns random item

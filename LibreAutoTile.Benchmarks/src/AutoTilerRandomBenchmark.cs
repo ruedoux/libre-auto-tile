@@ -9,7 +9,7 @@ public class AutoTilerRandomBenchmark
 {
   private const int MAX_TILE_ID = 100;
 
-  [Params(100, 1_000)]
+  [Params(100, 1_000, 2_000)]
   public int TileMaskCount;
 
   private readonly (Configuration.Models.Vector2, int)[] positionsWithIds100x100 = [];
@@ -30,7 +30,6 @@ public class AutoTilerRandomBenchmark
   [Benchmark]
   public void PlaceTile_SingleLayer_100x100_Random()
   {
-    foreach (var (position, tileId) in positionsWithIds100x100)
-      autoTiler.PlaceTile(0, position, tileId);
+    autoTiler.PlaceTiles(0, positionsWithIds100x100);
   }
 }

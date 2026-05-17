@@ -7,27 +7,46 @@ using Qwaitumin.SimpleTest;
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling;
 
 
-[SimpleTestClass]
+[TestClass]
 public class AutoTilerTest
 {
-  //private string jsonString = "";
-
-  [SimpleBeforeAll]
-  public void BeforeAll()
-  {
-    //jsonString = File.ReadAllText("../resources/configurations/ExampleConfigurationTransient.json");
-  }
-
-  [SimpleTestMethod]
-  public void PlaceTile_CorrectlyPlacesTile_WhenCalled()
+  [TestMethod]
+  public void PlaceTile_ThrowsException_WhenWrongLayer()
   {
     // Given
     AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new([], []), new([])) } });
 
     // When
-    autoTiler.PlaceTile(0, Vector2.Zero, 0);
-    TileData tileData = autoTiler.GetTile(0, Vector2.Zero);
-    autoTiler.PlaceTile(0, Vector2.Zero, -1);
+    // Then
+    Assertions.AssertThrows<ArgumentOutOfRangeException>(
+      () => autoTiler.PlaceTiles(1, [(new(), 0)]));
+    Assertions.AssertThrows<ArgumentOutOfRangeException>(
+      () => autoTiler.PlaceTiles(-1, [(new(), 0)]));
+  }
+
+  [TestMethod]
+  public void PlaceTile_ThrowsException_WhenWrongTileId()
+  {
+    // Given
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new([], []), new([])) } });
+
+    // When
+    // Then
+    Assertions.AssertThrows<ArgumentException>(
+      () => autoTiler.PlaceTiles(0, [(new(), 1)]));
+  }
+
+  [TestMethod]
+  [TestMethodArguments(0, 1)]
+  public void PlaceTile_CorrectlyPlacesTile_WhenCalled(int mapSize)
+  {
+    // Given
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new([], []), new([])) } }, new(mapSize, mapSize));
+
+    // When
+    autoTiler.PlaceTiles(0, [(Vector2.Zero, 0)]);
+    var tileData = autoTiler.GetTile(0, Vector2.Zero);
+    autoTiler.PlaceTiles(0, [(Vector2.Zero, -1)]);
     var tileDataAfterRemoval = autoTiler.GetTile(0, Vector2.Zero);
 
     // Then
@@ -36,22 +55,22 @@ public class AutoTilerTest
     Assertions.AssertEqual(0, tileData.CentreTileId);
   }
 
-  [SimpleTestMethod]
-  public void PlaceTile_CorrectlyPlacesTiles_WhenCalledAsync()
+  [TestMethod]
+  [TestMethodArguments(0, 10)]
+  public void PlaceTile_CorrectlyPlacesTiles_WhenCalledAsync(int mapSize)
   {
     // Given
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new([], []), new([])) } });
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new([], []), new([])) } }, new(mapSize, mapSize));
 
-    List<Vector2> positions = [];
+    List<(Vector2, int)> tiles = [];
     for (int x = 0; x < 10; x++)
       for (int y = 0; y < 10; y++)
-        positions.Add(new(x, y));
+        tiles.Add(new(new(x, y), 0));
 
     // When
     List<Task> tasks = [];
     for (int i = 0; i < 10; i++)
-      foreach (var position in positions)
-        tasks.Add(new Task(() => autoTiler.PlaceTile(0, position, 0)));
+      tasks.Add(new Task(() => autoTiler.PlaceTiles(0, tiles)));
 
     foreach (var task in tasks)
       task.Start();
@@ -59,29 +78,29 @@ public class AutoTilerTest
     Task.WhenAll(tasks).Wait();
 
     // Then
-    foreach (var position in positions)
+    foreach (var tile in tiles)
     {
-      var tileData = autoTiler.GetTile(0, position);
-      Assertions.AssertNotNull(tileData);
+      var tileData = autoTiler.GetTile(0, tile.Item1);
       Assertions.AssertEqual(0, tileData.CentreTileId);
     }
   }
 
-  [SimpleTestMethod]
-  public void PlaceTile_PlacesAndRemovesTile_WhenCalled()
+  [TestMethod]
+  [TestMethodArguments(0, 1)]
+  public void PlaceTile_PlacesAndRemovesTile_WhenCalled(int mapSize)
   {
     // Given
     (TileMask TileMask, TileAtlas TileAtlas)[] definedPairs = [
       (new(-1, -1, -1, -1, -1, -1, -1, -1), new(new(1, 0), "a.png"))];
     var items = GetItemNoise(new(-1, 0), definedPairs);
 
-    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new(definedPairs.Select(x => x.TileMask), []), new(definedPairs)) } });
+    AutoTiler autoTiler = new(1, new Dictionary<int, TileSearcher>() { { 0, new(new(definedPairs.Select(x => x.TileMask), []), new(definedPairs)) } }, new(mapSize, mapSize));
 
     // When
-    autoTiler.PlaceTile(0, Vector2.Zero, 0);
+    autoTiler.PlaceTiles(0, [(Vector2.Zero, 0)]);
     var beforeRemoval = autoTiler.GetTile(0, Vector2.Zero);
 
-    autoTiler.PlaceTile(0, Vector2.Zero, -1);
+    autoTiler.PlaceTiles(0, [(Vector2.Zero, -1)]);
     var afterRemoval = autoTiler.GetTile(0, Vector2.Zero);
 
     // Then

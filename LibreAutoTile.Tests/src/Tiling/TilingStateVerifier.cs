@@ -19,7 +19,7 @@ public class TilingStateVerifier(AutoTiler autoTiler, AutoTileConfiguration auto
 
   public void AddTile(int tileId, Vector2 position, TileMask expectedTileMask)
   {
-    autoTiler.PlaceTile(0, position, tileId);
+    autoTiler.PlaceTiles(0, [(position, tileId)]);
     mappedExpectedTileMasks[position] = new(tileId, expectedTileMask);
   }
 

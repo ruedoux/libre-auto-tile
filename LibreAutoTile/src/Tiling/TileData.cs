@@ -8,6 +8,8 @@ public struct TileData
   public TileMask TileMask { get; set; } = new();
   public TileAtlas TileAtlas { get; set; } = new();
 
+  public static TileData Empty => new() { CentreTileId = -1 };
+
   public TileData() { }
 
   public TileData(int centreTileId, TileMask tileMask, TileAtlas tileAtlas) : this()
@@ -16,6 +18,8 @@ public struct TileData
     TileMask = tileMask;
     TileAtlas = tileAtlas;
   }
+
+  public readonly bool IsEmpty() => CentreTileId == -1;
 
   public override readonly string ToString()
     => $"\"CentreTileId\":{CentreTileId}, \"TileMask\":{TileMask}, \"TileAtlas\":{TileAtlas}";

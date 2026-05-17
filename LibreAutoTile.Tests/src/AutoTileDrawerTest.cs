@@ -6,10 +6,10 @@ using Qwaitumin.LibreAutoTile.Tiling.Search;
 namespace Qwaitumin.LibreAutoTile.Tests;
 
 
-[SimpleTestClass]
+[TestClass]
 public class AutoTileDrawerTest
 {
-  [SimpleTestMethod]
+  [TestMethod]
   public void DrawTiles_ShouldDrawTiles_WhenMockedDrawer()
   {
     // Given
@@ -27,7 +27,7 @@ public class AutoTileDrawerTest
         Helpers.TILE_ID, testTileMapDrawer.Data[0][new(position.X, position.Y)].CentreTileId);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void DrawTilesAsync_ShouldDrawTiles_WhenMockedDrawer()
   {
     // Given
@@ -49,7 +49,7 @@ public class AutoTileDrawerTest
     });
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void DrawTilesAsync_ShouldDrawTiles_WhenMockedDrawerAndWait()
   {
     // Given

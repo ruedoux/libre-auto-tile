@@ -90,7 +90,7 @@ public readonly struct TileMask
   public static TileMask GetMinusOne()
     => new(-1, -1, -1, -1, -1, -1, -1, -1);
 
-  public static TileMask FromArray(int[] arr)
+  public static TileMask FromArray(Span<int> arr)
   {
     if (arr.Length != 8)
       throw new ArgumentException($"TileMask array should be of size 8 but is: '{arr.Length}'");

@@ -2,7 +2,9 @@ using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
 namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 
-
+/// <summary>
+/// Finds best fitting mask and atlas. Thread safe.
+/// </summary>
 public class TileSearcher(TileMaskSearcher tileMaskSearcher, TileAtlasResolver tileAtlasResolver)
 {
   private readonly TileMaskSearcher tileMaskSearcher = tileMaskSearcher;

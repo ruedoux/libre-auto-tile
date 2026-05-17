@@ -4,10 +4,10 @@ using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling.Search;
 
-[SimpleTestClass]
+[TestClass]
 public class TileMaskCacheTest
 {
-  [SimpleTestMethod]
+  [TestMethod]
   public void Constructor_ShouldThrow_WhenCapacityIsZeroOrLess()
   {
     // Then
@@ -17,7 +17,7 @@ public class TileMaskCacheTest
       () => new TileMaskCache(-1));
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void SetAndTryGet_ShouldReplaceSingleEntry_WhenCapacityIsOne()
   {
     // Given
@@ -43,7 +43,7 @@ public class TileMaskCacheTest
     Assertions.AssertEqual(value2, resultValue2AfterEviction);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void Set_ShouldUpdateExistingKeyAndKeepItCached_WhenSameKeyIsStoredTwice()
   {
     // Given
@@ -75,7 +75,7 @@ public class TileMaskCacheTest
     Assertions.AssertEqual(value3, resultValue3);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void SetAndTryGet_ShouldKeepMostRecentlyUsedItem_WhenCapacityReachedAndExistingKeyUpdated()
   {
     // Given

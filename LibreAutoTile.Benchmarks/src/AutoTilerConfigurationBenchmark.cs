@@ -28,13 +28,12 @@ public class AutoTilerConfigurationBenchmark
   [GlobalSetup]
   public void GlobalSetup()
   {
-    autoTiler = new(1, AUTO_TILE_CONFIGURATION);
+    autoTiler = new(1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(AUTO_TILE_CONFIGURATION));
   }
 
   [Benchmark]
   public void PlaceTile_SingleLayer_100x100_Configuration()
   {
-    foreach (var (position, tileId) in positionsWithIds100x100)
-      autoTiler.PlaceTile(0, position, tileId);
+    autoTiler.PlaceTiles(0, positionsWithIds100x100);
   }
 }

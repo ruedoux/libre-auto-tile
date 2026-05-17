@@ -6,24 +6,24 @@ using Qwaitumin.SimpleTest;
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling;
 
 
-[SimpleTestClass]
+[TestClass]
 public class TilingSetConnectionGroupTest
 {
   private string jsonString = "";
 
-  [SimpleBeforeAll]
+  [BeforeAll]
   public void BeforeAll()
   {
     jsonString = File.ReadAllText("../resources/configurations/ExampleConfigurationConnectionGroups.json");
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void PlaceTile_CorrectlyPlacesSingleTileFilledSquare_WhenMapEmpty()
   {
     // Given
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
-    AutoTiler autoTiler = new(1, autoTileConfiguration);
+    AutoTiler autoTiler = new(1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration));
     TilingStateVerifier tilingStateVerifier = new(autoTiler, autoTileConfiguration);
 
     // When
@@ -72,13 +72,13 @@ public class TilingSetConnectionGroupTest
     tilingStateVerifier.Verify();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void PlaceTile_CorrectlyPlacesMultipleTileFilledSquare_WhenTilesAlternated()
   {
     // Given
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
-    AutoTiler autoTiler = new(1, autoTileConfiguration);
+    AutoTiler autoTiler = new(1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration));
     TilingStateVerifier tilingStateVerifier = new(autoTiler, autoTileConfiguration);
 
     // When
@@ -127,13 +127,13 @@ public class TilingSetConnectionGroupTest
     tilingStateVerifier.Verify();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void PlaceTile_CorrectlyPlacesMultipleTileFilledSquare_WhenTilesRefilled()
   {
     // Given
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
-    AutoTiler autoTiler = new(1, autoTileConfiguration);
+    AutoTiler autoTiler = new(1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration));
     TilingStateVerifier tilingStateVerifier = new(autoTiler, autoTileConfiguration);
 
     // When

@@ -5,7 +5,7 @@ using Qwaitumin.SimpleTest;
 
 namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
 
-[SimpleTestClass]
+[TestClass]
 public class AutoTileConfigurationTest
 {
   private const uint TILE_SIZE = 16;
@@ -26,7 +26,7 @@ public class AutoTileConfigurationTest
       });
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void VerifyEquality()
   {
     SimpleEqualsVerifier.Verify(
@@ -41,7 +41,7 @@ public class AutoTileConfigurationTest
     );
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void LoadObjectFromFile_ShouldDeserialize_WhenLoadedFromFile()
   {
     // Given
@@ -55,7 +55,7 @@ public class AutoTileConfigurationTest
     Assertions.AssertEqual(autoTileConfiguration.TileSize, TILE_SIZE);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void Serialize_ShoudlKeepData_WhenDeserialized()
   {
     // Given

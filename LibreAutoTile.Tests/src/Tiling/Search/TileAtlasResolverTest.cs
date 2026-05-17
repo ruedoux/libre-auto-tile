@@ -4,10 +4,10 @@ using Qwaitumin.SimpleTest;
 
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling.Search;
 
-[SimpleTestClass]
+[TestClass]
 public class TileAtlasResolverTest
 {
-  [SimpleTestMethod]
+  [TestMethod]
   public void GetTileAtlas_ShouldReturnAtlas_WhenGivenAtlasExists()
   {
     // Given
@@ -27,7 +27,7 @@ public class TileAtlasResolverTest
     Assertions.AssertEqual(targetAtlas, resultTileAtlas);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void GetTileAtlas_ShouldReturnRandomAtlas_WhenMultipleAtlasesExists()
   {
     // Given
@@ -51,7 +51,7 @@ public class TileAtlasResolverTest
     Assertions.AssertTrue(tileAtlases2.Contains(resultTileAtlas2));
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void GetTileAtlas_ShouldReturnDefaultAtlas_WhenGivenDoesNotExist()
   {
     // Given

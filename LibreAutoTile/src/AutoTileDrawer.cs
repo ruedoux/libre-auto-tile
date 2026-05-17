@@ -31,14 +31,9 @@ public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
 
   public void DrawTiles(int layer, IEnumerable<(Vector2 Position, int TileId)> positionToTileIds)
   {
-    List<Vector2> positions = [];
-    foreach (var (position, tileId) in positionToTileIds)
-    {
-      autoTiler.PlaceTile(layer, position, tileId);
-      positions.Add(position);
-    }
-
-    UpdateTiles(layer, [.. positions]);
+    var tiles = positionToTileIds as (Vector2 Position, int TileId)[] ?? [.. positionToTileIds];
+    var positions = autoTiler.PlaceTiles(layer, tiles);
+    UpdateTiles(layer, positions);
   }
 
   public void UpdateTiles(int tileLayer, IEnumerable<Vector2> positions)

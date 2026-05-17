@@ -6,24 +6,24 @@ using Qwaitumin.SimpleTest;
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling;
 
 
-[SimpleTestClass]
+[TestClass]
 public class TilingSetTransientTest
 {
   private string jsonString = "";
 
-  [SimpleBeforeAll]
+  [BeforeAll]
   public void BeforeAll()
   {
     jsonString = File.ReadAllText("../resources/configurations/ExampleConfigurationTransient.json");
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void PlaceTile_CorrectlyPlacesSingleTileFilledSquare_WhenMapEmpty()
   {
     // Given
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
-    AutoTiler autoTiler = new(1, autoTileConfiguration);
+    AutoTiler autoTiler = new(1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration));
     TilingStateVerifier tilingStateVerifier = new(autoTiler, autoTileConfiguration);
 
     // When
@@ -72,13 +72,13 @@ public class TilingSetTransientTest
     tilingStateVerifier.Verify();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void PlaceTile_CorrectlyPlacesSingleTileEmptySquare_WhenMapEmpty()
   {
     // Given
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
-    AutoTiler autoTiler = new(1, autoTileConfiguration);
+    AutoTiler autoTiler = new(1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration));
     TilingStateVerifier tilingStateVerifier = new(autoTiler, autoTileConfiguration);
 
     // When
@@ -117,20 +117,20 @@ public class TilingSetTransientTest
 
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void PlaceTile_CorrectlyPlacesMultipleTileFilledSquare_WhenOtherTilesPresent()
   {
     // Given
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
-    AutoTiler autoTiler = new(1, autoTileConfiguration);
+    AutoTiler autoTiler = new(1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration));
     TilingStateVerifier tilingStateVerifier = new(autoTiler, autoTileConfiguration);
 
     // When
     // Then
     for (int x = -10; x < 10; x++)
       for (int y = -10; y < 10; y++)
-        autoTiler.PlaceTile(0, new(x, y), 1);
+        autoTiler.PlaceTiles(0, [(new(x, y), 1)]);
 
     tilingStateVerifier.AddTile(0, Vector2.Zero, new(1, 1, 1, 1, 1, 1, 1, 1));
     tilingStateVerifier.Verify();
@@ -176,20 +176,20 @@ public class TilingSetTransientTest
     tilingStateVerifier.Verify();
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void PlaceTile_CorrectlyPlacesMultipleTileEmptySquare_WhenOtherTilesPresent()
   {
     // Given
     var autoTileConfiguration = AutoTileConfiguration.FromJsonString(jsonString)
       ?? throw new ArgumentException();
-    AutoTiler autoTiler = new(1, autoTileConfiguration);
+    AutoTiler autoTiler = new(1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration));
     TilingStateVerifier tilingStateVerifier = new(autoTiler, autoTileConfiguration);
 
     // When
     // Then
     for (int x = -10; x < 10; x++)
       for (int y = -10; y < 10; y++)
-        autoTiler.PlaceTile(0, new(x, y), 1);
+        autoTiler.PlaceTiles(0, [(new(x, y), 1)]);
 
     tilingStateVerifier.AddTile(0, Vector2.Top, new(1, 1, 1, 1, 1, 1, 1, 1));
     tilingStateVerifier.UpdateTile(1, Vector2.Zero, new(1, 1, 1, 1, 1, 1, 1, 1));

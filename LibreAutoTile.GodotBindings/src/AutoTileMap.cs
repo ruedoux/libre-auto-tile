@@ -11,7 +11,7 @@ public class AutoTileMap : Node2D
   private readonly uint tileSize;
   private readonly TileMapDrawer tileMapDrawer;
 
-  public AutoTileMap(uint layerCount, AutoTileConfiguration autoTileConfiguration)
+  public AutoTileMap(int layerCount, AutoTileConfiguration autoTileConfiguration)
   {
     foreach (var (_, tileDefinition) in autoTileConfiguration.TileDefinitions)
       foreach (var (imageFileName, _) in tileDefinition.ImageFileNameToTileMaskDefinition)
@@ -28,7 +28,7 @@ public class AutoTileMap : Node2D
 
     tileMapDrawer = new TileMapDrawer(tileMapWrappers);
     autoTileDrawer = new(
-      tileMapDrawer, new AutoTiler(layerCount, autoTileConfiguration));
+      tileMapDrawer, new AutoTiler(layerCount, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration)));
     tileSize = autoTileConfiguration.TileSize;
   }
 

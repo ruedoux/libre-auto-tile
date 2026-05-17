@@ -5,10 +5,10 @@ using Qwaitumin.SimpleTest;
 namespace Qwaitumin.LibreAutoTile.Tests.Tiling.Search;
 
 
-[SimpleTestClass]
+[TestClass]
 public class TileMaskSearcherTest
 {
-  [SimpleTestMethod]
+  [TestMethod]
   public void FindBestMatch_ShouldFindBestResult_WhenGivenExactTileMask()
   {
     // Given
@@ -32,7 +32,7 @@ public class TileMaskSearcherTest
     Assertions.AssertEqual(tileMask333, resultTileMask333);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void FindBestMatch_ShouldFindBestResult_WhenGivenNotPreciseTileMask()
   {
     // Given
@@ -44,14 +44,13 @@ public class TileMaskSearcherTest
       new(topLeft: 0, top: 3)]);
 
     // When
-    var resultTileMask = tileMaskSearcher.FindBestMatch(
-new(topLeft: 0, top: 0, topRight: 0));
+    var resultTileMask = tileMaskSearcher.FindBestMatch(new(topLeft: 0, top: 0, topRight: 0));
 
     // Then
     Assertions.AssertEqual(resultTileMask, target);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void FindBestMatch_ShouldFindBestResult_WhenGivenWildCardTileMask()
   {
     // Given
@@ -71,7 +70,7 @@ new(topLeft: 0, top: 0, topRight: 0));
     Assertions.AssertEqual(resultTileMask, target);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void FindBestMatch_ShouldFindBestResult_WhenGivenAllWildCardTileMask()
   {
     // Given
@@ -94,7 +93,7 @@ new(topLeft: 0, top: 0, topRight: 0));
     Assertions.AssertEqual(resultTileMask, target);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void FindBestMatch_ShouldReturnFirstMask_WhenNoMatches()
   {
     // Given
@@ -109,7 +108,7 @@ new(topLeft: 0, top: 0, topRight: 0));
     Assertions.AssertEqual(target1, resultTileMask);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void Lookup_ShouldFindBestTileMask_WhenMatchingPatternNoiseHigh()
   {
     // Given
@@ -140,7 +139,7 @@ new(topLeft: 0, top: 0, topRight: 0));
     Assertions.AssertEqual(target, resultTileMask);
   }
 
-  [SimpleTestMethod]
+  [TestMethod]
   public void FindBestMatch_ShouldFindBestResult_WhenGivenConnectionGroupIds()
   {
     // Given
