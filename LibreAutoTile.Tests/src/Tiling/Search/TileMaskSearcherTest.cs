@@ -170,4 +170,45 @@ public class TileMaskSearcherTest
     Assertions.AssertEqual(resultTileMask3, target);
     Assertions.AssertEqual(resultTileMask4, target);
   }
+
+  [TestMethod]
+  public void FindBestMatch_ShouldMatchSerialResults_WhenCalledConcurrently()
+  {
+    // Given
+    Random random = new(123);
+    TileMask[] items = [.. Enumerable.Range(0, 512)
+      .Select(i => new TileMask(
+        topLeft: random.Next(-1,1000),
+        top: random.Next(-1,1000),
+        topRight: random.Next(-1,1000),
+        right: random.Next(-1,1000),
+        bottomRight: random.Next(-1,1000),
+        bottom: random.Next(-1,1000),
+        bottomLeft: random.Next(-1,1000),
+        left: random.Next(-1,1000)))];
+
+    TileMask[] targets = [.. Enumerable.Range(0, 2048)
+      .Select(i => new TileMask(
+        topLeft: random.Next(-1,1000),
+        top: random.Next(-1,1000),
+        topRight: random.Next(-1,1000),
+        right: random.Next(-1,1000),
+        bottomRight: random.Next(-1,1000),
+        bottom: random.Next(-1,1000),
+        bottomLeft: random.Next(-1,1000),
+        left: random.Next(-1,1000)))];
+
+    TileMaskSearcher serialSearcher = new(items);
+    TileMask[] expectedResults = [.. targets.Select(serialSearcher.FindBestMatch)];
+    TileMaskSearcher parallelSearcher = new(items);
+    TileMask[] actualResults = new TileMask[targets.Length];
+
+    // When
+    Parallel.For(0, targets.Length, i =>
+      actualResults[i] = parallelSearcher.FindBestMatch(targets[i]));
+
+    // Then
+    for (int i = 0; i < targets.Length; i++)
+      Assertions.AssertEqual(expectedResults[i], actualResults[i]);
+  }
 }

@@ -14,10 +14,7 @@ public sealed class IndexSearcher
   private readonly FrozenDictionary<int, ImmutableArray<int>>[] tileIdToItemIndexes;
   private readonly ImmutableArray<int>[] emptyTileLists;
   private readonly ImmutableArray<int>[] wildcardLists;
-  private readonly uint[] itemIndexToSeenGeneration;
-  private readonly int[] itemIndexToScore;
-  private readonly object searchLock = new();
-  private uint currentGeneration = 0;
+  private readonly ThreadLocal<SearchScratch> scratch;
 
   public IndexSearcher(
     int itemCount,
@@ -25,8 +22,7 @@ public sealed class IndexSearcher
     int wildcardId)
   {
     this.tileIdToItemIndexes = tileIdToItemIndexes;
-    itemIndexToSeenGeneration = new uint[itemCount];
-    itemIndexToScore = new int[itemCount];
+    scratch = new(() => new(itemCount));
 
     emptyTileLists = new ImmutableArray<int>[8];
     wildcardLists = new ImmutableArray<int>[8];
@@ -43,69 +39,74 @@ public sealed class IndexSearcher
   // For simplicity it just picks the last item with the best score.
   public int Search(TileMask target)
   {
-    lock (searchLock)
+    bool isTopLeftConnected = target.IsTopLeftConnected();
+    bool isTopRightConnected = target.IsTopRightConnected();
+    bool isBottomLeftConnected = target.IsBottomLeftConnected();
+    bool isBottomRightConnected = target.IsBottomRightConnected();
+
+    SearchScratch localScratch = scratch.Value!;
+    localScratch.IncrementGeneration();
+
+    int bestIndex = -1;
+    int bestScore = 0;
+    for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
     {
-      bool isTopLeftConnected = target.IsTopLeftConnected();
-      bool isTopRightConnected = target.IsTopRightConnected();
-      bool isBottomLeftConnected = target.IsBottomLeftConnected();
-      bool isBottomRightConnected = target.IsBottomRightConnected();
+      int tileId = target.GetTileIdByIndex(fieldIndex);
 
-      IncrementGeneration();
+      ImmutableArray<int> itemIndexList =
+        tileIdToItemIndexes[fieldIndex].TryGetValue(tileId, out var exactList)
+          ? exactList
+          : !wildcardLists[fieldIndex].IsDefaultOrEmpty
+            ? wildcardLists[fieldIndex]
+            : emptyTileLists[fieldIndex];
 
-      int bestIndex = -1;
-      int bestScore = 0;
-      for (int fieldIndex = 0; fieldIndex < 8; fieldIndex++)
+      if (itemIndexList.IsDefaultOrEmpty)
+        continue;
+
+      int weightToAdd = fieldIndex switch
       {
-        int tileId = target.GetTileIdByIndex(fieldIndex);
+        (int)TileMask.SurroundingDirection.TopLeft => isTopLeftConnected ? TOP_SCORE : LOW_SCORE,
+        (int)TileMask.SurroundingDirection.TopRight => isTopRightConnected ? TOP_SCORE : LOW_SCORE,
+        (int)TileMask.SurroundingDirection.BottomLeft => isBottomLeftConnected ? TOP_SCORE : LOW_SCORE,
+        (int)TileMask.SurroundingDirection.BottomRight => isBottomRightConnected ? TOP_SCORE : LOW_SCORE,
+        _ => TOP_SCORE
+      };
 
-        ImmutableArray<int> itemIndexList =
-          tileIdToItemIndexes[fieldIndex].TryGetValue(tileId, out var exactList)
-            ? exactList
-            : !wildcardLists[fieldIndex].IsDefaultOrEmpty
-              ? wildcardLists[fieldIndex]
-              : emptyTileLists[fieldIndex];
-
-        if (itemIndexList.IsDefaultOrEmpty)
-          continue;
-
-        int weightToAdd = fieldIndex switch
+      for (int i = 0; i < itemIndexList.Length; i++)
+      {
+        int itemIndex = itemIndexList[i];
+        if (localScratch.ItemIndexToSeenGeneration[itemIndex] != localScratch.CurrentGeneration)
         {
-          (int)TileMask.SurroundingDirection.TopLeft => isTopLeftConnected ? TOP_SCORE : LOW_SCORE,
-          (int)TileMask.SurroundingDirection.TopRight => isTopRightConnected ? TOP_SCORE : LOW_SCORE,
-          (int)TileMask.SurroundingDirection.BottomLeft => isBottomLeftConnected ? TOP_SCORE : LOW_SCORE,
-          (int)TileMask.SurroundingDirection.BottomRight => isBottomRightConnected ? TOP_SCORE : LOW_SCORE,
-          _ => TOP_SCORE
-        };
+          localScratch.ItemIndexToSeenGeneration[itemIndex] = localScratch.CurrentGeneration;
+          localScratch.ItemIndexToScore[itemIndex] = 0;
+        }
 
-        for (int i = 0; i < itemIndexList.Length; i++)
+        int updatedScore = localScratch.ItemIndexToScore[itemIndex] += weightToAdd;
+        if (updatedScore > bestScore)
         {
-          int itemIndex = itemIndexList[i];
-          if (itemIndexToSeenGeneration[itemIndex] != currentGeneration)
-          {
-            itemIndexToSeenGeneration[itemIndex] = currentGeneration;
-            itemIndexToScore[itemIndex] = 0;
-          }
-
-          int updatedScore = itemIndexToScore[itemIndex] += weightToAdd;
-          if (updatedScore > bestScore)
-          {
-            bestScore = updatedScore;
-            bestIndex = itemIndex;
-          }
+          bestScore = updatedScore;
+          bestIndex = itemIndex;
         }
       }
-
-      return bestIndex;
     }
+
+    return bestIndex;
   }
 
-  private void IncrementGeneration()
+  private sealed class SearchScratch(int itemCount)
   {
-    currentGeneration++;
-    if (currentGeneration == 0)
+    public readonly uint[] ItemIndexToSeenGeneration = new uint[itemCount];
+    public readonly int[] ItemIndexToScore = new int[itemCount];
+    public uint CurrentGeneration;
+
+    public void IncrementGeneration()
     {
-      Array.Clear(itemIndexToSeenGeneration, 0, itemIndexToSeenGeneration.Length);
-      currentGeneration = 1;
+      CurrentGeneration++;
+      if (CurrentGeneration == 0)
+      {
+        Array.Clear(ItemIndexToSeenGeneration, 0, ItemIndexToSeenGeneration.Length);
+        CurrentGeneration = 1;
+      }
     }
   }
 }
