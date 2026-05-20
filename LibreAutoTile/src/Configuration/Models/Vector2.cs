@@ -1,6 +1,6 @@
 namespace Qwaitumin.LibreAutoTile.Configuration.Models;
 
-public readonly struct Vector2(int x, int y)
+public readonly struct Vector2(int x, int y) : IEquatable<Vector2>
 {
   public readonly int X = x;
   public readonly int Y = y;
@@ -65,13 +65,11 @@ public readonly struct Vector2(int x, int y)
   public Vector3 ToVector3(int z)
    => new(X, Y, z);
 
-  public override readonly bool Equals(object? obj)
-  {
-    if (obj is not Vector2 other)
-      return false;
+  public readonly bool Equals(Vector2 other)
+    => X == other.X && Y == other.Y;
 
-    return X == other.X && Y == other.Y;
-  }
+  public override readonly bool Equals(object? obj)
+    => obj is Vector2 other && Equals(other);
 
   public override readonly int GetHashCode()
     => HashCode.Combine(X, Y);

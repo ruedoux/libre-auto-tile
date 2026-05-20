@@ -16,12 +16,13 @@ public class TileMaskSearcher
   private readonly FrozenSet<TileMask> existingMasks;
   private readonly ImmutableArray<TileMask> items;
   private readonly IndexSearcher indexSearcher;
-  private readonly TileMaskCache cache = new(1024);
+  private readonly TileMaskCache? cache;
 
   public TileMaskSearcher(
     IEnumerable<TileMask> tileMasks,
     HashSet<int>? connectionGroupTileIds = null,
-    uint? wildcardId = null)
+    uint? wildcardId = null,
+    int cacheSize = 1024)
   {
     items = [.. tileMasks.Distinct()];
     existingMasks = items.ToFrozenSet();
@@ -29,6 +30,11 @@ public class TileMaskSearcher
       items.Length,
       [.. BuildTileIdToItemIndexes(connectionGroupTileIds ?? []).Select(static d => d.ToFrozenDictionary())],
       (int?)wildcardId ?? DEFAULT_WILDCARD_ID);
+
+    if (cacheSize > 0)
+      cache = new(cacheSize);
+    else
+      cache = null;
   }
 
   /// <summary>
@@ -39,13 +45,14 @@ public class TileMaskSearcher
     if (existingMasks.Contains(target))
       return target;
 
-    if (cache.TryGet(target, out var cached))
-      return cached;
+    if (cache is not null)
+      if (cache.TryGet(target, out var cached))
+        return cached;
 
     int bestIndex = indexSearcher.Search(target);
     var result = bestIndex >= 0 ? items[bestIndex] : items.Length > 0 ? items[0] : new();
 
-    cache.Set(target, result);
+    cache?.Set(target, result);
     return result;
   }
 

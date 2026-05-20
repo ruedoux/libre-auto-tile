@@ -44,7 +44,7 @@ public sealed class IndexSearcher
     bool isBottomLeftConnected = target.IsBottomLeftConnected();
     bool isBottomRightConnected = target.IsBottomRightConnected();
 
-    SearchScratch localScratch = scratch.Value!;
+    SearchScratch localScratch = scratch.Value!; // ThreadLocal
     localScratch.IncrementGeneration();
 
     int bestIndex = -1;

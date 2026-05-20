@@ -30,11 +30,11 @@ public static class AutoTileConfigurationExtractor
         }
       }
     }
-    return items.ToArray();
+    return [.. items];
   }
 
   public static Dictionary<int, TileSearcher> BuildTileIdToTileMaskSearcher(
-    AutoTileConfiguration autoTileConfiguration)
+    AutoTileConfiguration autoTileConfiguration, int cacheSize = 1024)
   {
     var connectionGroupToTileIds = GetConnectionGroupToTileIds(autoTileConfiguration);
 
@@ -48,7 +48,10 @@ public static class AutoTileConfigurationExtractor
         connectionGroupArray = connectionGroupToTileIds[(uint)tileDefinition.ConnectionGroup];
 
       TileMaskSearcher tileMaskSearcher = new(
-        items.Select(x => x.TileMask), connectionGroupArray, autoTileConfiguration.WildcardId);
+        items.Select(x => x.TileMask),
+        connectionGroupArray,
+        autoTileConfiguration.WildcardId,
+        cacheSize);
       TileAtlasResolver tileAtlasResolver = new(items);
       tileIdToTileSearcher.Add((int)tileId, new(tileMaskSearcher, tileAtlasResolver));
     }

@@ -1,6 +1,6 @@
 namespace Qwaitumin.LibreAutoTile.Tiling.Search.Models;
 
-public readonly struct TileMask
+public readonly struct TileMask : IEquatable<TileMask>
 {
   public enum SurroundingDirection { TopLeft = 0, Top = 1, TopRight = 2, Right = 3, BottomRight = 4, Bottom = 5, BottomLeft = 6, Left = 7 }
 
@@ -149,21 +149,18 @@ public readonly struct TileMask
   public override readonly int GetHashCode()
     => HashCode.Combine(TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left);
 
+  public readonly bool Equals(TileMask other)
+    => TopLeft == other.TopLeft &&
+       Top == other.Top &&
+       TopRight == other.TopRight &&
+       Right == other.Right &&
+       BottomRight == other.BottomRight &&
+       Bottom == other.Bottom &&
+       BottomLeft == other.BottomLeft &&
+       Left == other.Left;
+
   public override readonly bool Equals(object? obj)
-  {
-    if (obj is TileMask other)
-    {
-      return TopLeft == other.TopLeft &&
-             Top == other.Top &&
-             TopRight == other.TopRight &&
-             Right == other.Right &&
-             BottomRight == other.BottomRight &&
-             Bottom == other.Bottom &&
-             BottomLeft == other.BottomLeft &&
-             Left == other.Left;
-    }
-    return false;
-  }
+    => obj is TileMask other && Equals(other);
 
   public static bool operator ==(TileMask left, TileMask right)
     => left.Equals(right);

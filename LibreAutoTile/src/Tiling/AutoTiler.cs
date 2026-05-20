@@ -65,7 +65,7 @@ public class AutoTiler
     }
   }
 
-  public Vector2[] PlaceTiles(int layer, IEnumerable<(Vector2 Position, int TileId)> tiles)
+  public IReadOnlyCollection<Vector2> PlaceTiles(int layer, IEnumerable<(Vector2 Position, int TileId)> tiles)
   {
     ValidateLayer(layer);
     var tileArray = tiles as (Vector2 Position, int TileId)[] ?? [.. tiles];
@@ -74,7 +74,7 @@ public class AutoTiler
 
     lock (layerToLock[layer])
     {
-      HashSet<Vector2> dirtyPositions = [];
+      HashSet<Vector2> dirtyPositions = []; // TODO: main allocation, should consider other options
       foreach (var (position, tileId) in tileArray)
       {
         if (tileId < 0)
@@ -90,7 +90,7 @@ public class AutoTiler
       foreach (var position in dirtyPositions)
         RecomputeTileAt(layer, position);
 
-      return [.. dirtyPositions];
+      return dirtyPositions;
     }
   }
 
