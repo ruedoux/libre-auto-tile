@@ -3,5 +3,4 @@ build
 rcedit-x64.exe
 BenchmarkDotNet.Artifacts
 local.md
-.codex
 LibreAutotile.GUI2

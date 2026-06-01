@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk/4.5.1">
+<Project Sdk="Godot.NET.Sdk/4.6.3">
   <ItemGroup>
     <ProjectReference Include="..\LibreAutoTile.GodotBindings\Qwaitumin.LibreAutoTile.GodotBindings.csproj" />
   </ItemGroup>

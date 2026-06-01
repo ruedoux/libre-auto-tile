@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk/4.5.1">
+<Project Sdk="Godot.NET.Sdk/4.6.3">
   <PropertyGroup>
     <RootNamespace>Qwaitumin.LibreAutoTile.GodotBingings.Tests</RootNamespace>
     <TargetFramework>net9.0</TargetFramework>

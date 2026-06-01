@@ -24,18 +24,11 @@ build_gui() {
   mkdir -p "$GUI_WINDOWS_TEMP"
 
   info "Building GUI export for Linux"
-  if ! godot --path LibreAutoTile.GUI --verbose --headless --export-release "Linux" "$GUI_LINUX_TEMP"/LibreAutoTile.GUI; then
-      error "Godot linux export failed"
-      exit 1
-  fi
+  godot --path LibreAutoTile.GUI --verbose --headless --export-release "Linux" "$GUI_LINUX_TEMP"/LibreAutoTile.GUI
+  tar -czvf "$EXPORT_OUTPUT"/linux-gui.tar.gz -C "$GUI_LINUX_TEMP" . > /dev/null
 
   info "Building GUI export for Windows"
-  if ! godot --path LibreAutoTile.GUI --verbose --headless --export-release "Windows Desktop" "$GUI_WINDOWS_TEMP"/LibreAutoTile.GUI.exe; then
-      error "Godot windows export failed"
-      exit 1
-  fi
-
-  tar -czvf "$EXPORT_OUTPUT"/linux-gui.tar.gz -C "$GUI_LINUX_TEMP" . > /dev/null
+  godot --path LibreAutoTile.GUI --verbose --headless --export-release "Windows Desktop" "$GUI_WINDOWS_TEMP"/LibreAutoTile.GUI.exe
   tar -czvf "$EXPORT_OUTPUT"/windows-gui.tar.gz -C "$GUI_WINDOWS_TEMP" . > /dev/null
 }
 

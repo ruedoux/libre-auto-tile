@@ -55,7 +55,7 @@ Currently, only Godot engine bindings are supported. Contributions for other gam
 
 Example usage in a live project [here](LibreAutoTile.GodotExample/Scenes/Examples).
 
-Library bindings draw terrains [10x](LibreAutoTile.GodotExample/Scenes/Comparasion) faster than godot terrain implementation.
+Library bindings draw terrains [50x](LibreAutoTile.GodotExample/Scenes/Comparasion) faster than godot terrain implementation.
 
 ## Contributions
 

@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <BenchmarkDotNetVersion>0.15.6</BenchmarkDotNetVersion>
-    <GodotSharpVersion>4.5.1</GodotSharpVersion>
+    <GodotSharpVersion>4.6.3</GodotSharpVersion>
   </PropertyGroup>
 
 </Project>
