@@ -38,8 +38,8 @@ public partial class TileSetContainer : Node2D
     {
       for (int y = startY; y < endY; y += tileSize)
       {
-        var bitmaskData = BitmaskDatabase.GetBitmaskData(fileName, new(x, y));
-        GD.Print(bitmaskData);
+        var scaledTilePosition = TileSetMath.ScaleDownTilePosition(new Vector2(x, y), tileSize);
+        var bitmaskData = BitmaskDatabase.GetBitmaskData(fileName, scaledTilePosition);
         uint probability = bitmaskData is null ? 1 : bitmaskData.GetProbability(layer);
         TileProbability.AddLabel(TileSetMath.ScaleDownTilePosition(new(x, y), tileSize), probability, tileSize);
       }
