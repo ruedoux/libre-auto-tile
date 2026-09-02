@@ -1,0 +1,103 @@
+using Godot;
+using Qwaitumin.LibreAutoTile.GUI.Views;
+
+namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
+
+public class SettingsController
+{
+  private readonly EditorContext context;
+
+  public SettingsController(EditorContext context)
+  {
+    this.context = context;
+    var view = context.View.SettingsPanel;
+    view.GridColorChanged += OnGridColorChanged;
+    view.SelectionColorChanged += OnSelectionColorChanged;
+    view.GuiColorChanged += OnGuiColorChanged;
+    view.BackgroundColorChanged += OnBackgroundColorChanged;
+    view.ProbabilityColorChanged += OnProbabilityColorChanged;
+    view.TileSizeSubmitted += OnTileSizeChanged;
+    view.FontSizeSubmitted += OnFontSizeChanged;
+    view.ResolutionSelected += OnResolutionChanged;
+  }
+
+  public static void SeedViewFromModel(EditorContext context)
+  {
+    var appearance = context.Appearance;
+    var view = context.View.SettingsPanel;
+    view.SetTileSizeText(context.Data.TileSize.ToString());
+    view.SetFontSizeText(appearance.FontSize.ToString());
+    view.SetGuiColor(appearance.GuiColor);
+    view.SetSelectionColor(appearance.SelectionColor);
+    view.SetBackgroundColor(appearance.BackgroundColor);
+    view.SetGridColor(appearance.GridColor);
+    view.SetProbabilityColor(appearance.ProbabilityColor);
+    view.SelectResolution(GetResolutionIndex(appearance.WindowSize));
+
+    Settings.ApplyGuiColor(appearance.GuiColor);
+    Settings.ApplyBackgroundColor(appearance.BackgroundColor);
+  }
+
+  private void OnGridColorChanged(Color color)
+  {
+    context.Appearance.GridColor = color;
+    context.RedrawGrid();
+  }
+
+  private void OnSelectionColorChanged(Color color)
+    => context.Appearance.SelectionColor = color;
+
+  private void OnGuiColorChanged(Color color)
+  {
+    context.Appearance.GuiColor = color;
+    Settings.ApplyGuiColor(color);
+  }
+
+  private void OnBackgroundColorChanged(Color color)
+  {
+    context.Appearance.BackgroundColor = color;
+    Settings.ApplyBackgroundColor(color);
+  }
+
+  private void OnProbabilityColorChanged(Color color)
+  {
+    context.Appearance.ProbabilityColor = color;
+    context.View.TileProbability.UpdateFontColor(color);
+  }
+
+  private void OnTileSizeChanged(string text)
+  {
+    if (!int.TryParse(text, out var tileSize) || tileSize <= 0)
+      return;
+
+    context.Data.TileSize = tileSize;
+    context.RedrawGrid();
+    context.RedrawProbabilityLabels();
+    context.RedrawBitmask();
+    context.Probability.RedrawSelection();
+  }
+
+  private void OnFontSizeChanged(string text)
+  {
+    if (!int.TryParse(text, out var fontSize) || fontSize <= 0)
+      return;
+
+    context.Appearance.FontSize = fontSize;
+    Settings.ApplyFontSize(fontSize);
+  }
+
+  private void OnResolutionChanged(long index)
+  {
+    var resolution = Settings.RESOLUTIONS[(int)index];
+    context.Appearance.WindowSize = resolution;
+    DisplayServer.WindowSetSize(resolution);
+  }
+
+  private static int GetResolutionIndex(Vector2I windowSize)
+  {
+    for (int i = 0; i < Settings.RESOLUTIONS.Length; i++)
+      if (Settings.RESOLUTIONS[i] == windowSize)
+        return i;
+    return Settings.DEFAULT_RESOLUTION_INDEX;
+  }
+}

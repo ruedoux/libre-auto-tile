@@ -52,14 +52,14 @@ build_libs() {
   dotnet pack LibreAutoTile.GodotBindings -c Release -p:PackageVersion="$PACKAGE_VERSION"
   cp LibreAutoTile/bin/Release/*.nupkg "$EXPORT_OUTPUT"/
   cp LibreAutoTile.GodotBindings/bin/Release/*.nupkg "$EXPORT_OUTPUT"/
-  
+
   find LibreAutoTile/bin/Release/ -type f \( -name "*.dll" -o -name "*.pdb" -o -name "*.json" \) -exec cp {} "$LIB_TEMP/" \;
   find LibreAutoTile.GodotBindings/bin/Release/ -type f \( -name "*.dll" -o -name "*.pdb" -o -name "*.json" \) -exec cp {} "$LIB_TEMP/" \;
   tar -czvf "$EXPORT_OUTPUT"/libs.tar.gz -C "$LIB_TEMP" . > /dev/null
 }
 
 run_benchmark() {
-  info "Running benchamrks"
+  info "Running benchmarks"
   (cd LibreAutoTile.Benchmarks && dotnet run -c Release --filter '*')
 }
 

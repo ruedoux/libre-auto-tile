@@ -35,7 +35,7 @@ public class TileDefinitionTest
   }
 
   [TestMethod]
-  public void Serialize_ShoudlKeepData_WhenDeserialized()
+  public void Serialize_ShouldKeepData_WhenDeserialized()
   {
     // Given
     TileDefinition tileDefinition = TileDefinition.Construct(

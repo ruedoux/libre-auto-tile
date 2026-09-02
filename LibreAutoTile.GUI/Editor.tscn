@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://jcybhhqvf8tw"]
+
+[ext_resource type="Script" uid="uid://ch05jp7rciw80" path="res://src/Views/EditorScene.cs" id="1_62x0m"]
+
+[node name="Editor" type="Control" unique_id=1592766393]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_62x0m")

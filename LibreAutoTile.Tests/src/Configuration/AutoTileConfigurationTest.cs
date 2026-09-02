@@ -56,7 +56,7 @@ public class AutoTileConfigurationTest
   }
 
   [TestMethod]
-  public void Serialize_ShoudlKeepData_WhenDeserialized()
+  public void Serialize_ShouldKeepData_WhenDeserialized()
   {
     // Given
     AutoTileConfiguration autoTileConfiguration = AutoTileConfiguration.Construct(

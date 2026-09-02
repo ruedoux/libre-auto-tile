@@ -22,7 +22,7 @@ public class TileMaskDataTest
   }
 
   [TestMethod]
-  public void Serialize_ShoudlKeepData_WhenDeserialized()
+  public void Serialize_ShouldKeepData_WhenDeserialized()
   {
     // Given
     TileMaskData tileMaskData = TileMaskData.Construct(DEFAULT_TILEMASK, 0);
