@@ -8,10 +8,17 @@ public class AutoTileMap : Node2D
 {
   private readonly TileMapWrapper[] tileMapWrappers;
   private readonly AutoTileDrawer autoTileDrawer;
-  private readonly uint tileSize;
   private readonly TileMapDrawer tileMapDrawer;
 
-  public AutoTileMap(int layerCount, AutoTileConfiguration autoTileConfiguration)
+  /// <summary>
+  /// Constructs the tile map. Must be called on the main thread: this creates Godot
+  /// Resources and Nodes (image loading, TileSet/atlas sources, CreateTile, AddChild)
+  /// that are not safe to build from a background thread
+  /// </summary>
+  public AutoTileMap(
+    int layerCount,
+    AutoTileConfiguration autoTileConfiguration,
+    TileSet.TileShapeEnum tileShape = TileSet.TileShapeEnum.Square)
   {
     foreach (var (_, tileDefinition) in autoTileConfiguration.TileDefinitions)
       foreach (var (imageFileName, _) in tileDefinition.ImageFileNameToTileMaskDefinition)
@@ -21,7 +28,7 @@ public class AutoTileMap : Node2D
     tileMapWrappers = new TileMapWrapper[layerCount];
     for (int layer = 0; layer < layerCount; layer++)
     {
-      TileMapWrapper tileMapWrapper = new(autoTileConfiguration);
+      TileMapWrapper tileMapWrapper = new(autoTileConfiguration, tileShape);
       tileMapWrappers[layer] = tileMapWrapper;
       AddChild(tileMapWrapper.TileMapLayer);
     }
@@ -29,15 +36,10 @@ public class AutoTileMap : Node2D
     tileMapDrawer = new TileMapDrawer(tileMapWrappers);
     autoTileDrawer = new(
       tileMapDrawer, new AutoTiler(layerCount, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration)));
-    tileSize = autoTileConfiguration.TileSize;
   }
 
-  public Vector2I WorldToMap(Vector2 worldPosition)
-  {
-    int tileXScaledDown = (int)Math.Floor(worldPosition.X / tileSize);
-    int tileYScaledDown = (int)Math.Floor(worldPosition.Y / tileSize);
-    return new Vector2I(tileXScaledDown, tileYScaledDown);
-  }
+  public Vector2I WorldToMap(Vector2 localPosition)
+    => tileMapWrappers[0].TileMapLayer.LocalToMap(localPosition);
 
   public int GetSourceId(string imageFileName)
     => tileMapDrawer.GetSourceId(imageFileName);

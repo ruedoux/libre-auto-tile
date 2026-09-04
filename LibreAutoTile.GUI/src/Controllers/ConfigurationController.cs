@@ -35,7 +35,7 @@ public class ConfigurationController
   private void SaveConfiguration(string filePath)
   {
     AutoTileConfiguration configuration = AutoTileConfigurationConverter.GetAsAutoTileConfiguration(
-      context.Data.Tiles.Tiles, context.Data.BitmaskDatabase, context.Data.TileSize);
+      context.Data.Tiles.Tiles, context.Data.BitmaskDatabase, context.Data.TileSize, context.Data.TileShape);
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
     GodotLogger.LOGGER.Log($"Saved to: {filePath}");
@@ -48,7 +48,9 @@ public class ConfigurationController
       filePath, context.Data.Tiles, context.Data.BitmaskDatabase);
 
     context.Data.TileSize = (int)autoTileConfiguration.TileSize;
+    context.Data.TileShape = autoTileConfiguration.TileShape;
     context.View.SettingsPanel.SetTileSizeText(context.Data.TileSize.ToString());
+    context.View.SettingsPanel.SelectTileShape(context.Data.TileShape);
 
     context.Data.ImagePath = "";
     context.Data.ImageSize = Vector2I.Zero;

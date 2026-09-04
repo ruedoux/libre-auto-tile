@@ -9,15 +9,20 @@ public class AutoTileConfiguration
 {
   public uint? WildcardId { get; private set; }
   public uint TileSize { get; private set; }
+  public TileShape TileShape { get; private set; }
   public ImmutableDictionary<uint, TileDefinition> TileDefinitions { get; private set; }
 
   [JsonConstructor]
   public AutoTileConfiguration(
-    uint tileSize, ImmutableDictionary<uint, TileDefinition> tileDefinitions, uint? wildcardId = null)
+    uint tileSize,
+    ImmutableDictionary<uint, TileDefinition> tileDefinitions,
+    uint? wildcardId = null,
+    TileShape tileShape = TileShape.Square)
   {
     TileSize = tileSize;
     TileDefinitions = tileDefinitions;
     WildcardId = wildcardId;
+    TileShape = tileShape;
     Dictionary<string, uint> tileNameToTileIds = [];
     foreach (var (tileId, tileDefinition) in tileDefinitions)
       if (!tileNameToTileIds.TryAdd(tileDefinition.Name, tileId))
@@ -25,8 +30,11 @@ public class AutoTileConfiguration
   }
 
   public static AutoTileConfiguration Construct(
-    uint tileSize, Dictionary<uint, TileDefinition> tileDefinitions, uint? wildcardId = null)
-      => new(tileSize, tileDefinitions.ToImmutableDictionary(), wildcardId);
+    uint tileSize,
+    Dictionary<uint, TileDefinition> tileDefinitions,
+    uint? wildcardId = null,
+    TileShape tileShape = TileShape.Square)
+      => new(tileSize, tileDefinitions.ToImmutableDictionary(), wildcardId, tileShape);
 
   public static AutoTileConfiguration? FromJsonString(string jsonString)
   {
@@ -62,14 +70,16 @@ public class AutoTileConfiguration
     if (other is null) return false;
     if (ReferenceEquals(this, other)) return true;
 
-    return TileSize == other.TileSize && TileDefinitions.SequenceEqual(other.TileDefinitions);
+    return TileSize == other.TileSize
+      && TileShape == other.TileShape
+      && TileDefinitions.SequenceEqual(other.TileDefinitions);
   }
 
   public override bool Equals(object? obj) => Equals(obj as AutoTileConfiguration);
 
   public override int GetHashCode()
   {
-    int hash = TileSize.GetHashCode();
+    int hash = HashCode.Combine(TileSize.GetHashCode(), TileShape.GetHashCode());
     foreach (var pair in TileDefinitions)
       hash = HashCode.Combine(hash, pair.Key.GetHashCode(), pair.Value.GetHashCode());
 

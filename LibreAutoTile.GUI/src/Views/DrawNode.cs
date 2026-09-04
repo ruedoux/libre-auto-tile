@@ -20,6 +20,15 @@ public partial class DrawNode : Node2D
     Vector2 from, Vector2 to, Color color, int width = 1, bool antialiasing = false)
       => drawQueue.Enqueue(() => DrawLine(from, to, color, width, antialiasing));
 
+  public void DrawPolygon(
+    Vector2[] points, Color color, bool filled = false, int width = 1)
+  {
+    if (filled)
+      drawQueue.Enqueue(() => DrawColoredPolygon(points, color));
+    else
+      drawQueue.Enqueue(() => DrawPolyline([.. points, points[0]], color, width));
+  }
+
   public void Clear()
     => drawQueue.Clear();
 

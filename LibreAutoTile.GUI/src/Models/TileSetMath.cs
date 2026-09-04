@@ -1,5 +1,6 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using TileShape = Qwaitumin.LibreAutoTile.Configuration.Models.TileShape;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Models;
 
@@ -70,6 +71,31 @@ public static class TileSetMath
 
   public static Vector2I SnapToTileCorner(Vector2 worldPosition, int tileSize)
     => ScaleDownTilePosition(worldPosition, tileSize) * tileSize;
+
+  public static Vector2[] GetTileOutlineVertices(
+    Vector2 tileTopLeft, int tileSize, TileShape shape)
+  {
+    if (shape == TileShape.Isometric)
+    {
+      float width = tileSize;
+      float height = tileSize / 2f;
+      return
+      [
+        new Vector2(tileTopLeft.X + width / 2, tileTopLeft.Y),
+        new Vector2(tileTopLeft.X + width, tileTopLeft.Y + height / 2),
+        new Vector2(tileTopLeft.X + width / 2, tileTopLeft.Y + height),
+        new Vector2(tileTopLeft.X, tileTopLeft.Y + height / 2),
+      ];
+    }
+
+    return
+    [
+      new Vector2(tileTopLeft.X, tileTopLeft.Y),
+      new Vector2(tileTopLeft.X + tileSize, tileTopLeft.Y),
+      new Vector2(tileTopLeft.X + tileSize, tileTopLeft.Y + tileSize),
+      new Vector2(tileTopLeft.X, tileTopLeft.Y + tileSize),
+    ];
+  }
 
   public static int BorderWidth(int tileSize)
     => (tileSize / 32) > 0 ? (tileSize / 32) : 1;

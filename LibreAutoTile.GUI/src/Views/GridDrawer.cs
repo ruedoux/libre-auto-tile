@@ -1,5 +1,6 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.Models;
+using TileShape = Qwaitumin.LibreAutoTile.Configuration.Models.TileShape;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Views;
 
@@ -31,12 +32,22 @@ public partial class GridDrawer : Node2D
     gridDrawNode.QueueRedraw();
   }
 
-  public void RedrawSquareTile(Vector2I snappedTilePosition, Color color, int tileSize, bool filled = false)
+  public void RedrawTile(
+    Vector2I snappedTilePosition, Color color, int tileSize, TileShape shape, bool filled = false)
   {
-    Rect2I tileRect = new(snappedTilePosition, new(tileSize, tileSize));
-
     var borderWidth = TileSetMath.BorderWidth(tileSize);
-    tileDrawNode.DrawRectangle(tileRect, color, width: borderWidth, filled: filled);
+    if (shape == TileShape.Isometric)
+    {
+      // Center the 2:1 isometric diamond in the square atlas cell.
+      Vector2 tileTopLeft = snappedTilePosition + new Vector2(0, tileSize / 4f);
+      var vertices = TileSetMath.GetTileOutlineVertices(tileTopLeft, tileSize, shape);
+      tileDrawNode.DrawPolygon(vertices, color, filled: filled, width: borderWidth);
+    }
+    else
+    {
+      Rect2I tileRect = new(snappedTilePosition, new Vector2I(tileSize, tileSize));
+      tileDrawNode.DrawRectangle(tileRect, color, width: borderWidth, filled: filled);
+    }
     tileDrawNode.QueueRedraw();
   }
 }

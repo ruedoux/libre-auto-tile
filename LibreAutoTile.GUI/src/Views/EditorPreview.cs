@@ -1,5 +1,6 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
+using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 using Qwaitumin.LibreAutoTile.GUI.Models;
 
@@ -49,11 +50,11 @@ public partial class EditorPreview : MarginContainer
         var imageFileName = imageAtlasToImageName.Item2;
         var sourceId = AutoTileMap.GetSourceId(imageFileName);
         var source = AutoTileMap.GetTileMapLayer(0).TileSet.GetSource(sourceId);
-        var tileSize = autoTileConfiguration.TileSize;
+        var tileSize = (int)autoTileConfiguration.TileSize;
         texture = TileTextureHelper.GetTileTexture(
           (TileSetAtlasSource)source,
           new(atlasPosition.X, atlasPosition.Y),
-          new((int)tileSize, (int)tileSize));
+          new(tileSize, tileSize));
       }
 
       var previewTile = new PreviewTile();
@@ -69,11 +70,18 @@ public partial class EditorPreview : MarginContainer
       ChangeActiveTile(firstTile);
   }
 
-  public void InitializeTileMap(AutoTileConfiguration autoTileConfiguration)
+  public void InitializeTileMap(AutoTileConfiguration autoTileConfiguration, TileShape tileShape)
   {
     AutoTileMap?.QueueFree();
-    AutoTileMap = new(1, autoTileConfiguration);
+    AutoTileMap = new(1, autoTileConfiguration, MapTileShape(tileShape));
   }
+
+  private static TileSet.TileShapeEnum MapTileShape(TileShape tileShape)
+    => tileShape switch
+    {
+      TileShape.Isometric => TileSet.TileShapeEnum.Isometric,
+      _ => TileSet.TileShapeEnum.Square,
+    };
 
   private void ChangeActiveTile(PreviewTile previewTile)
   {

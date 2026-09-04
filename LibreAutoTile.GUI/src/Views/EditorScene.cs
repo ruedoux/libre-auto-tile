@@ -1,5 +1,6 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.Models;
+using TileShape = Qwaitumin.LibreAutoTile.Configuration.Models.TileShape;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Views;
 
@@ -138,8 +139,8 @@ public partial class EditorScene : Control
   public void RedrawGrid(Rect2I size, Color color, int scaledTileSize)
     => GridDrawer.RedrawSquareGrid(size, color, scaledTileSize);
 
-  public void RedrawSquareTile(Vector2I snappedTilePosition, Color color, int scaledTileSize)
-    => GridDrawer.RedrawSquareTile(snappedTilePosition, color, scaledTileSize);
+  public void RedrawTile(Vector2I snappedTilePosition, Color color, int scaledTileSize, TileShape shape)
+    => GridDrawer.RedrawTile(snappedTilePosition, color, scaledTileSize, shape);
 
   public void DisplayTileLabel(string text)
   {
@@ -188,12 +189,13 @@ public partial class EditorScene : Control
     previewHighlightDrawNode.Hide();
   }
 
-  public void RedrawPreviewHighlight(Vector2I snappedTilePosition, Color color, int scaledTileSize)
-    => RedrawHighlight(previewHighlightDrawNode, snappedTilePosition, color, scaledTileSize);
+  public void RedrawPreviewHighlight(
+    Vector2 tileTopLeft, Color color, int scaledTileSize, TileShape shape)
+    => RedrawHighlight(previewHighlightDrawNode, tileTopLeft, color, scaledTileSize, shape);
 
   public void RedrawProbabilitySelection(Vector2I snappedTilePosition, Color color, int scaledTileSize)
   {
-    RedrawHighlight(probabilitySelectionDrawNode, snappedTilePosition, color, scaledTileSize);
+    RedrawHighlight(probabilitySelectionDrawNode, snappedTilePosition, color, scaledTileSize, TileShape.Square);
     probabilitySelectionDrawNode.Show();
   }
 
@@ -204,11 +206,18 @@ public partial class EditorScene : Control
   }
 
   private static void RedrawHighlight(
-    DrawNode drawNode, Vector2I snappedTilePosition, Color color, int scaledTileSize)
+    DrawNode drawNode, Vector2 tileTopLeft, Color color, int scaledTileSize, TileShape shape)
   {
-    drawNode.DrawRectangle(
-      new(snappedTilePosition, new(scaledTileSize, scaledTileSize)),
-      color, width: TileSetMath.BorderWidth(scaledTileSize));
+    var borderWidth = TileSetMath.BorderWidth(scaledTileSize);
+    if (shape == TileShape.Isometric)
+    {
+      var vertices = TileSetMath.GetTileOutlineVertices(tileTopLeft, scaledTileSize, shape);
+      drawNode.DrawPolygon(vertices, color, width: borderWidth);
+    }
+    else
+    {
+      drawNode.DrawRectangle(new Rect2I((Vector2I)tileTopLeft, new Vector2I(scaledTileSize, scaledTileSize)), color, width: borderWidth);
+    }
     drawNode.QueueRedraw();
   }
 }

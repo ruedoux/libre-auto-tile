@@ -6,23 +6,6 @@ using Qwaitumin.LibreAutoTile.Configuration.Models;
 
 namespace Qwaitumin.LibreAutoTile.Configuration;
 
-public class Vector2Converter : JsonConverter<Vector2>
-{
-  public override Vector2 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-  {
-    if (reader.TokenType != JsonTokenType.String)
-      throw new JsonException("Expected string token");
-
-    var stringValue = reader!.GetString()
-      ?? throw new JsonException("Token is null");
-
-    return Vector2.FromString(stringValue);
-  }
-
-  public override void Write(Utf8JsonWriter writer, Vector2 value, JsonSerializerOptions options)
-    => writer.WriteStringValue(value.ToString());
-}
-
 public class Vector2DictionaryConverter<TValue> : JsonConverter<Dictionary<Vector2, TValue>>
 {
   public override Dictionary<Vector2, TValue> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -117,7 +100,6 @@ public class TileColorConverter : JsonConverter<TileColor>
 
 [JsonSourceGenerationOptions(
   Converters = [
-    typeof(Vector2Converter),
     typeof(Vector3TileMaskDataDictionaryConverter),
     typeof(TileColorConverter),
     typeof(Vector3Converter),

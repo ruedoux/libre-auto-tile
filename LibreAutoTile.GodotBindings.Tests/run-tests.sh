@@ -9,5 +9,4 @@ for arg in "$@"; do
   esac
 done
 
-godot --path=. --headless --build-solutions --quit
 godot --path=. --headless --script=src/Run.cs $TEST_CLASS $TEST_METHOD

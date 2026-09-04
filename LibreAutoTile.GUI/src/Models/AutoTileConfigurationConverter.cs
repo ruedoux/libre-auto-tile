@@ -9,7 +9,7 @@ namespace Qwaitumin.LibreAutoTile.GUI.Models;
 public static class AutoTileConfigurationConverter
 {
   public static AutoTileConfiguration GetAsAutoTileConfiguration(
-    IEnumerable<TileModel> createdTiles, BitmaskDatabase tileDatabase, int tileSize)
+    IEnumerable<TileModel> createdTiles, BitmaskDatabase tileDatabase, int tileSize, TileShape tileShape)
   {
     var allMasks = GroupMasksByTileId(tileDatabase);
 
@@ -28,7 +28,8 @@ public static class AutoTileConfigurationConverter
       tileDefinitions[(uint)tile.TileId] = tileDefinition;
     }
 
-    return AutoTileConfiguration.Construct((uint)tileSize, tileDefinitions);
+    return AutoTileConfiguration.Construct(
+      (uint)tileSize, tileDefinitions, tileShape: tileShape);
   }
 
   public static AutoTileConfiguration LoadConfiguration(

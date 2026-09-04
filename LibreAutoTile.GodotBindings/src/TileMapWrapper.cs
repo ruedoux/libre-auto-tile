@@ -9,13 +9,21 @@ internal class TileMapWrapper
   public readonly TileMapLayer TileMapLayer;
   public readonly FrozenDictionary<string, int> ImageFileToSourceId;
 
-  public TileMapWrapper(AutoTileConfiguration autoTileConfiguration)
+  public TileMapWrapper(
+    AutoTileConfiguration autoTileConfiguration,
+    TileSet.TileShapeEnum tileShape = TileSet.TileShapeEnum.Square)
   {
-    Vector2I tileSize = new((int)autoTileConfiguration.TileSize, (int)autoTileConfiguration.TileSize);
+    int tileSize = (int)autoTileConfiguration.TileSize;
     Dictionary<string, HashSet<Vector2I>> imageFileNamesToAtlasPositions = GetImageFileNameToAtlasPositions(
       autoTileConfiguration);
 
-    TileSet tileSet = new();
+    TileSet tileSet = new()
+    {
+      TileShape = tileShape,
+      TileSize = GetTileSizeForShape(tileShape, tileSize)
+    };
+    if (tileShape == TileSet.TileShapeEnum.Isometric)
+      tileSet.TileLayout = TileSet.TileLayoutEnum.DiamondDown;
     Dictionary<string, int> imageFileToSourceId = [];
     foreach (var (imageFileName, atlasPositions) in imageFileNamesToAtlasPositions)
     {
@@ -35,13 +43,20 @@ internal class TileMapWrapper
     ImageFileToSourceId = imageFileToSourceId.ToFrozenDictionary();
   }
 
-  private static int AddSource(TileSet tileSet, string sourceImagePath, Vector2I tileSize)
+  private static Vector2I GetTileSizeForShape(TileSet.TileShapeEnum tileShape, int atlasTileSize)
+  {
+    if (tileShape == TileSet.TileShapeEnum.Isometric)
+      return new Vector2I(atlasTileSize, Math.Max(1, atlasTileSize / 2));
+    return new Vector2I(atlasTileSize, atlasTileSize);
+  }
+
+  private static int AddSource(TileSet tileSet, string sourceImagePath, int tileSize)
   {
     var texture = Image.LoadFromFile(sourceImagePath);
 
     TileSetAtlasSource source = new()
     {
-      TextureRegionSize = tileSize,
+      TextureRegionSize = new Vector2I(tileSize, tileSize),
       Texture = ImageTexture.CreateFromImage(texture)
     };
 

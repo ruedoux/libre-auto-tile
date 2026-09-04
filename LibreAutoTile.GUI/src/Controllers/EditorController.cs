@@ -1,6 +1,7 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.GUI.Models;
 using Qwaitumin.LibreAutoTile.GUI.Views;
+using TileShape = Qwaitumin.LibreAutoTile.Configuration.Models.TileShape;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
 
@@ -75,20 +76,37 @@ public class EditorController
 
   private void OnMouseMoved(Vector2 mousePosition)
   {
-    var snappedTilePosition = TileSetMath.SnapToTileCorner(mousePosition, context.ScaledTileSize);
-
     if (context.ActiveTool == EditorTool.Preview)
     {
-      context.View.RedrawPreviewHighlight(snappedTilePosition, context.Appearance.SelectionColor, context.ScaledTileSize);
+      RedrawPreviewHighlight(mousePosition);
       return;
     }
 
-    context.View.RedrawSquareTile(snappedTilePosition, context.Appearance.SelectionColor, context.ScaledTileSize);
+    var snappedTilePosition = TileSetMath.SnapToTileCorner(mousePosition, context.ScaledTileSize);
+    context.View.RedrawTile(snappedTilePosition, context.Appearance.SelectionColor, context.ScaledTileSize, context.Data.TileShape);
     var tilePosition = TileSetMath.ScaleDownTilePosition(mousePosition, context.ScaledTileSize);
     context.View.DisplayTileLabel(tilePosition.ToString());
 
     if (context.ActiveTool == EditorTool.Tiles)
       RedrawBitmaskGhost(mousePosition);
+  }
+
+  private void RedrawPreviewHighlight(Vector2 mousePosition)
+  {
+    var autoTileMap = context.View.PreviewPanel.AutoTileMap;
+    if (autoTileMap is null)
+      return;
+
+    var mapPosition = autoTileMap.WorldToMap(mousePosition / Settings.IMAGE_SCALING);
+    // MapToLocal returns the center of the cell; convert to the tile's bounding-box top-left.
+    // The isometric diamond bounding box is tileSize wide and tileSize/2 tall.
+    Vector2 center = autoTileMap.GetTileMapLayer(0).MapToLocal(mapPosition) * Settings.IMAGE_SCALING;
+    Vector2 tileTopLeft = context.Data.TileShape == TileShape.Isometric
+      ? center - new Vector2(context.ScaledTileSize / 2f, context.ScaledTileSize / 4f)
+      : center - new Vector2(context.ScaledTileSize / 2f, context.ScaledTileSize / 2f);
+
+    context.View.RedrawPreviewHighlight(
+      tileTopLeft, context.Appearance.SelectionColor, context.ScaledTileSize, context.Data.TileShape);
   }
 
   private void RedrawBitmaskGhost(Vector2 worldPosition)

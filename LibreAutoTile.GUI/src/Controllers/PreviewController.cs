@@ -21,8 +21,8 @@ public class PreviewController
     context.View.ShowPreviewHighlight();
 
     AutoTileConfiguration autoTileConfiguration = AutoTileConfigurationConverter.GetAsAutoTileConfiguration(
-      context.Data.Tiles.Tiles, context.Data.BitmaskDatabase, context.Data.TileSize);
-    context.View.PreviewPanel.InitializeTileMap(autoTileConfiguration);
+      context.Data.Tiles.Tiles, context.Data.BitmaskDatabase, context.Data.TileSize, context.Data.TileShape);
+    context.View.PreviewPanel.InitializeTileMap(autoTileConfiguration, context.Data.TileShape);
     context.View.PreviewPanel.AddCreatedTiles(
       [.. context.Data.Tiles.Tiles.Select(t => (t.TileId, t.TileName))],
       autoTileConfiguration);
@@ -78,10 +78,10 @@ public class PreviewController
     if (mouseLeftClicked || mouseRightClicked)
     {
       List<Vector2I> surroundingPositions = [];
-      var scaledMousePosition = autoTileMap.WorldToMap(mousePosition / Settings.IMAGE_SCALING);
+      var mapPosition = autoTileMap.WorldToMap(mousePosition / Settings.IMAGE_SCALING);
       for (int x = -1; x < 2; x++)
         for (int y = -1; y < 2; y++)
-          surroundingPositions.Add(scaledMousePosition + new Vector2I(x, y));
+          surroundingPositions.Add(mapPosition + new Vector2I(x, y));
       autoTileMap.UpdateTiles(0, [.. surroundingPositions]);
     }
   }

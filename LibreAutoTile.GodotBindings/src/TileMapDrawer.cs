@@ -31,8 +31,13 @@ internal class TileMapDrawer(TileMapWrapper[] tileMapWrappers) : ITileMapDrawer
         {
           if (tileMapWrappers[tileLayer].ImageFileToSourceId.TryGetValue(tileData.TileAtlas.ImageFileName, out int overrideSourceId))
           {
-            atlasCoords = GodotTypeMapper.Map(tileData.TileAtlas.Position);
-            sourceId = overrideSourceId;
+            var atlas = GodotTypeMapper.Map(tileData.TileAtlas.Position);
+            var source = tileMapWrappers[tileLayer].TileMapLayer.TileSet.GetSource(overrideSourceId);
+            if (source.HasTile(atlas))
+            {
+              atlasCoords = atlas;
+              sourceId = overrideSourceId;
+            }
           }
         }
 

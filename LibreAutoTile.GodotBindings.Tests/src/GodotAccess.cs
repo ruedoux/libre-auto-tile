@@ -1,4 +1,5 @@
 using Godot;
+using System.Threading;
 
 namespace LibreAutoTile.GodotBindings.Tests;
 
@@ -19,6 +20,35 @@ public class GodotAccess
   {
     Callable.From(() => accessNode.AddChild(node)).CallDeferred();
     WaitNextFrames();
+  }
+
+  /// <summary>
+  /// Runs a function on the main thread and blocks until it completes
+  /// </summary>
+  public static T RunOnMainThread<T>(Func<T> func)
+  {
+    T result = default!;
+    Exception? error = null;
+    using var done = new ManualResetEventSlim(false);
+    Callable.From(() =>
+    {
+      try
+      {
+        result = func();
+      }
+      catch (Exception e)
+      {
+        error = e;
+      }
+      finally
+      {
+        done.Set();
+      }
+    }).CallDeferred();
+    done.Wait();
+    if (error is not null)
+      throw error;
+    return result;
   }
 
   public static void WaitNextFrames(int n = 2)

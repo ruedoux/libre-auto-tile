@@ -84,7 +84,7 @@ public partial class EditorTiles : MarginContainer
 
       TileList.MoveChild(row, index);
       row.SetActive(viewModel.IsActive);
-      row.Refresh();
+      row.Refresh(viewModel);
       index++;
     }
   }

@@ -14,7 +14,7 @@ public partial class GuiTile : PanelContainer
   public readonly LineEdit ConnectionGroupEdit;
   public readonly ColorPickerButton ColorPickerButton;
 
-  public TileViewModel Model { get; }
+  public TileViewModel Model { get; private set; }
 
   public event Action? RemoveRequested;
   public event Action<string>? NameSubmitted;
@@ -72,14 +72,15 @@ public partial class GuiTile : PanelContainer
     ColorPickerButton.ColorChanged += color => ColorChanged?.Invoke(color);
 
     ColorPickerButton.Color = Model.Color;
-    Refresh();
+    Refresh(model);
   }
 
-  public void Refresh()
+  public void Refresh(TileViewModel model)
   {
-    TileNameEdit.Text = Model.TileName;
-    TileIdEdit.Text = Model.TileId.ToString();
-    ConnectionGroupEdit.Text = Model.ConnectionGroup?.ToString() ?? "null";
+    Model = model;
+    TileNameEdit.Text = model.TileName;
+    TileIdEdit.Text = model.TileId.ToString();
+    ConnectionGroupEdit.Text = model.ConnectionGroup?.ToString() ?? "null";
   }
 
   public void SetActive(bool active)

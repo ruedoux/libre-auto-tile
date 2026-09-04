@@ -1,4 +1,5 @@
 using Godot;
+using Qwaitumin.LibreAutoTile.Configuration.Models;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Views;
 
@@ -7,6 +8,7 @@ public partial class EditorSettings : MarginContainer
   public readonly LineEdit TileSizeLineEdit;
   public readonly LineEdit FontSizeLineEdit;
   public readonly OptionButton ResolutionOptionButton;
+  public readonly OptionButton TileShapeOptionButton;
   public readonly ColorPickerButton GuiColorPicker;
   public readonly ColorPickerButton SelectionColorPicker;
   public readonly ColorPickerButton BackgroundColorPicker;
@@ -21,6 +23,7 @@ public partial class EditorSettings : MarginContainer
   public event Action<string>? TileSizeSubmitted;
   public event Action<string>? FontSizeSubmitted;
   public event Action<long>? ResolutionSelected;
+  public event Action<TileShape>? TileShapeSelected;
 
   public EditorSettings()
   {
@@ -41,6 +44,12 @@ public partial class EditorSettings : MarginContainer
       .AppendOptionButton().ExpandHorizontal();
     foreach (var resolution in Settings.RESOLUTIONS)
       ResolutionOptionButton.AddItem($"{resolution.X}x{resolution.Y}");
+
+    TileShapeOptionButton = vbox.AppendHBox().ExpandHorizontal()
+      .AppendLabel("Tile shape").ExpandHorizontal().ExpandVertical().FitContent().Back()
+      .AppendOptionButton().ExpandHorizontal();
+    foreach (var tileShape in Enum.GetValues<TileShape>())
+      TileShapeOptionButton.AddItem(tileShape.ToString());
 
     GuiColorPicker = vbox.AppendHBox().ExpandHorizontal()
       .AppendLabel("GUI").ExpandHorizontal().ExpandVertical().FitContent().Back()
@@ -70,6 +79,8 @@ public partial class EditorSettings : MarginContainer
     TileSizeLineEdit.TextSubmitted += text => TileSizeSubmitted?.Invoke(text);
     FontSizeLineEdit.TextSubmitted += text => FontSizeSubmitted?.Invoke(text);
     ResolutionOptionButton.ItemSelected += index => ResolutionSelected?.Invoke(index);
+    TileShapeOptionButton.ItemSelected += index =>
+      TileShapeSelected?.Invoke(Enum.GetValues<TileShape>()[(int)index]);
   }
 
   public void SetTileSizeText(string text)
@@ -95,4 +106,7 @@ public partial class EditorSettings : MarginContainer
 
   public void SelectResolution(long index)
     => ResolutionOptionButton.Select((int)index);
+
+  public void SelectTileShape(TileShape tileShape)
+    => TileShapeOptionButton.Select(Array.IndexOf(Enum.GetValues<TileShape>(), tileShape));
 }

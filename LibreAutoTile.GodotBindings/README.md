@@ -22,3 +22,17 @@ int tileId = 0;
 int layer = 0;
 autoTileMap.DrawTiles(layer, [(new Vector2I(0,0), tileId)]);
 ```
+
+## Isometric
+
+Pass a tile shape to render on an isometric (diamond) tile map. The core autotiling
+logic is shape-agnostic, so only the Godot `TileSet` configuration changes:
+
+```cs
+AutoTileMap autoTileMap = new(
+  1, autoTileConfiguration, TileSet.TileShapeEnum.Isometric);
+AddChild(autoTileMap);
+```
+
+`WorldToMap` uses Godot's shape-aware `TileMapLayer.LocalToMap`, so mouse-to-cell
+conversion works for both square and isometric maps.

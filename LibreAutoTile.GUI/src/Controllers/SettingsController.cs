@@ -1,4 +1,6 @@
 using Godot;
+using Qwaitumin.LibreAutoTile.Configuration.Models;
+using Qwaitumin.LibreAutoTile.GUI.Models;
 using Qwaitumin.LibreAutoTile.GUI.Views;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
@@ -19,6 +21,7 @@ public class SettingsController
     view.TileSizeSubmitted += OnTileSizeChanged;
     view.FontSizeSubmitted += OnFontSizeChanged;
     view.ResolutionSelected += OnResolutionChanged;
+    view.TileShapeSelected += OnTileShapeChanged;
   }
 
   public static void SeedViewFromModel(EditorContext context)
@@ -33,6 +36,7 @@ public class SettingsController
     view.SetGridColor(appearance.GridColor);
     view.SetProbabilityColor(appearance.ProbabilityColor);
     view.SelectResolution(GetResolutionIndex(appearance.WindowSize));
+    view.SelectTileShape(context.Data.TileShape);
 
     Settings.ApplyGuiColor(appearance.GuiColor);
     Settings.ApplyBackgroundColor(appearance.BackgroundColor);
@@ -67,14 +71,11 @@ public class SettingsController
 
   private void OnTileSizeChanged(string text)
   {
-    if (!int.TryParse(text, out var tileSize) || tileSize <= 0)
+    if (!int.TryParse(text, out var size) || size <= 0)
       return;
 
-    context.Data.TileSize = tileSize;
-    context.RedrawGrid();
-    context.RedrawProbabilityLabels();
-    context.RedrawBitmask();
-    context.Probability.RedrawSelection();
+    context.Data.TileSize = size;
+    RedrawTiles();
   }
 
   private void OnFontSizeChanged(string text)
@@ -91,6 +92,20 @@ public class SettingsController
     var resolution = Settings.RESOLUTIONS[(int)index];
     context.Appearance.WindowSize = resolution;
     DisplayServer.WindowSetSize(resolution);
+  }
+
+  private void OnTileShapeChanged(TileShape tileShape)
+  {
+    context.Data.TileShape = tileShape;
+    RedrawTiles();
+  }
+
+  private void RedrawTiles()
+  {
+    context.RedrawGrid();
+    context.RedrawProbabilityLabels();
+    context.RedrawBitmask();
+    context.Probability.RedrawSelection();
   }
 
   private static int GetResolutionIndex(Vector2I windowSize)
