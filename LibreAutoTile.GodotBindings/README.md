@@ -1,11 +1,11 @@
 # LibreAutoTile Godot Bindings
 
-Godot Bindings implementation for LibreAutoTile. Example usage on live project [here](https://github.com/ruedoux/libre-auto-tile/tree/main/LibreAutoTile.GodotExample).
+Godot Bindings implementation for LibreAutoTile. Example usage in a live project [here](../LibreAutoTile.GodotExample).
 
 ## Installation
 
-1. Using .csproj repository from repo (recommended for most recent version)
-2. Using NuGet:
+1. Link the `.csproj` from this repository (recommended for the most recent version), or
+2. Install from NuGet:
 
 ```sh
 dotnet add package Qwaitumin.LibreAutoTile.GodotBindings
@@ -23,6 +23,9 @@ int layer = 0;
 autoTileMap.DrawTiles(layer, [(new Vector2I(0,0), tileId)]);
 ```
 
+> Note: `AutoTileMap` must be constructed on the main thread — it creates Godot
+> Resources and Nodes (image loading, TileSet/atlas sources, `CreateTile`, `AddChild`).
+
 ## Isometric
 
 Pass a tile shape to render on an isometric (diamond) tile map. The core autotiling
@@ -33,6 +36,3 @@ AutoTileMap autoTileMap = new(
   1, autoTileConfiguration, TileSet.TileShapeEnum.Isometric);
 AddChild(autoTileMap);
 ```
-
-`WorldToMap` uses Godot's shape-aware `TileMapLayer.LocalToMap`, so mouse-to-cell
-conversion works for both square and isometric maps.
