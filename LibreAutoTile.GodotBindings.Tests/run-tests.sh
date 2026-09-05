@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Generate .godot/ (UID cache, etc.) so UID references like the main scene
+# resolve in a fresh checkout / CI where .godot/ isn't committed.
+godot --path=. --headless --import
+
 for arg in "$@"; do
   case $arg in
     --test-method=*)
