@@ -72,17 +72,38 @@ public class AutoTileConfiguration
 
     return TileSize == other.TileSize
       && TileShape == other.TileShape
-      && TileDefinitions.SequenceEqual(other.TileDefinitions);
+      && WildcardId == other.WildcardId
+      && TileDefinitionsEqual(TileDefinitions, other.TileDefinitions);
   }
 
   public override bool Equals(object? obj) => Equals(obj as AutoTileConfiguration);
 
   public override int GetHashCode()
   {
-    int hash = HashCode.Combine(TileSize.GetHashCode(), TileShape.GetHashCode());
-    foreach (var pair in TileDefinitions)
-      hash = HashCode.Combine(hash, pair.Key.GetHashCode(), pair.Value.GetHashCode());
+    var hash = new HashCode();
+    hash.Add(TileSize);
+    hash.Add(TileShape);
+    hash.Add(WildcardId);
 
-    return hash;
+    int tileDefinitionsHash = 0;
+    foreach (var (tileId, tileDefinition) in TileDefinitions)
+      tileDefinitionsHash = unchecked(tileDefinitionsHash + HashCode.Combine(tileId, tileDefinition.GetHashCode()));
+    hash.Add(tileDefinitionsHash);
+
+    return hash.ToHashCode();
+  }
+
+  private static bool TileDefinitionsEqual(
+    ImmutableDictionary<uint, TileDefinition> left,
+    ImmutableDictionary<uint, TileDefinition> right)
+  {
+    if (left.Count != right.Count)
+      return false;
+
+    foreach (var (tileId, tileDefinition) in left)
+      if (!right.TryGetValue(tileId, out var otherDefinition) || !tileDefinition.Equals(otherDefinition))
+        return false;
+
+    return true;
   }
 }

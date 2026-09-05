@@ -11,7 +11,7 @@ public partial class Run : Node2D
   {
     GodotAccess.Bind(GetTree());
     var args = OS.GetCmdlineArgs()
-      .Where(arg => arg.Contains("--test-method") || arg.Contains("--test-method"))
+      .Where(arg => arg.Contains("--test-class") || arg.Contains("--test-method"))
       .ToArray();
 
     task = Task.Run(() =>

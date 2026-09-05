@@ -119,6 +119,7 @@ publish_release() {
     mkdir -p "$EXPORT_OUTPUT"
     build_libs
     build_gui
+    run_all_tests
     run_benchmark
 
     if [[ "${CI:-}" == "true" ]]; then

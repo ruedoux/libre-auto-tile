@@ -25,16 +25,14 @@ jobs:
         run: dotnet run --no-build
         working-directory: LibreAutoTile.Tests
 
-  ### Delays the build substantially on github
-  # test-godot:
-  #   runs-on: barichello/godot-ci:mono-4.5.1
-  #   needs: test-native
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Setup .NET
-  #       uses: actions/setup-dotnet@v4
-  #       with:
-  #         dotnet-version: 9.0.x
-  #     - name: Run LibreAutoTile.GodotBindings.Tests
-  #       run: run-tests.sh
-  #       working-directory: LibreAutoTile.GodotBindings.Tests
+  test-godot:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:mono-4.7.1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Run LibreAutoTile.GodotBindings.Tests
+        run: ./run-tests.sh
+        working-directory: LibreAutoTile.GodotBindings.Tests

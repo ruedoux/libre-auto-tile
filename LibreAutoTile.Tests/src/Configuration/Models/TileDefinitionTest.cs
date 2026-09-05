@@ -32,6 +32,10 @@ public class TileDefinitionTest
       TileDefinition.Construct(imageFileNameToTileMaskDefinition: DEFAULT_FILE_TO_TILEMASK),
       TileDefinition.Construct(imageFileNameToTileMaskDefinition: DEFAULT_FILE_TO_TILEMASK),
       TileDefinition.Construct(imageFileNameToTileMaskDefinition: new() { { "b", DEFAULT_TILEMASK_DEFINITION } }));
+    SimpleEqualsVerifier.Verify(
+      TileDefinition.Construct(imageFileNameToTileMaskDefinition: DEFAULT_FILE_TO_TILEMASK, connectionGroup: 0),
+      TileDefinition.Construct(imageFileNameToTileMaskDefinition: DEFAULT_FILE_TO_TILEMASK, connectionGroup: 0),
+      TileDefinition.Construct(imageFileNameToTileMaskDefinition: DEFAULT_FILE_TO_TILEMASK, connectionGroup: 1));
   }
 
   [TestMethod]

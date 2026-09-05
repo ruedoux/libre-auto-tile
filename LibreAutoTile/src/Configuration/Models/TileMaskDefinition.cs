@@ -73,21 +73,23 @@ public class TileMaskDefinition
 
   public override int GetHashCode()
   {
-    var hash = new HashCode();
+    int definitionsHash = 0;
 
-    foreach (var kvp in AtlasPositionToTileMaskAndChance)
+    foreach (var (atlasPosition, tileMasksAndChance) in AtlasPositionToTileMaskAndChance)
     {
-      hash.Add(kvp.Key);
+      var entryHash = new HashCode();
+      entryHash.Add(atlasPosition);
 
-      foreach (var (Mask, Chance) in kvp.Value)
+      foreach (var (Mask, Chance) in tileMasksAndChance)
       {
         foreach (var item in Mask)
-          hash.Add(item);
-
-        hash.Add(Chance);
+          entryHash.Add(item);
+        entryHash.Add(Chance);
       }
+
+      definitionsHash = unchecked(definitionsHash + entryHash.ToHashCode());
     }
 
-    return hash.ToHashCode();
+    return definitionsHash;
   }
 }

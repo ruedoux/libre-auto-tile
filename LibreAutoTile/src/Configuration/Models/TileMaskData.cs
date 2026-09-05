@@ -36,7 +36,6 @@ public class TileMaskData(ImmutableArray<int> mask, uint chance)
       return false;
 
     if (ReferenceEquals(this, other)) return true;
-    if (other is null) return false;
 
     return Chance == other.Chance &&
       Mask.SequenceEqual(other.Mask);

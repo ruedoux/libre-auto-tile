@@ -1,3 +1,5 @@
+#!/bin/bash
+
 for arg in "$@"; do
   case $arg in
     --test-method=*)

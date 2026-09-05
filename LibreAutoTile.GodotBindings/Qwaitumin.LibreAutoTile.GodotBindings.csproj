@@ -20,9 +20,19 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>Autotile algorithm implementation bindings for godot</Description>
-    <RepositoryUrl>https://github.com/ruedoux/libre-auto-tile/tree/main</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ruedoux/libre-auto-tile</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/ruedoux/libre-auto-tile</PackageProjectUrl>
     <PackageTags>auto tile libreautotile autotile libre godot bindings</PackageTags>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
+  </ItemGroup>
 
 </Project>

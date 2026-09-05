@@ -39,6 +39,11 @@ public class AutoTileConfigurationTest
       AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }),
       AutoTileConfiguration.Construct(0, new() { { 1, DEFAULT_TILE_DEFINITION } })
     );
+    SimpleEqualsVerifier.Verify(
+      AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 1),
+      AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 1),
+      AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 2)
+    );
   }
 
   [TestMethod]

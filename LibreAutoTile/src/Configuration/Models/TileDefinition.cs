@@ -54,7 +54,7 @@ public class TileDefinition(
         return false;
     }
 
-    return Name == other.Name && Color == other.Color;
+    return Name == other.Name && Color == other.Color && ConnectionGroup == other.ConnectionGroup;
   }
 
   public override int GetHashCode()
@@ -62,11 +62,13 @@ public class TileDefinition(
     var hash = new HashCode();
     hash.Add(Name);
     hash.Add(Color);
+    hash.Add(ConnectionGroup);
+
+    int definitionsHash = 0;
     foreach (var (k, v) in ImageFileNameToTileMaskDefinition)
-    {
-      hash.Add(k);
-      hash.Add(v);
-    }
+      definitionsHash = unchecked(definitionsHash + HashCode.Combine(k, v.GetHashCode()));
+    hash.Add(definitionsHash);
+
     return hash.ToHashCode();
   }
 }
