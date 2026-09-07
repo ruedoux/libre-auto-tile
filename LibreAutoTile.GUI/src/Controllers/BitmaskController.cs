@@ -13,7 +13,7 @@ public class BitmaskController
   public BitmaskController(EditorContext context)
   {
     this.context = context;
-    context.View.LayerControl.LayerSpinBox.ValueChanged += OnLayerSpinBoxChanged;
+    context.EditorScene.LayerControl.LayerSpinBox.ValueChanged += OnLayerSpinBoxChanged;
   }
 
   private void OnLayerSpinBoxChanged(double value)
@@ -26,19 +26,19 @@ public class BitmaskController
     if (GodotExtensions.IsMouseOnElements(context.UiElements))
       return;
 
-    var mousePosition = context.View.GetGlobalMousePosition();
+    var mousePosition = context.EditorScene.GetGlobalMousePosition();
     var mousePositionInt = new Vector2I((int)mousePosition.X, (int)mousePosition.Y);
 
     var mouseRightClicked = inputEventMouse.ButtonMask == MouseButtonMask.Right;
     var mouseLeftClicked = inputEventMouse.ButtonMask == MouseButtonMask.Left;
 
-    if (!new Rect2I(Vector2I.Zero, context.Data.ImageSize).HasPoint(mousePositionInt))
+    if (!new Rect2I(Vector2I.Zero, context.EditorData.ImageSize).HasPoint(mousePositionInt))
       return;
 
     if (mouseRightClicked)
       RemoveBitmaskSegment(mousePositionInt);
-    if (mouseLeftClicked && context.Data.Tiles.ActiveTile is not null)
-      AddBitmaskSegment(context.Data.Tiles.ActiveTile.TileId, mousePositionInt);
+    if (mouseLeftClicked && context.EditorData.Tiles.ActiveTile is not null)
+      AddBitmaskSegment(context.EditorData.Tiles.ActiveTile.TileId, mousePositionInt);
     if (mouseRightClicked || mouseLeftClicked)
       context.RedrawBitmask();
   }
@@ -46,27 +46,27 @@ public class BitmaskController
   private void AddBitmaskSegment(int tileId, Vector2 worldPosition)
   {
     var scaledTilePosition = TileSetMath.ScaleDownTilePosition(worldPosition, context.ScaledTileSize);
-    context.Data.BitmaskDatabase.CreateBitmaskData(context.Data.ImagePath, scaledTilePosition);
-    var bitmaskData = context.Data.BitmaskDatabase.GetBitmaskData(context.Data.ImagePath, scaledTilePosition)
+    context.EditorData.BitmaskDatabase.CreateBitmaskData(context.EditorData.ImagePath, scaledTilePosition);
+    var bitmaskData = context.EditorData.BitmaskDatabase.GetBitmaskData(context.EditorData.ImagePath, scaledTilePosition)
       ?? throw new NullReferenceException("BitmaskData is null");
     var bitmaskPosition = TileSetMath.DetermineBitmaskPosition(worldPosition, context.ScaledTileSize);
-    bitmaskData.AddBitmask(context.Data.CurrentLayer, tileId, bitmaskPosition);
+    bitmaskData.AddBitmask(context.EditorData.CurrentLayer, tileId, bitmaskPosition);
     context.RefreshImageOptions();
   }
 
   private void RemoveBitmaskSegment(Vector2 worldPosition)
   {
     var scaledTilePosition = TileSetMath.ScaleDownTilePosition(worldPosition, context.ScaledTileSize);
-    var bitmaskData = context.Data.BitmaskDatabase.GetBitmaskData(context.Data.ImagePath, scaledTilePosition);
+    var bitmaskData = context.EditorData.BitmaskDatabase.GetBitmaskData(context.EditorData.ImagePath, scaledTilePosition);
     if (bitmaskData is null) return;
 
     var bitmaskPosition = TileSetMath.DetermineBitmaskPosition(worldPosition, context.ScaledTileSize);
-    bitmaskData.RemoveBitmask(context.Data.CurrentLayer, bitmaskPosition);
+    bitmaskData.RemoveBitmask(context.EditorData.CurrentLayer, bitmaskPosition);
 
     if (bitmaskData.IsEmpty())
     {
-      context.Data.BitmaskDatabase.RemoveBitmaskData(context.Data.ImagePath, scaledTilePosition);
-      context.View.TileProbability.ChangeLabelProbability(scaledTilePosition, 1);
+      context.EditorData.BitmaskDatabase.RemoveBitmaskData(context.EditorData.ImagePath, scaledTilePosition);
+      context.EditorScene.TileProbability.ChangeLabelProbability(scaledTilePosition, 1);
     }
     context.RefreshImageOptions();
   }

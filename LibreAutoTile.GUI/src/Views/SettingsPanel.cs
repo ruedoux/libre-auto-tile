@@ -3,7 +3,7 @@ using Qwaitumin.LibreAutoTile.Configuration.Models;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Views;
 
-public partial class EditorSettings : MarginContainer
+public partial class SettingsPanel : MarginContainer
 {
   public readonly LineEdit TileSizeLineEdit;
   public readonly LineEdit FontSizeLineEdit;
@@ -25,7 +25,7 @@ public partial class EditorSettings : MarginContainer
   public event Action<long>? ResolutionSelected;
   public event Action<TileShape>? TileShapeSelected;
 
-  public EditorSettings()
+  public SettingsPanel()
   {
     this.ExpandFill();
 

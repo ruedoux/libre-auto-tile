@@ -97,9 +97,10 @@ public static class GodotExtensions
     return label;
   }
 
-  public static LineEdit AppendLineEdit(this Node parent)
+  public static LineEdit AppendLineEdit(this Node parent, string content = "")
   {
     var widget = new LineEdit();
+    widget.Text = content;
     parent.AddChild(widget);
     return widget;
   }

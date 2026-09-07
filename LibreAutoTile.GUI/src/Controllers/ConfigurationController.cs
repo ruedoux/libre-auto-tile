@@ -12,7 +12,7 @@ public class ConfigurationController
   public ConfigurationController(EditorContext context)
   {
     this.context = context;
-    var view = context.View;
+    var view = context.EditorScene;
     view.SelectImageButton.Pressed += ShowImageDialog;
     view.SelectImageDialog.FileSelected += LoadImageFromFile;
     view.SaveButton.Pressed += ShowSaveConfigurationDialog;
@@ -24,37 +24,41 @@ public class ConfigurationController
   }
 
   private void ShowImageDialog()
-    => context.View.SelectImageDialog.PopupCenteredRatio(Settings.DIALOG_SCREEN_RATIO);
+    => context.EditorScene.SelectImageDialog.PopupCenteredRatio(Settings.DIALOG_SCREEN_RATIO);
 
   private void ShowSaveConfigurationDialog()
-    => context.View.SaveConfigurationDialog.PopupCenteredRatio(Settings.DIALOG_SCREEN_RATIO);
+    => context.EditorScene.SaveConfigurationDialog.PopupCenteredRatio(Settings.DIALOG_SCREEN_RATIO);
 
   private void ShowLoadConfigurationDialog()
-    => context.View.LoadConfigurationDialog.PopupCenteredRatio(Settings.DIALOG_SCREEN_RATIO);
+    => context.EditorScene.LoadConfigurationDialog.PopupCenteredRatio(Settings.DIALOG_SCREEN_RATIO);
 
   private void SaveConfiguration(string filePath)
   {
     AutoTileConfiguration configuration = AutoTileConfigurationConverter.GetAsAutoTileConfiguration(
-      context.Data.Tiles.Tiles, context.Data.BitmaskDatabase, context.Data.TileSize, context.Data.TileShape);
+      context.EditorData.Tiles.Tiles, context.EditorData.BitmaskDatabase, context.EditorData.TileSize, context.EditorData.TileShape,
+      context.EditorData.WildcardId);
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
     GodotLogger.LOGGER.Log($"Saved to: {filePath}");
-    context.View.MessageDisplay.DisplayText($"[color=green]Saved to: {filePath}[/color]");
+    context.EditorScene.MessageDisplay.DisplayText($"[color=green]Saved to: {filePath}[/color]");
   }
 
   private void LoadConfiguration(string filePath)
   {
     AutoTileConfiguration autoTileConfiguration = AutoTileConfigurationConverter.LoadConfiguration(
-      filePath, context.Data.Tiles, context.Data.BitmaskDatabase);
+      filePath, context.EditorData.Tiles, context.EditorData.BitmaskDatabase);
 
-    context.Data.TileSize = (int)autoTileConfiguration.TileSize;
-    context.Data.TileShape = autoTileConfiguration.TileShape;
-    context.View.SettingsPanel.SetTileSizeText(context.Data.TileSize.ToString());
-    context.View.SettingsPanel.SelectTileShape(context.Data.TileShape);
+    context.EditorData.TileSize = (int)autoTileConfiguration.TileSize;
+    context.EditorData.TileShape = autoTileConfiguration.TileShape;
+    context.EditorScene.SettingsPanel.SetTileSizeText(context.EditorData.TileSize.ToString());
+    context.EditorScene.SettingsPanel.SelectTileShape(context.EditorData.TileShape);
 
-    context.Data.ImagePath = "";
-    context.Data.ImageSize = Vector2I.Zero;
-    context.View.ClearImage();
+    context.EditorData.WildcardId = (int?)autoTileConfiguration.WildcardId;
+    context.EditorScene.TilesPanel.SetWildcardIdText(context.EditorData.WildcardId?.ToString() ?? "");
+
+    context.EditorData.ImagePath = "";
+    context.EditorData.ImageSize = Vector2I.Zero;
+    context.EditorScene.ClearImage();
 
     context.RefreshTilesView();
     context.RedrawGrid();
@@ -62,33 +66,33 @@ public class ConfigurationController
     context.RedrawProbabilityLabels();
     context.Probability.ResetSelection();
 
-    string? firstImage = context.Data.BitmaskDatabase.GetAll().Keys.FirstOrDefault();
+    string? firstImage = context.EditorData.BitmaskDatabase.GetAll().Keys.FirstOrDefault();
     if (firstImage is not null)
     {
       if (File.Exists(firstImage))
         LoadImageFromPath(firstImage);
       else
-        context.View.MessageDisplay.DisplayText(
+        context.EditorScene.MessageDisplay.DisplayText(
           $"[color=yellow]Could not find image referenced by configuration: {firstImage}[/color]");
     }
 
     context.RefreshImageOptions();
     GodotLogger.LOGGER.Log($"Loaded from: {filePath}");
-    context.View.MessageDisplay.DisplayText($"[color=green]Loaded from: {filePath}[/color]");
+    context.EditorScene.MessageDisplay.DisplayText($"[color=green]Loaded from: {filePath}[/color]");
   }
 
   private void ClearConfiguration()
   {
     GodotLogger.LOGGER.Log("> Starting clearing editor state");
-    context.Data.Tiles.Clear();
-    context.Data.BitmaskDatabase.Clear();
+    context.EditorData.Tiles.Clear();
+    context.EditorData.BitmaskDatabase.Clear();
     context.RefreshTilesView();
     context.RedrawBitmask();
     context.RedrawProbabilityLabels();
     context.Probability.ResetSelection();
     context.RefreshImageOptions();
     GodotLogger.LOGGER.Log("> Finished clearing editor state");
-    context.View.MessageDisplay.DisplayText("[color=green]Cleared configuration[/color]");
+    context.EditorScene.MessageDisplay.DisplayText("[color=green]Cleared configuration[/color]");
   }
 
   private void LoadImageFromFile(string path)
@@ -103,11 +107,11 @@ public class ConfigurationController
       Image.Interpolation.Nearest);
 
     var texture = ImageTexture.CreateFromImage(image);
-    context.Data.ImagePath = relativePath;
-    context.Data.ImageSize = new Vector2I(image.GetWidth(), image.GetHeight());
+    context.EditorData.ImagePath = relativePath;
+    context.EditorData.ImageSize = new Vector2I(image.GetWidth(), image.GetHeight());
 
-    context.View.SetImage(texture);
-    context.View.SetCameraView(new(Vector2I.Zero, context.Data.ImageSize));
+    context.EditorScene.SetImage(texture);
+    context.EditorScene.SetCameraView(new(Vector2I.Zero, context.EditorData.ImageSize));
     context.RedrawGrid();
     context.RedrawProbabilityLabels();
     context.RedrawBitmask();
@@ -120,7 +124,7 @@ public class ConfigurationController
   {
     if (!File.Exists(imageName))
     {
-      context.View.MessageDisplay.DisplayText($"[color=yellow]Could not find image: {imageName}[/color]");
+      context.EditorScene.MessageDisplay.DisplayText($"[color=yellow]Could not find image: {imageName}[/color]");
       context.RefreshImageOptions();
       return;
     }

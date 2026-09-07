@@ -1,5 +1,4 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Models;
 using Qwaitumin.LibreAutoTile.GUI.Views.Presentation;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
@@ -14,7 +13,7 @@ public class TileController
   public TileController(EditorContext context)
   {
     this.context = context;
-    var view = context.View;
+    var view = context.EditorScene;
     view.TilesPanel.AddTileRequested += OnAddTileRequested;
     view.TilesPanel.RemoveRequested += OnTileRemoveRequested;
     view.TilesPanel.NameSubmitted += OnTileNameSubmitted;
@@ -24,11 +23,12 @@ public class TileController
     view.TilesPanel.MoveUpRequested += OnTileMoveUpRequested;
     view.TilesPanel.MoveDownRequested += OnTileMoveDownRequested;
     view.TilesPanel.ColorChanged += OnTileColorChanged;
+    view.TilesPanel.WildcardIdChanged += OnWildcardIdChanged;
   }
 
   private void OnAddTileRequested()
   {
-    var tile = context.Data.Tiles.AddNew();
+    var tile = context.EditorData.Tiles.AddNew();
     context.RefreshTilesView();
     GodotLogger.LOGGER.Log($"Added new tile: {tile.TileName}");
   }
@@ -37,14 +37,14 @@ public class TileController
   {
     var tile = TileViewMapper.ToModel(viewModel);
     TileDeleted?.Invoke(tile.TileId);
-    context.Data.Tiles.Remove(tile);
+    context.EditorData.Tiles.Remove(tile);
     context.RefreshTilesView();
     GodotLogger.LOGGER.Log($"Removed tile {tile.TileName}");
   }
 
   private void OnTileNameSubmitted(TileViewModel viewModel, string name)
   {
-    context.Data.Tiles.TryChangeName(TileViewMapper.ToModel(viewModel), name);
+    context.EditorData.Tiles.TryChangeName(TileViewMapper.ToModel(viewModel), name);
     context.RefreshTilesView();
   }
 
@@ -52,7 +52,7 @@ public class TileController
   {
     var tile = TileViewMapper.ToModel(viewModel);
     int oldId = tile.TileId;
-    context.Data.Tiles.TryChangeId(tile, text);
+    context.EditorData.Tiles.TryChangeId(tile, text);
     if (tile.TileId != oldId)
       TileIdChanged?.Invoke(tile.TileId, oldId);
     context.RefreshTilesView();
@@ -60,27 +60,27 @@ public class TileController
 
   private void OnTileConnectionGroupSubmitted(TileViewModel viewModel, string text)
   {
-    context.Data.Tiles.TryChangeConnectionGroup(TileViewMapper.ToModel(viewModel), text);
+    context.EditorData.Tiles.TryChangeConnectionGroup(TileViewMapper.ToModel(viewModel), text);
     context.RefreshTilesView();
   }
 
   private void OnTileSelectRequested(TileViewModel viewModel)
   {
     var tile = TileViewMapper.ToModel(viewModel);
-    context.Data.Tiles.SetActive(tile);
+    context.EditorData.Tiles.SetActive(tile);
     context.RefreshTilesView();
     context.RedrawBitmask();
   }
 
   private void OnTileMoveUpRequested(TileViewModel viewModel)
   {
-    context.Data.Tiles.MoveUp(TileViewMapper.ToModel(viewModel));
+    context.EditorData.Tiles.MoveUp(TileViewMapper.ToModel(viewModel));
     context.RefreshTilesView();
   }
 
   private void OnTileMoveDownRequested(TileViewModel viewModel)
   {
-    context.Data.Tiles.MoveDown(TileViewMapper.ToModel(viewModel));
+    context.EditorData.Tiles.MoveDown(TileViewMapper.ToModel(viewModel));
     context.RefreshTilesView();
   }
 
@@ -88,5 +88,17 @@ public class TileController
   {
     TileViewMapper.ToModel(viewModel).Color = color;
     context.RedrawBitmask();
+  }
+
+  private void OnWildcardIdChanged(string text)
+  {
+    if (string.IsNullOrWhiteSpace(text))
+    {
+      context.EditorData.WildcardId = null;
+      return;
+    }
+
+    if (int.TryParse(text, out int wildcardId) && wildcardId >= 0)
+      context.EditorData.WildcardId = wildcardId;
   }
 }

@@ -3,11 +3,12 @@ using Qwaitumin.LibreAutoTile.GUI.Views.Presentation;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Views;
 
-public partial class EditorTiles : MarginContainer
+public partial class TilesPanel : MarginContainer
 {
   public readonly Button AddTileButton;
   public readonly OptionButton ImageSelector;
   public readonly VBoxContainer TileList;
+  public readonly LineEdit WildcardLineEdit;
 
   private readonly HBoxContainer imageRow;
   private readonly List<string> imagePaths = [];
@@ -23,20 +24,25 @@ public partial class EditorTiles : MarginContainer
   public event Action<TileViewModel>? MoveUpRequested;
   public event Action<TileViewModel>? MoveDownRequested;
   public event Action<TileViewModel, Color>? ColorChanged;
+  public event Action<string>? WildcardIdChanged;
 
-  public EditorTiles()
+  public TilesPanel()
   {
     this.ExpandFill();
 
     var vbox = this.AppendVBox().ExpandFill();
-
     imageRow = vbox.AppendHBox().ExpandHorizontal();
-    imageRow.AppendLabel("Image").ExpandHorizontal().ExpandVertical();
     ImageSelector = imageRow.AppendOptionButton().ExpandHorizontal().ExpandVertical();
     imageRow.Visible = false;
+
+    var wildcardRow = vbox.AppendHBox().ExpandHorizontal();
+    wildcardRow.AppendLabel("Wildcard Id").ExpandHorizontal();
+    WildcardLineEdit = wildcardRow.AppendLineEdit().ExpandHorizontal();
     AddTileButton = vbox.AppendButton("Add new tile").ExpandHorizontal();
     TileList = vbox.AppendScroll().ExpandHorizontal().ExpandVertical()
       .AppendVBox().ExpandHorizontal();
+
+    WildcardLineEdit.TextChanged += text => WildcardIdChanged?.Invoke(text);
 
     AddTileButton.Pressed += () => AddTileRequested?.Invoke();
     ImageSelector.ItemSelected += idx =>
@@ -108,4 +114,6 @@ public partial class EditorTiles : MarginContainer
     TileList.RemoveChild(row);
     row.QueueFree();
   }
+
+  public void SetWildcardIdText(string text) => WildcardLineEdit.Text = text;
 }

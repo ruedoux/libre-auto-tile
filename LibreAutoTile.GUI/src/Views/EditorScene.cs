@@ -19,10 +19,10 @@ public partial class EditorScene : Control
   public readonly Button LoadButton;
   public readonly Button ClearButton;
   public readonly TabContainer OptionToolsTabs;
-  public readonly EditorSettings SettingsPanel;
-  public readonly EditorTiles TilesPanel;
-  public readonly EditorProbability ProbabilityPanel;
-  public readonly EditorPreview PreviewPanel;
+  public readonly SettingsPanel SettingsPanel;
+  public readonly TilesPanel TilesPanel;
+  public readonly ProbabilityPanel ProbabilityPanel;
+  public readonly PreviewPanel PreviewPanel;
 
   public readonly TextureRect ImageNode;
   public readonly FileDialog SelectImageDialog;
@@ -31,7 +31,7 @@ public partial class EditorScene : Control
 
   public readonly BitmaskDrawer BitmaskDrawer;
   public readonly TileProbability TileProbability;
-  public readonly EditorLayer LayerControl;
+  public readonly LayerControl LayerControl;
   public readonly MessageDisplay MessageDisplay;
 
   public EditorScene()
@@ -84,16 +84,10 @@ public partial class EditorScene : Control
       .ExpandVertical()
       .StretchRatio(0.45f);
 
-    var settingsPanel = new EditorSettings();
-    SettingsPanel = settingsPanel;
-    OptionToolsTabs.AddTab(settingsPanel, "Settings");
-
-    var tilesPanel = new EditorTiles();
-    TilesPanel = tilesPanel;
-    OptionToolsTabs.AddTab(tilesPanel, "Tiles");
-
-    ProbabilityPanel = OptionToolsTabs.AddTab(new EditorProbability(), "Chance");
-    PreviewPanel = OptionToolsTabs.AddTab(new EditorPreview(), "Preview");
+    SettingsPanel = OptionToolsTabs.AddTab(new SettingsPanel(), "Settings");
+    TilesPanel = OptionToolsTabs.AddTab(new TilesPanel(), "Tiles");
+    ProbabilityPanel = OptionToolsTabs.AddTab(new ProbabilityPanel(), "Chance");
+    PreviewPanel = OptionToolsTabs.AddTab(new PreviewPanel(), "Preview");
 
     var workspace = sc.AppendVBox().ExpandHorizontal().ExpandVertical();
 
@@ -113,7 +107,7 @@ public partial class EditorScene : Control
       .WithMargins(0, Settings.MARGIN_BIG, Settings.MARGIN_MEDIUM, Settings.MARGIN_MEDIUM);
     var bottomBarHbox = bottomBar.AppendHBox().ExpandHorizontal();
     bottomBarHbox.Alignment = BoxContainer.AlignmentMode.End;
-    LayerControl = bottomBarHbox.AppendChild(new EditorLayer());
+    LayerControl = bottomBarHbox.AppendChild(new LayerControl());
   }
 
   public override void _Ready()

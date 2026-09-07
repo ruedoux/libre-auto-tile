@@ -2,12 +2,12 @@ using Godot;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Views;
 
-public partial class EditorProbability : MarginContainer
+public partial class ProbabilityPanel : MarginContainer
 {
   public readonly SpinBox ProbabilitySpinBox;
   private readonly RichTextLabel positionLabel;
 
-  public EditorProbability()
+  public ProbabilityPanel()
   {
     this.ExpandFill();
 

@@ -16,21 +16,22 @@ public class PreviewController
 
   public void EnterPreview()
   {
-    context.View.HideWorkspace();
-    context.View.SetInfiniteCameraView();
-    context.View.ShowPreviewHighlight();
+    context.EditorScene.HideWorkspace();
+    context.EditorScene.SetInfiniteCameraView();
+    context.EditorScene.ShowPreviewHighlight();
 
     AutoTileConfiguration autoTileConfiguration = AutoTileConfigurationConverter.GetAsAutoTileConfiguration(
-      context.Data.Tiles.Tiles, context.Data.BitmaskDatabase, context.Data.TileSize, context.Data.TileShape);
-    context.View.PreviewPanel.InitializeTileMap(autoTileConfiguration, context.Data.TileShape);
-    context.View.PreviewPanel.AddCreatedTiles(
-      [.. context.Data.Tiles.Tiles.Select(t => (t.TileId, t.TileName))],
+      context.EditorData.Tiles.Tiles, context.EditorData.BitmaskDatabase, context.EditorData.TileSize, context.EditorData.TileShape,
+      context.EditorData.WildcardId);
+    context.EditorScene.PreviewPanel.InitializeTileMap(autoTileConfiguration, context.EditorData.TileShape);
+    context.EditorScene.PreviewPanel.AddCreatedTiles(
+      [.. context.EditorData.Tiles.Tiles.Select(t => (t.TileId, t.TileName))],
       autoTileConfiguration);
 
-    var autoTileMap = context.View.PreviewPanel.AutoTileMap;
+    var autoTileMap = context.EditorScene.PreviewPanel.AutoTileMap;
     if (autoTileMap is not null)
     {
-      context.View.AddChild(autoTileMap);
+      context.EditorScene.AddChild(autoTileMap);
       autoTileMap.Scale = new(Settings.IMAGE_SCALING, Settings.IMAGE_SCALING);
     }
 
@@ -39,13 +40,13 @@ public class PreviewController
 
   public void ExitPreview()
   {
-    context.View.ShowWorkspace();
-    context.View.HidePreviewHighlight();
-    context.View.SetCameraView(new(Vector2I.Zero, context.Data.ImageSize));
+    context.EditorScene.ShowWorkspace();
+    context.EditorScene.HidePreviewHighlight();
+    context.EditorScene.SetCameraView(new(Vector2I.Zero, context.EditorData.ImageSize));
 
-    var autoTileMap = context.View.PreviewPanel.AutoTileMap;
+    var autoTileMap = context.EditorScene.PreviewPanel.AutoTileMap;
     if (autoTileMap is not null)
-      context.View.RemoveChild(autoTileMap);
+      context.EditorScene.RemoveChild(autoTileMap);
 
     context.RedrawGrid();
     context.RedrawBitmask();
@@ -59,12 +60,12 @@ public class PreviewController
     if (GodotExtensions.IsMouseOnElements(context.UiElements))
       return;
 
-    var autoTileMap = context.View.PreviewPanel.AutoTileMap;
-    var activeTile = context.View.PreviewPanel.ActiveTile;
+    var autoTileMap = context.EditorScene.PreviewPanel.AutoTileMap;
+    var activeTile = context.EditorScene.PreviewPanel.ActiveTile;
     if (autoTileMap is null || activeTile is null)
       return;
 
-    var mousePosition = context.View.GetGlobalMousePosition();
+    var mousePosition = context.EditorScene.GetGlobalMousePosition();
     var mouseRightClicked = inputEventMouse.ButtonMask == MouseButtonMask.Right;
     var mouseLeftClicked = inputEventMouse.ButtonMask == MouseButtonMask.Left;
 

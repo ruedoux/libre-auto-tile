@@ -115,7 +115,8 @@ public static class Settings
 
   private static StyleBoxFlat CreateColorPickerStyle()
     => new StyleBoxFlat()
-      .WithCornerRadius(CORNER_RADIUS);
+      .WithCornerRadius(CORNER_RADIUS)
+      .WithBorderWidth(BORDER_WIDTH);
 
   private static StyleBoxFlat CreateTabStyle()
     => new StyleBoxFlat()

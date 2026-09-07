@@ -6,14 +6,14 @@ using Qwaitumin.LibreAutoTile.GUI.Models;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Views;
 
-public partial class EditorPreview : MarginContainer
+public partial class PreviewPanel : MarginContainer
 {
   public readonly VBoxContainer TileList;
 
   public AutoTileMap? AutoTileMap { get; private set; } = null;
   public PreviewTile? ActiveTile { get; private set; } = null;
 
-  public EditorPreview()
+  public PreviewPanel()
   {
     this.ExpandFill();
     TileList = this.AppendVBox().ExpandFill()

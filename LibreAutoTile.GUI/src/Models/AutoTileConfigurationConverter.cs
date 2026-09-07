@@ -9,7 +9,7 @@ namespace Qwaitumin.LibreAutoTile.GUI.Models;
 public static class AutoTileConfigurationConverter
 {
   public static AutoTileConfiguration GetAsAutoTileConfiguration(
-    IEnumerable<TileModel> createdTiles, BitmaskDatabase tileDatabase, int tileSize, TileShape tileShape)
+    IEnumerable<TileModel> createdTiles, BitmaskDatabase tileDatabase, int tileSize, TileShape tileShape, int? wildcardId)
   {
     var allMasks = GroupMasksByTileId(tileDatabase);
 
@@ -29,7 +29,9 @@ public static class AutoTileConfigurationConverter
     }
 
     return AutoTileConfiguration.Construct(
-      (uint)tileSize, tileDefinitions, tileShape: tileShape);
+      (uint)tileSize, tileDefinitions,
+      wildcardId: wildcardId is int id ? (uint)id : null,
+      tileShape: tileShape);
   }
 
   public static AutoTileConfiguration LoadConfiguration(

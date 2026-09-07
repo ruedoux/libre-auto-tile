@@ -15,23 +15,23 @@ public class ProbabilityController
   public ProbabilityController(EditorContext context)
   {
     this.context = context;
-    context.View.ProbabilityPanel.ProbabilitySpinBox.ValueChanged += OnProbabilitySpinBoxChanged;
+    context.EditorScene.ProbabilityPanel.ProbabilitySpinBox.ValueChanged += OnProbabilitySpinBoxChanged;
   }
 
   public void EnterProbability()
   {
-    context.View.TileProbability.Show();
+    context.EditorScene.TileProbability.Show();
     context.RedrawProbabilityLabels();
-    selectedProbabilityTile = context.Data.ImagePath == "" ? null : Vector2I.Zero;
+    selectedProbabilityTile = context.EditorData.ImagePath == "" ? null : Vector2I.Zero;
     SyncSpinBox();
     RedrawSelection();
   }
 
   public void ExitProbability()
   {
-    context.View.TileProbability.Hide();
+    context.EditorScene.TileProbability.Hide();
     selectedProbabilityTile = null;
-    context.View.ClearProbabilitySelection();
+    context.EditorScene.ClearProbabilitySelection();
     SyncSpinBox();
   }
 
@@ -42,7 +42,7 @@ public class ProbabilityController
     if (GodotExtensions.IsMouseOnElements(context.UiElements))
       return;
 
-    var mousePosition = context.View.GetGlobalMousePosition();
+    var mousePosition = context.EditorScene.GetGlobalMousePosition();
     var mousePositionInt = new Vector2I((int)mousePosition.X, (int)mousePosition.Y);
 
     var mouseLeftClicked = inputEventMouse.ButtonMask == MouseButtonMask.Left;
@@ -53,7 +53,7 @@ public class ProbabilityController
   private void SelectProbabilityTile(Vector2I worldPosition)
   {
     var scaledTilePosition = TileSetMath.ScaleDownTilePosition(worldPosition, context.ScaledTileSize);
-    var bitmaskData = context.Data.BitmaskDatabase.GetBitmaskData(context.Data.ImagePath, scaledTilePosition);
+    var bitmaskData = context.EditorData.BitmaskDatabase.GetBitmaskData(context.EditorData.ImagePath, scaledTilePosition);
     if (bitmaskData is null || bitmaskData.IsEmpty())
       return;
 
@@ -70,7 +70,7 @@ public class ProbabilityController
     if (!TryGetSelectedBitmaskData(out var bitmaskData))
       return;
 
-    long currentValue = bitmaskData.GetProbability(context.Data.CurrentLayer);
+    long currentValue = bitmaskData.GetProbability(context.EditorData.CurrentLayer);
     SetSelectedProbability((uint)Math.Clamp(currentValue + delta, 0L, uint.MaxValue));
   }
 
@@ -79,9 +79,9 @@ public class ProbabilityController
     if (!TryGetSelectedBitmaskData(out var bitmaskData))
       return;
 
-    bitmaskData.SetProbability(context.Data.CurrentLayer, value);
-    context.View.TileProbability.ChangeLabelProbability(selectedProbabilityTile!.Value, value);
-    context.View.ProbabilityPanel.SetProbabilityValue(value);
+    bitmaskData.SetProbability(context.EditorData.CurrentLayer, value);
+    context.EditorScene.TileProbability.ChangeLabelProbability(selectedProbabilityTile!.Value, value);
+    context.EditorScene.ProbabilityPanel.SetProbabilityValue(value);
   }
 
   private bool TryGetSelectedBitmaskData(out BitmaskData bitmaskData)
@@ -90,7 +90,7 @@ public class ProbabilityController
     if (selectedProbabilityTile is null)
       return false;
 
-    var result = context.Data.BitmaskDatabase.GetBitmaskData(context.Data.ImagePath, selectedProbabilityTile.Value);
+    var result = context.EditorData.BitmaskDatabase.GetBitmaskData(context.EditorData.ImagePath, selectedProbabilityTile.Value);
     if (result is null || result.IsEmpty())
       return false;
 
@@ -100,29 +100,29 @@ public class ProbabilityController
 
   public void SyncSpinBox()
   {
-    context.View.ProbabilityPanel.SetSelectedPosition(selectedProbabilityTile);
+    context.EditorScene.ProbabilityPanel.SetSelectedPosition(selectedProbabilityTile);
     bool hasData = TryGetSelectedBitmaskData(out var bitmaskData);
-    context.View.ProbabilityPanel.SetProbabilityEnabled(hasData);
+    context.EditorScene.ProbabilityPanel.SetProbabilityEnabled(hasData);
     if (hasData)
-      context.View.ProbabilityPanel.SetProbabilityValue(bitmaskData.GetProbability(context.Data.CurrentLayer));
+      context.EditorScene.ProbabilityPanel.SetProbabilityValue(bitmaskData.GetProbability(context.EditorData.CurrentLayer));
   }
 
   public void RedrawSelection()
   {
     if (selectedProbabilityTile is null)
     {
-      context.View.ClearProbabilitySelection();
+      context.EditorScene.ClearProbabilitySelection();
       return;
     }
 
-    context.View.RedrawProbabilitySelection(
-      selectedProbabilityTile.Value * context.ScaledTileSize, context.Appearance.SelectionColor, context.ScaledTileSize);
+    context.EditorScene.RedrawProbabilitySelection(
+      selectedProbabilityTile.Value * context.ScaledTileSize, context.AppearanceSettings.SelectionColor, context.ScaledTileSize);
   }
 
   public void ResetSelection()
   {
     selectedProbabilityTile = null;
-    context.View.ClearProbabilitySelection();
+    context.EditorScene.ClearProbabilitySelection();
     SyncSpinBox();
   }
 }

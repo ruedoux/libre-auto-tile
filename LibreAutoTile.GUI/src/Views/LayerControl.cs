@@ -2,11 +2,11 @@ using Godot;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Views;
 
-public partial class EditorLayer : HBoxContainer
+public partial class LayerControl : HBoxContainer
 {
   public readonly SpinBox LayerSpinBox;
 
-  public EditorLayer()
+  public LayerControl()
   {
     this.AppendLabel("Layer").ExpandVertical().FitContent().DisableAutowrap();
 

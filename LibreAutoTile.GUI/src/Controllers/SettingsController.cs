@@ -1,6 +1,5 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.GUI.Models;
 using Qwaitumin.LibreAutoTile.GUI.Views;
 
 namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
@@ -12,7 +11,7 @@ public class SettingsController
   public SettingsController(EditorContext context)
   {
     this.context = context;
-    var view = context.View.SettingsPanel;
+    var view = context.EditorScene.SettingsPanel;
     view.GridColorChanged += OnGridColorChanged;
     view.SelectionColorChanged += OnSelectionColorChanged;
     view.GuiColorChanged += OnGuiColorChanged;
@@ -26,9 +25,9 @@ public class SettingsController
 
   public static void SeedViewFromModel(EditorContext context)
   {
-    var appearance = context.Appearance;
-    var view = context.View.SettingsPanel;
-    view.SetTileSizeText(context.Data.TileSize.ToString());
+    var appearance = context.AppearanceSettings;
+    var view = context.EditorScene.SettingsPanel;
+    view.SetTileSizeText(context.EditorData.TileSize.ToString());
     view.SetFontSizeText(appearance.FontSize.ToString());
     view.SetGuiColor(appearance.GuiColor);
     view.SetSelectionColor(appearance.SelectionColor);
@@ -36,7 +35,8 @@ public class SettingsController
     view.SetGridColor(appearance.GridColor);
     view.SetProbabilityColor(appearance.ProbabilityColor);
     view.SelectResolution(GetResolutionIndex(appearance.WindowSize));
-    view.SelectTileShape(context.Data.TileShape);
+    view.SelectTileShape(context.EditorData.TileShape);
+    context.EditorScene.TilesPanel.SetWildcardIdText(context.EditorData.WildcardId?.ToString() ?? "");
 
     Settings.ApplyGuiColor(appearance.GuiColor);
     Settings.ApplyBackgroundColor(appearance.BackgroundColor);
@@ -44,29 +44,29 @@ public class SettingsController
 
   private void OnGridColorChanged(Color color)
   {
-    context.Appearance.GridColor = color;
+    context.AppearanceSettings.GridColor = color;
     context.RedrawGrid();
   }
 
   private void OnSelectionColorChanged(Color color)
-    => context.Appearance.SelectionColor = color;
+    => context.AppearanceSettings.SelectionColor = color;
 
   private void OnGuiColorChanged(Color color)
   {
-    context.Appearance.GuiColor = color;
+    context.AppearanceSettings.GuiColor = color;
     Settings.ApplyGuiColor(color);
   }
 
   private void OnBackgroundColorChanged(Color color)
   {
-    context.Appearance.BackgroundColor = color;
+    context.AppearanceSettings.BackgroundColor = color;
     Settings.ApplyBackgroundColor(color);
   }
 
   private void OnProbabilityColorChanged(Color color)
   {
-    context.Appearance.ProbabilityColor = color;
-    context.View.TileProbability.UpdateFontColor(color);
+    context.AppearanceSettings.ProbabilityColor = color;
+    context.EditorScene.TileProbability.UpdateFontColor(color);
   }
 
   private void OnTileSizeChanged(string text)
@@ -74,7 +74,7 @@ public class SettingsController
     if (!int.TryParse(text, out var size) || size <= 0)
       return;
 
-    context.Data.TileSize = size;
+    context.EditorData.TileSize = size;
     RedrawTiles();
   }
 
@@ -83,20 +83,20 @@ public class SettingsController
     if (!int.TryParse(text, out var fontSize) || fontSize <= 0)
       return;
 
-    context.Appearance.FontSize = fontSize;
+    context.AppearanceSettings.FontSize = fontSize;
     Settings.ApplyFontSize(fontSize);
   }
 
   private void OnResolutionChanged(long index)
   {
     var resolution = Settings.RESOLUTIONS[(int)index];
-    context.Appearance.WindowSize = resolution;
+    context.AppearanceSettings.WindowSize = resolution;
     DisplayServer.WindowSetSize(resolution);
   }
 
   private void OnTileShapeChanged(TileShape tileShape)
   {
-    context.Data.TileShape = tileShape;
+    context.EditorData.TileShape = tileShape;
     RedrawTiles();
   }
 

@@ -83,9 +83,9 @@ public class EditorController
     }
 
     var snappedTilePosition = TileSetMath.SnapToTileCorner(mousePosition, context.ScaledTileSize);
-    context.View.RedrawTile(snappedTilePosition, context.Appearance.SelectionColor, context.ScaledTileSize, context.Data.TileShape);
+    context.EditorScene.RedrawTile(snappedTilePosition, context.AppearanceSettings.SelectionColor, context.ScaledTileSize, context.EditorData.TileShape);
     var tilePosition = TileSetMath.ScaleDownTilePosition(mousePosition, context.ScaledTileSize);
-    context.View.DisplayTileLabel(tilePosition.ToString());
+    context.EditorScene.DisplayTileLabel(tilePosition.ToString());
 
     if (context.ActiveTool == EditorTool.Tiles)
       RedrawBitmaskGhost(mousePosition);
@@ -93,7 +93,7 @@ public class EditorController
 
   private void RedrawPreviewHighlight(Vector2 mousePosition)
   {
-    var autoTileMap = context.View.PreviewPanel.AutoTileMap;
+    var autoTileMap = context.EditorScene.PreviewPanel.AutoTileMap;
     if (autoTileMap is null)
       return;
 
@@ -101,16 +101,16 @@ public class EditorController
     // MapToLocal returns the center of the cell; convert to the tile's bounding-box top-left.
     // The isometric diamond bounding box is tileSize wide and tileSize/2 tall.
     Vector2 center = autoTileMap.GetTileMapLayer(0).MapToLocal(mapPosition) * Settings.IMAGE_SCALING;
-    Vector2 tileTopLeft = context.Data.TileShape == TileShape.Isometric
+    Vector2 tileTopLeft = context.EditorData.TileShape == TileShape.Isometric
       ? center - new Vector2(context.ScaledTileSize / 2f, context.ScaledTileSize / 4f)
       : center - new Vector2(context.ScaledTileSize / 2f, context.ScaledTileSize / 2f);
 
-    context.View.RedrawPreviewHighlight(
-      tileTopLeft, context.Appearance.SelectionColor, context.ScaledTileSize, context.Data.TileShape);
+    context.EditorScene.RedrawPreviewHighlight(
+      tileTopLeft, context.AppearanceSettings.SelectionColor, context.ScaledTileSize, context.EditorData.TileShape);
   }
 
   private void RedrawBitmaskGhost(Vector2 worldPosition)
-    => context.View.BitmaskDrawer.RedrawBitmaskGhost(
+    => context.EditorScene.BitmaskDrawer.RedrawBitmaskGhost(
       worldPosition, context.ScaledTileSize, new(r: 255f, g: 255f, b: 255f, a: 0.5f));
 
   private void OnTabChanged(long tab)
@@ -119,15 +119,15 @@ public class EditorController
 
     if (IsTab(newTab, PREVIEW_TAB_NAME) && !context.HasAnyBitmaskCentre())
     {
-      context.View.MessageDisplay.DisplayText("[color=red]No bitmask data to preview[/color]");
-      context.View.OptionToolsTabs.CurrentTab = previousTabIndex;
+      context.EditorScene.MessageDisplay.DisplayText("[color=red]No bitmask data to preview[/color]");
+      context.EditorScene.OptionToolsTabs.CurrentTab = previousTabIndex;
       return;
     }
 
-    if (IsTab(newTab, PROBABILITY_TAB_NAME) && context.Data.ImagePath == "")
+    if (IsTab(newTab, PROBABILITY_TAB_NAME) && context.EditorData.ImagePath == "")
     {
-      context.View.MessageDisplay.DisplayText("[color=red]No tileset loaded[/color]");
-      context.View.OptionToolsTabs.CurrentTab = previousTabIndex;
+      context.EditorScene.MessageDisplay.DisplayText("[color=red]No tileset loaded[/color]");
+      context.EditorScene.OptionToolsTabs.CurrentTab = previousTabIndex;
       return;
     }
 
@@ -160,12 +160,12 @@ public class EditorController
   }
 
   private bool IsTab(int tabIndex, string name)
-    => context.View.OptionToolsTabs.GetTabTitle(tabIndex) == name;
+    => context.EditorScene.OptionToolsTabs.GetTabTitle(tabIndex) == name;
 
   private void SetLayer(int layer)
   {
-    context.Data.CurrentLayer = layer;
-    context.View.LayerControl.SetLayer(layer);
+    context.EditorData.CurrentLayer = layer;
+    context.EditorScene.LayerControl.SetLayer(layer);
     context.RedrawBitmask();
     context.RedrawProbabilityLabels();
     probabilityController.SyncSpinBox();
@@ -189,18 +189,18 @@ public class EditorController
       return;
     }
 
-    context.View.CameraControl.ZoomCamera(delta * context.View.CameraControl.ZoomValue);
+    context.EditorScene.CameraControl.ZoomCamera(delta * context.EditorScene.CameraControl.ZoomValue);
   }
 
   private void OnTileDeleted(int tileId)
   {
-    foreach (var (_, positionToPackedTileData) in context.Data.BitmaskDatabase.GetAll())
+    foreach (var (_, positionToPackedTileData) in context.EditorData.BitmaskDatabase.GetAll())
     {
       foreach (var (position, bitmaskData) in positionToPackedTileData)
       {
         foreach (var layer in bitmaskData.GetLayers())
           if (bitmaskData.GetCentreTileId(layer) == tileId)
-            context.View.TileProbability.ChangeLabelProbability(position, 1);
+            context.EditorScene.TileProbability.ChangeLabelProbability(position, 1);
 
         bitmaskData.RemoveTileId(tileId);
       }
@@ -211,7 +211,7 @@ public class EditorController
 
   private void OnTileIdChanged(int newId, int oldId)
   {
-    foreach (var (_, positionToPackedTileData) in context.Data.BitmaskDatabase.GetAll())
+    foreach (var (_, positionToPackedTileData) in context.EditorData.BitmaskDatabase.GetAll())
       foreach (var (_, bitmaskData) in positionToPackedTileData)
         bitmaskData.ChangeTileId(newId, oldId);
     context.RedrawBitmask();
