@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://dr2gx1bk3sjar"]
+
+[ext_resource type="Script" uid="uid://ce161nue1l1m7" path="res://Scenes/Comparasion/Compare.cs" id="1_compare"]
+
+[node name="Compare" type="Node2D" unique_id=492483783]
+script = ExtResource("1_compare")
+
+[node name="TimeLayer" type="CanvasLayer" parent="." unique_id=1382741759]
+
+[node name="TimeContainer" type="MarginContainer" parent="TimeLayer" unique_id=1499350407]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="TimeLabel" type="Label" parent="TimeLayer/TimeContainer" unique_id=1085198152]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 64
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MenuLayer" type="CanvasLayer" parent="." unique_id=260896493]
+
+[node name="MarginContainer" type="MarginContainer" parent="MenuLayer" unique_id=533158658]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuLayer/MarginContainer" unique_id=747875421]
+layout_mode = 2
+
+[node name="Settings" type="MarginContainer" parent="MenuLayer/MarginContainer/VBoxContainer" unique_id=1498280362]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 64
+theme_override_constants/margin_top = 128
+theme_override_constants/margin_right = 64
+theme_override_constants/margin_bottom = 64
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuLayer/MarginContainer/VBoxContainer/Settings" unique_id=421716244]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MenuLayer/MarginContainer/VBoxContainer/Settings/VBoxContainer" unique_id=1124704482]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Map Size"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/MarginContainer/VBoxContainer/Settings/VBoxContainer" unique_id=693088498]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="x" type="LineEdit" parent="MenuLayer/MarginContainer/VBoxContainer/Settings/VBoxContainer/HBoxContainer" unique_id=419933187]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "512"
+alignment = 1
+
+[node name="Label" type="Label" parent="MenuLayer/MarginContainer/VBoxContainer/Settings/VBoxContainer/HBoxContainer" unique_id=1431509737]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "x"
+
+[node name="y" type="LineEdit" parent="MenuLayer/MarginContainer/VBoxContainer/Settings/VBoxContainer/HBoxContainer" unique_id=34645112]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "512"
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/MarginContainer/VBoxContainer" unique_id=1920171466]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LATButton" type="Button" parent="MenuLayer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1230732935]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "LibreAutoTile"
+
+[node name="BuiltInButton" type="Button" parent="MenuLayer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=410711202]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "Godot AutoTile 
+(built in)"
+
+[node name="BoxContainer" type="BoxContainer" parent="MenuLayer/MarginContainer/VBoxContainer" unique_id=1876004949]
+layout_mode = 2
+size_flags_vertical = 3

@@ -13,7 +13,7 @@ error() { echo -e "${RED_COLOR}[ERROR]${NO_COLOR} $@"; }
 build_gui() {
   info "Building GUI"
   info "Godot Version"
-  godot --version --quit
+  godot --version
 
   info "Download rcedit"
   if [ ! -f "rcedit-x64.exe" ]; then
@@ -120,7 +120,7 @@ publish_release() {
     build_libs
     build_gui
     run_all_tests
-    run_benchmark
+    #run_benchmark
 
     if [[ "${CI:-}" == "true" ]]; then
         # CI detected, skip prompts
