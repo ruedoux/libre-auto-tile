@@ -21,29 +21,35 @@ internal class TileMapDrawer(TileMapWrapper[] tileMapWrappers) : ITileMapDrawer
     if (tileLayer >= tileMapWrappers.Length)
       throw new ArgumentException($"No layer: {tileLayer}");
 
-    Callable.From(() =>
+    if (OS.GetThreadCallerId() == OS.GetMainThreadId())
+      DrawTilesImmediate(tileLayer, positionsToTileData);
+    else
+      Callable.From(() => DrawTilesImmediate(tileLayer, positionsToTileData)).CallDeferred();
+  }
+
+  private void DrawTilesImmediate(
+    int tileLayer, IEnumerable<(Configuration.Models.Vector2, Tiling.TileData)> positionsToTileData)
+  {
+    foreach (var (position, tileData) in positionsToTileData)
     {
-      foreach (var (position, tileData) in positionsToTileData)
+      Vector2I? atlasCoords = null;
+      var sourceId = -1;
+      if (tileData.TileAtlas.ImageFileName is not null && tileData.TileAtlas.ImageFileName != "")
       {
-        Vector2I? atlasCoords = null;
-        var sourceId = -1;
-        if (tileData.TileAtlas.ImageFileName is not null && tileData.TileAtlas.ImageFileName != "")
+        if (tileMapWrappers[tileLayer].ImageFileToSourceId.TryGetValue(tileData.TileAtlas.ImageFileName, out int overrideSourceId))
         {
-          if (tileMapWrappers[tileLayer].ImageFileToSourceId.TryGetValue(tileData.TileAtlas.ImageFileName, out int overrideSourceId))
+          var atlas = GodotTypeMapper.Map(tileData.TileAtlas.Position);
+          var source = tileMapWrappers[tileLayer].TileMapLayer.TileSet.GetSource(overrideSourceId);
+          if (source.HasTile(atlas))
           {
-            var atlas = GodotTypeMapper.Map(tileData.TileAtlas.Position);
-            var source = tileMapWrappers[tileLayer].TileMapLayer.TileSet.GetSource(overrideSourceId);
-            if (source.HasTile(atlas))
-            {
-              atlasCoords = atlas;
-              sourceId = overrideSourceId;
-            }
+            atlasCoords = atlas;
+            sourceId = overrideSourceId;
           }
         }
-
-        tileMapWrappers[tileLayer].TileMapLayer.SetCell(GodotTypeMapper.Map(position), sourceId, atlasCoords);
       }
-    }).CallDeferred();
+
+      tileMapWrappers[tileLayer].TileMapLayer.SetCell(GodotTypeMapper.Map(position), sourceId, atlasCoords);
+    }
   }
 
   public int GetSourceId(string imageFileName)

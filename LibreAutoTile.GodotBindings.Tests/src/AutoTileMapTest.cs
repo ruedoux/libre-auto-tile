@@ -33,6 +33,27 @@ public class AutoTileMapTest
   }
 
   [TestMethod]
+  public void DrawTiles_PlacesTileMapTileSynchronously_WhenCalledOnMainThread()
+  {
+    // Given
+    var autoTileConfiguration = AutoTileConfiguration.LoadFromFile(CONFIG_PATH);
+    AutoTileMap autoTileMap = GodotAccess.RunOnMainThread(
+      () => new AutoTileMap(1, autoTileConfiguration));
+    GodotAccess.AddNodeToTree(autoTileMap);
+
+    // When
+    var sourceId = GodotAccess.RunOnMainThread(() =>
+    {
+      autoTileMap.DrawTiles(0, [(Vector2I.Zero, (int)TILES.GRASS)]);
+      return autoTileMap.GetTileMapLayer(0).GetCellSourceId(Vector2I.Zero);
+    });
+
+    // Then
+    Assertions.AssertNotEqual(-1, sourceId);
+    autoTileMap.QueueFree();
+  }
+
+  [TestMethod]
   public void DrawTilesAsync_PlacesTileMapTile_WhenCalled()
   {
     // Given
