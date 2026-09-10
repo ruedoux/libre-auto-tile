@@ -13,13 +13,17 @@ public class AutoTileMap : Node2D
   /// <summary>
   /// Constructs the tile map. Must be called on the main thread: this creates Godot
   /// Resources and Nodes (image loading, TileSet/atlas sources, CreateTile, AddChild)
-  /// that are not safe to build from a background thread
+  /// that are not safe to build from a background thread.
+  /// Throws <see cref="InvalidOperationException"/> when not called on the main thread.
   /// </summary>
   public AutoTileMap(
     int layerCount,
     AutoTileConfiguration autoTileConfiguration,
     TileSet.TileShapeEnum tileShape = TileSet.TileShapeEnum.Square)
   {
+    if (OS.GetThreadCallerId() != OS.GetMainThreadId())
+      throw new InvalidOperationException("AutoTileMap must be constructed on the main thread.");
+
     foreach (var (_, tileDefinition) in autoTileConfiguration.TileDefinitions)
       foreach (var (imageFileName, _) in tileDefinition.ImageFileNameToTileMaskDefinition)
         if (!File.Exists(imageFileName))

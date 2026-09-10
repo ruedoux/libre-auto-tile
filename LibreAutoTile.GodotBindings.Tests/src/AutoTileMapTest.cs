@@ -54,6 +54,14 @@ public class AutoTileMapTest
   }
 
   [TestMethod]
+  public void Constructor_Throws_WhenCalledOffMainThread()
+  {
+    var autoTileConfiguration = AutoTileConfiguration.LoadFromFile(CONFIG_PATH);
+    Assertions.AssertThrows<InvalidOperationException>(
+      () => new AutoTileMap(1, autoTileConfiguration));
+  }
+
+  [TestMethod]
   public void DrawTilesAsync_PlacesTileMapTile_WhenCalled()
   {
     // Given
