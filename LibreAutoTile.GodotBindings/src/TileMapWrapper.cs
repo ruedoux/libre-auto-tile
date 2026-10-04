@@ -1,6 +1,8 @@
 using System.Collections.Frozen;
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
+using Qwaitumin.LibreAutoTile.Configuration.Models;
+using Qwaitumin.LibreAutoTile.Tiling;
 
 namespace Qwaitumin.LibreAutoTile.GodotBindings;
 
@@ -11,18 +13,19 @@ internal class TileMapWrapper
 
   public TileMapWrapper(
     AutoTileConfiguration autoTileConfiguration,
-    TileSet.TileShapeEnum tileShape = TileSet.TileShapeEnum.Square)
+    TileShape tileShape = TileShape.Square)
   {
     int tileSize = (int)autoTileConfiguration.TileSize;
-    Dictionary<string, HashSet<Vector2I>> imageFileNamesToAtlasPositions = GetImageFileNameToAtlasPositions(
+    var imageFileNamesToAtlasPositions = AutoTileConfigurationExtractor.GetImageFileNameToAtlasPositions(
       autoTileConfiguration);
 
+    TileSet.TileShapeEnum godotTileShape = GodotTypeMapper.Map(tileShape);
     TileSet tileSet = new()
     {
-      TileShape = tileShape,
-      TileSize = GetTileSizeForShape(tileShape, tileSize)
+      TileShape = godotTileShape,
+      TileSize = GodotTypeMapper.Map(tileShape.GetCellSize(tileSize))
     };
-    if (tileShape == TileSet.TileShapeEnum.Isometric)
+    if (godotTileShape == TileSet.TileShapeEnum.Isometric)
       tileSet.TileLayout = TileSet.TileLayoutEnum.DiamondDown;
     Dictionary<string, int> imageFileToSourceId = [];
     foreach (var (imageFileName, atlasPositions) in imageFileNamesToAtlasPositions)
@@ -31,7 +34,7 @@ internal class TileMapWrapper
       imageFileToSourceId[imageFileName] = sourceId;
       var source = (TileSetAtlasSource)tileSet.GetSource(sourceId);
       foreach (var atlasPosition in atlasPositions)
-        source.CreateTile(atlasPosition);
+        source.CreateTile(GodotTypeMapper.Map(atlasPosition));
     }
 
     TileMapLayer = new()
@@ -41,13 +44,6 @@ internal class TileMapWrapper
     };
 
     ImageFileToSourceId = imageFileToSourceId.ToFrozenDictionary();
-  }
-
-  private static Vector2I GetTileSizeForShape(TileSet.TileShapeEnum tileShape, int atlasTileSize)
-  {
-    if (tileShape == TileSet.TileShapeEnum.Isometric)
-      return new Vector2I(atlasTileSize, Math.Max(1, atlasTileSize / 2));
-    return new Vector2I(atlasTileSize, atlasTileSize);
   }
 
   private static int AddSource(TileSet tileSet, string sourceImagePath, int tileSize)
@@ -61,28 +57,5 @@ internal class TileMapWrapper
     };
 
     return tileSet.AddSource(source);
-  }
-
-  private static Dictionary<string, HashSet<Vector2I>> GetImageFileNameToAtlasPositions(
-    AutoTileConfiguration autoTileConfiguration)
-  {
-    Dictionary<string, HashSet<Vector2I>> imageFileNamesToAtlasPositions = [];
-    foreach (var (_, tileDefinition) in autoTileConfiguration.TileDefinitions)
-    {
-      foreach (var (ImageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
-      {
-        foreach (var (atlasPosition, _) in tileMaskDefinition.AtlasPositionToTileMaskAndChance)
-        {
-          if (!imageFileNamesToAtlasPositions.TryGetValue(ImageFileName, out var atlasPositions))
-          {
-            atlasPositions = [];
-            imageFileNamesToAtlasPositions[ImageFileName] = atlasPositions;
-          }
-          atlasPositions.Add(GodotTypeMapper.Map(atlasPosition.ToVector2()));
-        }
-      }
-    }
-
-    return imageFileNamesToAtlasPositions;
   }
 }

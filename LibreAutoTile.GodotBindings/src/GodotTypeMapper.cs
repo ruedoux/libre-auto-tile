@@ -28,4 +28,7 @@ public static class GodotTypeMapper
 
   public static Color Map(TileColor color)
     => new(color.Rf, color.Gf, color.Bf, color.Af);
+
+  public static TileSet.TileShapeEnum Map(TileShape tileShape)
+    => tileShape == TileShape.Isometric ? TileSet.TileShapeEnum.Isometric : TileSet.TileShapeEnum.Square;
 }

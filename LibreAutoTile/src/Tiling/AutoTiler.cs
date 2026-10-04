@@ -14,31 +14,36 @@ public class AutoTiler
     Vector2.TopLeft, Vector2.Top, Vector2.TopRight, Vector2.Right, Vector2.BottomRight, Vector2.Bottom, Vector2.BottomLeft, Vector2.Left];
 
   private readonly FrozenDictionary<int, TileSearcher> tileSearcherById;
-  private readonly IAutoTilerData autoTilerData;
+  private readonly AutoTilerData autoTilerData;
 
   private readonly object[] layerToLock;
+  private readonly HashSet<Vector2>[] layerToDirtyPositions;
 
   /// <summary>
-  /// Leaving mapSize as default (0,0) makes the map dynamic (dictionary).
-  /// Passing a size makes the map static size (array).
+  /// chunkSize must be a power of two and controls the size of each dynamically allocated chunk.
+  /// chunkPoolCapacity controls how many freed chunk arrays are kept for reuse (0 disables pooling).
+  /// Memory note: a chunk holds chunkSize² × ~64 B. At the default 128² that is ~1 MB/chunk,
+  /// so a pool of 64 retains up to ~64 MB of chunk arrays in steady state.
   /// </summary>
   public AutoTiler(
     int layerCount,
     IReadOnlyDictionary<int, TileSearcher> tileIdToTileMaskSearcher,
-    Vector2 mapSize = default)
+    int chunkSize = 128,
+    int chunkPoolCapacity = 64)
   {
     if (layerCount < 1)
       throw new ArgumentOutOfRangeException(nameof(layerCount), $"Layer count must be at least 1, given: {layerCount}");
 
-    if (mapSize == default)
-      autoTilerData = new AutoTilerDataDynamic(layerCount);
-    else
-      autoTilerData = new AutoTilerDataStatic(layerCount, mapSize);
+    autoTilerData = new AutoTilerData(layerCount, chunkSize, chunkPoolCapacity);
 
     tileSearcherById = tileIdToTileMaskSearcher.ToFrozenDictionary();
     layerToLock = new object[layerCount];
+    layerToDirtyPositions = new HashSet<Vector2>[layerCount];
     for (int i = 0; i < layerCount; i++)
+    {
       layerToLock[i] = new object();
+      layerToDirtyPositions[i] = new(Vector2FastComparer.INSTANCE);
+    }
   }
 
   public void Clear()
@@ -65,6 +70,12 @@ public class AutoTiler
     }
   }
 
+  /// <summary>
+  /// Places tiles on the given layer and recomputes the affected positions.
+  /// The returned collection is a reusable buffer scoped to this layer; it is only
+  /// valid until the next PlaceTiles or Clear call on the same layer, so it must be
+  /// consumed synchronously (as AutoTileDrawer does).
+  /// </summary>
   public IReadOnlyCollection<Vector2> PlaceTiles(int layer, IEnumerable<(Vector2 Position, int TileId)> tiles)
   {
     ValidateLayer(layer);
@@ -74,7 +85,8 @@ public class AutoTiler
 
     lock (layerToLock[layer])
     {
-      HashSet<Vector2> dirtyPositions = []; // TODO: main allocation, should consider other options
+      HashSet<Vector2> dirtyPositions = layerToDirtyPositions[layer];
+      dirtyPositions.Clear();
       foreach (var (position, tileId) in tileArray)
       {
         if (tileId < 0)
@@ -96,16 +108,13 @@ public class AutoTiler
 
   private void RecomputeTileAt(int layer, Vector2 position)
   {
-    TileData tileData = GetTileDataAt(layer, position);
+    Span<int> tileMaskArray = stackalloc int[8];
+    TileData tileData = autoTilerData.GetCenterAndSurrounding(layer, position, CELL_SURROUNDING_DIRECTIONS, tileMaskArray);
     if (tileData.IsEmpty())
     {
       autoTilerData.Remove(layer, position);
       return;
     }
-
-    Span<int> tileMaskArray = stackalloc int[8];
-    for (int i = 0; i < CELL_SURROUNDING_DIRECTIONS.Length; i++)
-      tileMaskArray[i] = GetTileDataAt(layer, position + CELL_SURROUNDING_DIRECTIONS[i]).CentreTileId;
 
     TileMask tileMask = TileMask.FromArray(tileMaskArray);
     var bestMatch = tileSearcherById[tileData.CentreTileId].FindBestMatch(tileMask);

@@ -1,5 +1,6 @@
 using Godot;
 using Qwaitumin.LibreAutoTile.Configuration;
+using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Qwaitumin.LibreAutoTile.Tiling;
 
 namespace Qwaitumin.LibreAutoTile.GodotBindings;
@@ -19,20 +20,19 @@ public class AutoTileMap : Node2D
   public AutoTileMap(
     int layerCount,
     AutoTileConfiguration autoTileConfiguration,
-    TileSet.TileShapeEnum tileShape = TileSet.TileShapeEnum.Square)
+    TileShape? tileShape = null)
   {
     if (OS.GetThreadCallerId() != OS.GetMainThreadId())
       throw new InvalidOperationException("AutoTileMap must be constructed on the main thread.");
 
-    foreach (var (_, tileDefinition) in autoTileConfiguration.TileDefinitions)
-      foreach (var (imageFileName, _) in tileDefinition.ImageFileNameToTileMaskDefinition)
-        if (!File.Exists(imageFileName))
-          throw new FileNotFoundException($"File defined in configuration does not exist: '{imageFileName}'");
+    autoTileConfiguration.VerifyFiles();
+
+    TileShape resolvedTileShape = tileShape ?? autoTileConfiguration.TileShape;
 
     tileMapWrappers = new TileMapWrapper[layerCount];
     for (int layer = 0; layer < layerCount; layer++)
     {
-      TileMapWrapper tileMapWrapper = new(autoTileConfiguration, tileShape);
+      TileMapWrapper tileMapWrapper = new(autoTileConfiguration, resolvedTileShape);
       tileMapWrappers[layer] = tileMapWrapper;
       AddChild(tileMapWrapper.TileMapLayer);
     }
@@ -42,7 +42,7 @@ public class AutoTileMap : Node2D
       tileMapDrawer, new AutoTiler(layerCount, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(autoTileConfiguration)));
   }
 
-  public Vector2I WorldToMap(Vector2 localPosition)
+  public Vector2I WorldToMap(Godot.Vector2 localPosition)
     => tileMapWrappers[0].TileMapLayer.LocalToMap(localPosition);
 
   public int GetSourceId(string imageFileName)
@@ -65,15 +65,10 @@ public class AutoTileMap : Node2D
   }
 
   public async Task DrawTilesAsync(int layer, IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
-    => await Task.Run(() => DrawTiles(layer, positionToTileIds));
+    => await autoTileDrawer.DrawTilesAsync(layer, ConvertPositions(positionToTileIds));
 
   public void DrawTiles(int layer, IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
-  {
-    var positionToTileIdsConverted = positionToTileIds
-      .Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))
-      .ToArray();
-    autoTileDrawer.DrawTiles(layer, positionToTileIdsConverted);
-  }
+    => autoTileDrawer.DrawTiles(layer, ConvertPositions(positionToTileIds));
 
   public void UpdateTiles(int tileLayer, Vector2I[] positions)
   {
@@ -81,8 +76,20 @@ public class AutoTileMap : Node2D
     autoTileDrawer.UpdateTiles(tileLayer, positionsConverted);
   }
 
+  private static (Configuration.Models.Vector2 Position, int TileId)[] ConvertPositions(
+    IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
+    => positionToTileIds
+      .Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))
+      .ToArray();
+
   public new void QueueFree()
   {
+    if (OS.GetThreadCallerId() != OS.GetMainThreadId())
+    {
+      Callable.From(() => QueueFree()).CallDeferred();
+      return;
+    }
+
     foreach (var tileMapWrapper in tileMapWrappers)
       tileMapWrapper.TileMapLayer.QueueFree();
     base.QueueFree();

@@ -1,6 +1,7 @@
 using Qwaitumin.SimpleTest;
 using Qwaitumin.LibreAutoTile.GodotBindings;
 using Qwaitumin.LibreAutoTile.Configuration;
+using Qwaitumin.LibreAutoTile.Configuration.Models;
 using Godot;
 
 namespace LibreAutoTile.GodotBindings.Tests;
@@ -156,7 +157,7 @@ public class AutoTileMapTest
     // Given
     var autoTileConfiguration = AutoTileConfiguration.LoadFromFile(CONFIG_PATH);
     AutoTileMap autoTileMap = GodotAccess.RunOnMainThread(
-      () => new AutoTileMap(1, autoTileConfiguration, TileSet.TileShapeEnum.Isometric));
+      () => new AutoTileMap(1, autoTileConfiguration, TileShape.Isometric));
     GodotAccess.AddNodeToTree(autoTileMap);
 
     // When
@@ -177,7 +178,7 @@ public class AutoTileMapTest
     // Given
     var autoTileConfiguration = AutoTileConfiguration.LoadFromFile(CONFIG_PATH);
     AutoTileMap autoTileMap = GodotAccess.RunOnMainThread(
-      () => new AutoTileMap(1, autoTileConfiguration, TileSet.TileShapeEnum.Isometric));
+      () => new AutoTileMap(1, autoTileConfiguration, TileShape.Isometric));
     GodotAccess.AddNodeToTree(autoTileMap);
 
     try

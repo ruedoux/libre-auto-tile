@@ -16,11 +16,8 @@ public class AutoTilerConcurrentBenchmark
   [Params(4, 8)]
   public int LayerCount;
 
-  [Params(false, true)]
-  public bool UseStaticMap;
-
   [Params(256)]
-  public int ChunkSize;
+  public int TileGridSize;
 
   private AutoTiler autoTiler = null!;
   private (Vector2, int)[][] positionsWithIdsArray = null!;
@@ -36,19 +33,15 @@ public class AutoTilerConcurrentBenchmark
   {
     positionsWithIdsArray = new (Vector2, int)[LayerCount][];
     for (int i = 0; i < LayerCount; i++)
-      positionsWithIdsArray[i] = Helper.GetRandomChunk(ChunkSize, ChunkSize, maxTileId: 2);
+      positionsWithIdsArray[i] = Helper.GetRandomChunk(TileGridSize, TileGridSize, maxTileId: 2);
+
+    autoTiler = new(
+      LayerCount, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(AUTO_TILE_CONFIGURATION, cacheSize: 1024));
   }
 
   [IterationSetup]
   public void IterationSetup()
-  {
-    Vector2 mapSize = UseStaticMap
-      ? new(ChunkSize, ChunkSize)
-      : default;
-
-    autoTiler = new(
-      LayerCount, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(AUTO_TILE_CONFIGURATION, cacheSize: 1024), mapSize);
-  }
+    => autoTiler.Clear();
 
   [Benchmark]
   public void PlaceTiles_DifferentLayers_Sequential()

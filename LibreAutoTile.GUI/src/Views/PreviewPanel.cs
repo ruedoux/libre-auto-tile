@@ -73,15 +73,8 @@ public partial class PreviewPanel : MarginContainer
   public void InitializeTileMap(AutoTileConfiguration autoTileConfiguration, TileShape tileShape)
   {
     AutoTileMap?.QueueFree();
-    AutoTileMap = new(1, autoTileConfiguration, MapTileShape(tileShape));
+    AutoTileMap = new(1, autoTileConfiguration, tileShape);
   }
-
-  private static TileSet.TileShapeEnum MapTileShape(TileShape tileShape)
-    => tileShape switch
-    {
-      TileShape.Isometric => TileSet.TileShapeEnum.Isometric,
-      _ => TileSet.TileShapeEnum.Square,
-    };
 
   private void ChangeActiveTile(PreviewTile previewTile)
   {

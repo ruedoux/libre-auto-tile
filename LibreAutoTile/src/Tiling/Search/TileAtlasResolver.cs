@@ -9,7 +9,7 @@ namespace Qwaitumin.LibreAutoTile.Tiling.Search;
 /// </summary>
 public class TileAtlasResolver
 {
-  private readonly FrozenDictionary<TileMask, (int Offset, int Count)> indexMap;
+  private readonly FrozenDictionary<TileMask, (int Offset, int Count, ulong TotalChance)> indexMap;
   private readonly TileAtlas[] atlasArray;
 
   public TileAtlasResolver(IEnumerable<(TileMask TileMask, TileAtlas TileAtlas)> items)
@@ -27,13 +27,18 @@ public class TileAtlasResolver
     }
 
     var atlasList = new List<TileAtlas>();
-    var mapBuilder = new Dictionary<TileMask, (int Offset, int Count)>(grouped.Count);
+    var mapBuilder = new Dictionary<TileMask, (int Offset, int Count, ulong TotalChance)>(grouped.Count);
 
     foreach (var (mask, list) in grouped)
     {
       int offset = atlasList.Count;
       atlasList.AddRange(list);
-      mapBuilder[mask] = (offset, list.Count);
+
+      ulong totalChance = 0;
+      foreach (var atlas in list)
+        totalChance = unchecked(totalChance + atlas.Chance);
+
+      mapBuilder[mask] = (offset, list.Count, totalChance);
     }
 
     atlasArray = [.. atlasList];
@@ -45,18 +50,10 @@ public class TileAtlasResolver
     if (!indexMap.TryGetValue(tileMask, out var index))
       return new TileAtlas();
 
-    if (index.Count == 1)
+    if (index.Count == 1 || index.TotalChance == 0)
       return atlasArray[index.Offset];
 
-    ulong totalChance = 0;
-    for (int i = index.Offset; i < index.Offset + index.Count; i++)
-      totalChance = unchecked(totalChance + atlasArray[i].Chance);
-
-    if (totalChance == 0)
-      return atlasArray[index.Offset];
-
-    ulong randomNumber = (ulong)Random.Shared.NextInt64((long)totalChance);
-    randomNumber = ulong.Clamp(randomNumber, 0, totalChance - 1);
+    ulong randomNumber = (ulong)Random.Shared.NextInt64((long)index.TotalChance);
 
     ulong currentChance = 0;
     for (int i = index.Offset; i < index.Offset + index.Count; i++)

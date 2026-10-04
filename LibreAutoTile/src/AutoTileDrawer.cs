@@ -42,6 +42,6 @@ public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
     foreach (var position in positions)
       tileLayerToData.Add(new(position, autoTiler.GetTile(tileLayer, position)));
 
-    tileMapDrawer.DrawTiles(tileLayer, [.. tileLayerToData]);
+    tileMapDrawer.DrawTiles(tileLayer, tileLayerToData);
   }
 }

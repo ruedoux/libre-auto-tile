@@ -14,10 +14,7 @@ public class AutoTilerBenchmark
   private static readonly AutoTileConfiguration AUTO_TILE_CONFIGURATION;
 
   [Params(256, 512)]
-  public int ChunkSize;
-
-  [Params(false, true)]
-  public bool UseStaticMap;
+  public int TileGridSize;
 
   private (Vector2, int)[] positionsWithIds = null!;
   private AutoTiler autoTilerNoCache = null!;
@@ -32,19 +29,21 @@ public class AutoTilerBenchmark
   [GlobalSetup]
   public void GlobalSetup()
   {
-    positionsWithIds = Helper.GetRandomChunk(ChunkSize, ChunkSize, minTileId: 0, maxTileId: 2);
+    positionsWithIds = Helper.GetRandomChunk(TileGridSize, TileGridSize, minTileId: 0, maxTileId: 2);
+
+    // Constructed once so measured iterations reflect steady-state (warm chunk pool +
+    // grown reusable dirty-position set), not first-call setup cost.
+    autoTilerNoCache = new(
+      1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(AUTO_TILE_CONFIGURATION, 0));
+    autoTilerWithCache = new(
+      1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(AUTO_TILE_CONFIGURATION, 1024));
   }
 
   [IterationSetup]
   public void IterationSetup()
   {
-    Vector2 mapSize = UseStaticMap
-      ? new(ChunkSize, ChunkSize)
-      : default;
-    autoTilerNoCache = new(
-      1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(AUTO_TILE_CONFIGURATION, 0), mapSize);
-    autoTilerWithCache = new(
-      1, AutoTileConfigurationExtractor.BuildTileIdToTileMaskSearcher(AUTO_TILE_CONFIGURATION, 1024), mapSize);
+    autoTilerNoCache.Clear();
+    autoTilerWithCache.Clear();
   }
 
   [Benchmark]

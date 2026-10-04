@@ -22,6 +22,15 @@ public class GodotAccess
     WaitNextFrames();
   }
 
+  public static void Cleanup()
+  {
+    if (accessNode is not null)
+    {
+      accessNode.QueueFree();
+      accessNode = null!;
+    }
+  }
+
   /// <summary>
   /// Runs a function on the main thread and blocks until it completes
   /// </summary>

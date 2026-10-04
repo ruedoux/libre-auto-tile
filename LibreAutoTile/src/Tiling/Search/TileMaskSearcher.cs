@@ -45,9 +45,8 @@ public class TileMaskSearcher
     if (existingMasks.Contains(target))
       return target;
 
-    if (cache is not null)
-      if (cache.TryGet(target, out var cached))
-        return cached;
+    if (cache?.TryGet(target, out var cached) == true)
+      return cached;
 
     int bestIndex = indexSearcher.Search(target);
     var result = bestIndex >= 0 ? items[bestIndex] : items.Length > 0 ? items[0] : new();

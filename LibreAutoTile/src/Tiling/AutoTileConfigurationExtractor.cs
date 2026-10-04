@@ -14,6 +14,29 @@ public static class AutoTileConfigurationExtractor
       .GroupBy(td => td.Value.ConnectionGroup!.Value)
       .ToDictionary(g => g.Key, g => new HashSet<int>(g.Select(td => (int)td.Key)));
 
+  public static Dictionary<string, HashSet<Vector2>> GetImageFileNameToAtlasPositions(
+    AutoTileConfiguration autoTileConfiguration)
+  {
+    Dictionary<string, HashSet<Vector2>> imageFileNamesToAtlasPositions = [];
+    foreach (var (_, tileDefinition) in autoTileConfiguration.TileDefinitions)
+    {
+      foreach (var (imageFileName, tileMaskDefinition) in tileDefinition.ImageFileNameToTileMaskDefinition)
+      {
+        foreach (var (atlasPosition, _) in tileMaskDefinition.AtlasPositionToTileMaskAndChance)
+        {
+          if (!imageFileNamesToAtlasPositions.TryGetValue(imageFileName, out var atlasPositions))
+          {
+            atlasPositions = [];
+            imageFileNamesToAtlasPositions[imageFileName] = atlasPositions;
+          }
+          atlasPositions.Add(atlasPosition.ToVector2());
+        }
+      }
+    }
+
+    return imageFileNamesToAtlasPositions;
+  }
+
   public static (TileMask TileMask, TileAtlas TileAtlas)[] GetItems(
     TileDefinition tileDefinition)
   {

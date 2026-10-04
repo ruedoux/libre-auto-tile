@@ -33,6 +33,9 @@ logic is shape-agnostic, so only the Godot `TileSet` configuration changes:
 
 ```cs
 AutoTileMap autoTileMap = new(
-  1, autoTileConfiguration, TileSet.TileShapeEnum.Isometric);
+  1, autoTileConfiguration, TileShape.Isometric);
 AddChild(autoTileMap);
 ```
+
+> `tileShape` defaults to the shape stored in the configuration
+> (`autoTileConfiguration.TileShape`).

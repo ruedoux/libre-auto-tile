@@ -24,6 +24,9 @@ public partial class Run : Node2D
   public override void _PhysicsProcess(double delta)
   {
     if (task.IsCompleted)
+    {
+      GodotAccess.Cleanup();
       GetTree().Quit();
+    }
   }
 }
