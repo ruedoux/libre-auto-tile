@@ -1,10 +1,10 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Models;
-using Qwaitumin.LibreAutoTile.GUI.Views.Presentation;
-using Qwaitumin.LibreAutoTile.GUI.Views;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.GUI.Models;
+using LibreAutoTile.GUI.Views.Presentation;
+using LibreAutoTile.GUI.Views;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
+namespace LibreAutoTile.GUI.Controllers;
 
 /// <summary>
 /// Single facade controllers use to read the model and trigger view rendering.

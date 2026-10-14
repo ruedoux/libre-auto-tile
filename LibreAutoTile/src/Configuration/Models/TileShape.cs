@@ -1,4 +1,4 @@
-namespace Qwaitumin.LibreAutoTile.Configuration.Models;
+namespace LibreAutoTile.Configuration.Models;
 
 /// <summary>
 /// Tile shape used for rendering. Determines how tile dimensions map to a Godot

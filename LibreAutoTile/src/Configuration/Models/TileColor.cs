@@ -1,4 +1,4 @@
-namespace Qwaitumin.LibreAutoTile.Configuration.Models;
+namespace LibreAutoTile.Configuration.Models;
 
 public readonly struct TileColor(byte r, byte g, byte b, byte a = 255)
 {

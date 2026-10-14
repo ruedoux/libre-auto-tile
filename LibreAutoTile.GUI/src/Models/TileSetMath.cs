@@ -1,8 +1,8 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
-using TileShape = Qwaitumin.LibreAutoTile.Configuration.Models.TileShape;
+using LibreAutoTile.Tiling.Search.Models;
+using TileShape = LibreAutoTile.Configuration.Models.TileShape;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Models;
+namespace LibreAutoTile.GUI.Models;
 
 public static class TileSetMath
 {

@@ -1,7 +1,7 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Models;
+using LibreAutoTile.GUI.Models;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Views;
+namespace LibreAutoTile.GUI.Views;
 
 public partial class BitmaskDrawer : Node2D
 {

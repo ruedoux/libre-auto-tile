@@ -1,4 +1,4 @@
-namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
+namespace LibreAutoTile.GUI.Controllers;
 
 public enum EditorTool
 {

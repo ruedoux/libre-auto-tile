@@ -1,8 +1,8 @@
 using System.Collections.Frozen;
 using System.Collections.Immutable;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tiling.Search;
+namespace LibreAutoTile.Tiling.Search;
 
 // TODO interface, should have possibility of picking either square or hexagonal tiles
 public sealed class IndexSearcher

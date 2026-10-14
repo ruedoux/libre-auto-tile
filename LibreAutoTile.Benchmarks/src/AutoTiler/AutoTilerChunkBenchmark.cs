@@ -1,9 +1,9 @@
 using BenchmarkDotNet.Attributes;
-using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling;
+using LibreAutoTile.Configuration;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Tiling;
 
-namespace Qwaitumin.LibreAutoTile.Benchmark;
+namespace LibreAutoTile.Benchmark;
 
 /// <summary>
 /// Measures the chunked dynamic backend against its two tuning knobs:

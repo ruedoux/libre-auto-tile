@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LibreAutoTile\LibreAutoTile.csproj" />
+    <ProjectReference Include="..\modules\simple-test\SimpleTest\SimpleTest.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>LibreAutoTile.Tests</RootNamespace>
+  </PropertyGroup>
+
+</Project>

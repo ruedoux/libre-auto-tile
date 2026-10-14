@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Views.Presentation;
+namespace LibreAutoTile.GUI.Views.Presentation;
 
 public sealed record TileViewModel(
   object Key,

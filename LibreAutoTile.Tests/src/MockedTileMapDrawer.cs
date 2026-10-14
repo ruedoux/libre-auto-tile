@@ -1,7 +1,7 @@
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Tiling;
 
-namespace Qwaitumin.LibreAutoTile.Tests;
+namespace LibreAutoTile.Tests;
 
 internal class MockedTileMapDrawer : ITileMapDrawer
 {

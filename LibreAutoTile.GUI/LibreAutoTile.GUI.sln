@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwaitumin.LibreAutoTile.GUI", "Qwaitumin.LibreAutoTile.GUI.csproj", "{8ADB30F9-E8A5-42A7-A3DD-FD9F03A91DF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibreAutoTile.GUI", "LibreAutoTile.GUI.csproj", "{8ADB30F9-E8A5-42A7-A3DD-FD9F03A91DF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

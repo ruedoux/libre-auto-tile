@@ -1,11 +1,11 @@
 using Godot;
-using Qwaitumin.Logging;
+using SimpleLogging;
 
-namespace Qwaitumin.LibreAutoTile.GUI;
+namespace LibreAutoTile.GUI;
 
 public static class GodotLogger
 {
-  public static readonly Logging.Logger LOGGER = null!;
+  public static readonly SimpleLogging.Logger LOGGER = null!;
 
   static GodotLogger()
   {

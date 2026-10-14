@@ -1,6 +1,6 @@
 # LibreAutoTile Godot Bindings Tests
 
-Tests for the Godot bindings, using the `Qwaitumin.SimpleTest` framework.
+Tests for the Godot bindings, using the `SimpleTest` framework.
 
 ## Running
 

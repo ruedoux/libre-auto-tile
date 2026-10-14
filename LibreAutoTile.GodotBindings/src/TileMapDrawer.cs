@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GodotBindings;
+namespace LibreAutoTile.GodotBindings;
 
 internal class TileMapDrawer(TileMapWrapper[] tileMapWrappers) : ITileMapDrawer
 {

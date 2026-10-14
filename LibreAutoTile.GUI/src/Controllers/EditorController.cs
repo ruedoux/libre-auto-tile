@@ -1,9 +1,9 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Models;
-using Qwaitumin.LibreAutoTile.GUI.Views;
-using TileShape = Qwaitumin.LibreAutoTile.Configuration.Models.TileShape;
+using LibreAutoTile.GUI.Models;
+using LibreAutoTile.GUI.Views;
+using TileShape = LibreAutoTile.Configuration.Models.TileShape;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
+namespace LibreAutoTile.GUI.Controllers;
 
 public class EditorController
 {

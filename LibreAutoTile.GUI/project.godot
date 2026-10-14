@@ -14,7 +14,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="Qwaitumin.LibreAutoTile.GUI"
+config/name="LibreAutoTile.GUI"
 run/main_scene="uid://jcybhhqvf8tw"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
@@ -27,7 +27,7 @@ window/stretch/mode="viewport"
 
 [dotnet]
 
-project/assembly_name="Qwaitumin.LibreAutoTile.GUI"
+project/assembly_name="LibreAutoTile.GUI"
 
 [filesystem]
 

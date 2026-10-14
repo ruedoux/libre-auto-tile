@@ -1,7 +1,7 @@
-using Qwaitumin.SimpleTest;
-using Qwaitumin.LibreAutoTile.GodotBindings;
-using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
+using SimpleTest;
+using LibreAutoTile.GodotBindings;
+using LibreAutoTile.Configuration;
+using LibreAutoTile.Configuration.Models;
 using Godot;
 
 namespace LibreAutoTile.GodotBindings.Tests;

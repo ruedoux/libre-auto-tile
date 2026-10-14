@@ -1,6 +1,6 @@
-using Qwaitumin.LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Configuration.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+namespace LibreAutoTile.Tiling.Search.Models;
 
 public readonly struct TileAtlas(Vector2 position, string imageFileName, uint chance = 0)
 {

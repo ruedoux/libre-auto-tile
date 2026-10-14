@@ -1,7 +1,7 @@
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.SimpleTest;
+using LibreAutoTile.Configuration.Models;
+using SimpleTest;
 
-namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
+namespace LibreAutoTile.Tests.Configuration;
 
 [TestClass]
 public class TileMaskDefinitionTest

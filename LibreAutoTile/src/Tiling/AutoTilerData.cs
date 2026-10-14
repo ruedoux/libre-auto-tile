@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Configuration.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tiling;
+namespace LibreAutoTile.Tiling;
 
 internal class AutoTilerData
 {

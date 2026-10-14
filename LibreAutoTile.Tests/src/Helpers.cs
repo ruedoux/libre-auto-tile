@@ -1,6 +1,6 @@
-using Qwaitumin.LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Configuration.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tests;
+namespace LibreAutoTile.Tests;
 
 public static class Helpers
 {

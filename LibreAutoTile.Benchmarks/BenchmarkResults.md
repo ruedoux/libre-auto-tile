@@ -1,4 +1,4 @@
-## Qwaitumin.LibreAutoTile.Benchmark.TileMaskSearcherBenchmark-20260910-215928
+## LibreAutoTile.Benchmark.TileMaskSearcherBenchmark-20260910-215928
 
 ```
 

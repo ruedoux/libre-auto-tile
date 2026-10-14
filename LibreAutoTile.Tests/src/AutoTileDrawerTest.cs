@@ -1,9 +1,9 @@
-using Qwaitumin.LibreAutoTile.Tiling;
-using Qwaitumin.SimpleTest;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling.Search;
+using LibreAutoTile.Tiling;
+using SimpleTest;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Tiling.Search;
 
-namespace Qwaitumin.LibreAutoTile.Tests;
+namespace LibreAutoTile.Tests;
 
 
 [TestClass]

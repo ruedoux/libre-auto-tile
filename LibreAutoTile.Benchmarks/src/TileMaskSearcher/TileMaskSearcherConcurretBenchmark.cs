@@ -1,8 +1,8 @@
 using BenchmarkDotNet.Attributes;
-using Qwaitumin.LibreAutoTile.Tiling.Search;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.Tiling.Search;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.Benchmark;
+namespace LibreAutoTile.Benchmark;
 
 
 [MemoryDiagnoser(displayGenColumns: false)]

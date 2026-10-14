@@ -1,7 +1,7 @@
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.Benchmark;
+namespace LibreAutoTile.Benchmark;
 
 internal static class Helper
 {

@@ -1,4 +1,4 @@
-namespace Qwaitumin.LibreAutoTile.Configuration.Models;
+namespace LibreAutoTile.Configuration.Models;
 
 public readonly struct Vector3(int x, int y, int z)
 {

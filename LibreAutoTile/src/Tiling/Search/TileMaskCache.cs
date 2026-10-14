@@ -1,6 +1,6 @@
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tiling.Search;
+namespace LibreAutoTile.Tiling.Search;
 
 public sealed class TileMaskCache
 {

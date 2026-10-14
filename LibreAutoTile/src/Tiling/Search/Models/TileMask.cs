@@ -1,4 +1,4 @@
-namespace Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+namespace LibreAutoTile.Tiling.Search.Models;
 
 public readonly struct TileMask : IEquatable<TileMask>
 {

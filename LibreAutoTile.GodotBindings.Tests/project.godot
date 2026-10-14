@@ -14,10 +14,10 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="Qwaitumin.LibreAutoTile.GodotBindings.Tests"
+config/name="LibreAutoTile.GodotBindings.Tests"
 run/main_scene="uid://gdto4emmdt52"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 
 [dotnet]
 
-project/assembly_name="Qwaitumin.LibreAutoTile.GodotBindings.Tests"
+project/assembly_name="LibreAutoTile.GodotBindings.Tests"

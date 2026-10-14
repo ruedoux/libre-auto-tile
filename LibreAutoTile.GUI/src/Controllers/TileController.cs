@@ -1,7 +1,7 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Views.Presentation;
+using LibreAutoTile.GUI.Views.Presentation;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
+namespace LibreAutoTile.GUI.Controllers;
 
 public class TileController
 {

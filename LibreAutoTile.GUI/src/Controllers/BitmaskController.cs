@@ -1,8 +1,8 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Models;
-using Qwaitumin.LibreAutoTile.GUI.Views;
+using LibreAutoTile.GUI.Models;
+using LibreAutoTile.GUI.Views;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
+namespace LibreAutoTile.GUI.Controllers;
 
 public class BitmaskController
 {

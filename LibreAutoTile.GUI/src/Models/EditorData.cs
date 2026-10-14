@@ -1,7 +1,7 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Configuration.Models;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Models;
+namespace LibreAutoTile.GUI.Models;
 
 public class EditorData
 {

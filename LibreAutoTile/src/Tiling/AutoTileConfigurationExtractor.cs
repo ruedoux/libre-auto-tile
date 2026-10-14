@@ -1,9 +1,9 @@
-using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling.Search;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.Configuration;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Tiling.Search;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tiling;
+namespace LibreAutoTile.Tiling;
 
 public static class AutoTileConfigurationExtractor
 {

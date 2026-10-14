@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Models;
+namespace LibreAutoTile.GUI.Models;
 
 public class BitmaskDatabase
 {

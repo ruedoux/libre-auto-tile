@@ -2,9 +2,9 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Configuration.Models;
 
-namespace Qwaitumin.LibreAutoTile.Configuration;
+namespace LibreAutoTile.Configuration;
 
 public class Vector2DictionaryConverter<TValue> : JsonConverter<Dictionary<Vector2, TValue>>
 {

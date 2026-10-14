@@ -1,9 +1,9 @@
 using BenchmarkDotNet.Attributes;
-using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling;
+using LibreAutoTile.Configuration;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Tiling;
 
-namespace Qwaitumin.LibreAutoTile.Benchmark;
+namespace LibreAutoTile.Benchmark;
 
 [MemoryDiagnoser(displayGenColumns: false)]
 [WarmupCount(4)]

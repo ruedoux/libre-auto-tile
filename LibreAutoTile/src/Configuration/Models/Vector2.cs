@@ -1,4 +1,4 @@
-namespace Qwaitumin.LibreAutoTile.Configuration.Models;
+namespace LibreAutoTile.Configuration.Models;
 
 public readonly struct Vector2(int x, int y) : IEquatable<Vector2>
 {

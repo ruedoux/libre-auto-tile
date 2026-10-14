@@ -1,6 +1,6 @@
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tiling;
+namespace LibreAutoTile.Tiling;
 
 public struct TileData
 {

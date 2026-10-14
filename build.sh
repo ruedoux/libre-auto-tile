@@ -43,15 +43,9 @@ build_libs() {
   rm -rf LibreAutoTile/bin
   rm -rf LibreAutoTile.GodotBindings/bin
 
-  if [[ -z "${PACKAGE_VERSION:-}" ]]; then
-      PACKAGE_VERSION="0.0.0-debug"
-  fi
-
   dotnet restore
-  dotnet pack LibreAutoTile -c Release -p:PackageVersion="$PACKAGE_VERSION"
-  dotnet pack LibreAutoTile.GodotBindings -c Release -p:PackageVersion="$PACKAGE_VERSION"
-  cp LibreAutoTile/bin/Release/*.nupkg "$EXPORT_OUTPUT"/
-  cp LibreAutoTile.GodotBindings/bin/Release/*.nupkg "$EXPORT_OUTPUT"/
+  dotnet build LibreAutoTile -c Release
+  dotnet build LibreAutoTile.GodotBindings -c Release
 
   find LibreAutoTile/bin/Release/ -type f \( -name "*.dll" -o -name "*.pdb" -o -name "*.json" \) -exec cp {} "$LIB_TEMP/" \;
   find LibreAutoTile.GodotBindings/bin/Release/ -type f \( -name "*.dll" -o -name "*.pdb" -o -name "*.json" \) -exec cp {} "$LIB_TEMP/" \;
@@ -77,67 +71,8 @@ run_all_tests() {
   fi
 }
 
-publish() {
-    info "Attempting to publish version $PACKAGE_VERSION"
-    info "Meant only for maintainers use"
-
-    if [[ -z "$NUGET_API_KEY" ]]; then
-        error "NUGET_API_KEY is not set."
-        exit 1
-    fi
-
-    if [[ ! -f release-notes.md ]]; then
-        error "release-notes.md not found."
-        exit 1
-    fi
-
-    if ! gh auth status &> /dev/null; then
-        error "GitHub CLI (gh) not authenticated."
-        exit 1
-    fi
-
-    for pkg in "$EXPORT_OUTPUT"/*.nupkg; do
-        dotnet nuget push "$pkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
-    done
-
-    gh release create "$PACKAGE_VERSION" "$EXPORT_OUTPUT"/* --title "$PACKAGE_VERSION" --notes-file release-notes.md
-}
-
-publish_release() {
-    if [[ -z "${2:-}" ]]; then
-        echo "Usage: $0 --publish <version>"
-        exit 1
-    fi
-
-    PACKAGE_VERSION="$2"
-    if [[ ! "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9._]+)?$ ]]; then
-        error "Package version must match x.x.x or x.x.x-suffix"
-        exit 1
-    fi
-
-    rm -rf ./build
-    mkdir -p "$EXPORT_OUTPUT"
-    build_libs
-    build_gui
-    run_all_tests
-    #run_benchmark
-
-    if [[ "${CI:-}" == "true" ]]; then
-        # CI detected, skip prompts
-        confirm="y"
-    else
-        read -p "Are you sure you want to publish version '$2'? [y/N] " confirm
-    fi
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        echo "Aborted."
-        exit 1
-    fi
-
-    publish "$2"
-}
-
 help() {
-  echo "Usage: $0 [--build-gui|--build-libs|--build-all|--run-tests|--run-benchmark|--publish <version>]"
+  echo "Usage: $0 [--build-gui|--build-libs|--build-all|--run-tests|--run-benchmark]"
 }
 
 if [[ $# -eq 0 ]]; then
@@ -170,9 +105,6 @@ case "$1" in
     ;;
   --run-benchmark)
     run_benchmark
-    ;;
-  --publish)
-    publish_release "$@"
     ;;
   *)
     help

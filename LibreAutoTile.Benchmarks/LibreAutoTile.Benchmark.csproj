@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\LibreAutoTile\Qwaitumin.LibreAutoTile.csproj" />
+    <ProjectReference Include="..\LibreAutoTile\LibreAutoTile.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Qwaitumin.LibreAutoTile.Benchmarks</RootNamespace>
+    <RootNamespace>LibreAutoTile.Benchmarks</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -31,20 +31,7 @@ Sample JSON configurations are in [`resources/configurations/`](resources/config
 
 ## Installation
 
-1. Link the `.csproj` from this repository (for the latest version), or
-2. Install from NuGet:
-
-If you want to install the Godot bindings:
-
-```sh
-dotnet add package Qwaitumin.LibreAutoTile.GodotBindings
-```
-
-If you want to install the core library:
-
-```sh
-dotnet add package Qwaitumin.LibreAutoTile
-```
+Link the `.csproj` from this repository (for the latest version).
 
 > Library targets:
 
@@ -57,12 +44,11 @@ dotnet add package Qwaitumin.LibreAutoTile
 
 Use the `build.sh` script (on Windows use WSL or compile each project manually):
 
-- `./build.sh --build-libs` — pack the core and Godot bindings libraries
+- `./build.sh --build-libs` — build the core and Godot bindings libraries
 - `./build.sh --build-gui` — export the GUI for Linux and Windows
 - `./build.sh --build-all` — build libraries and GUI
 - `./build.sh --run-tests` — run the core and Godot bindings tests
 - `./build.sh --run-benchmark` — run the benchmarks
-- `./build.sh --publish <version>` — pack, test, and publish a release (maintainers only)
 
 ## Game Engine Integration
 

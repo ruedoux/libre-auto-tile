@@ -7,7 +7,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 
-namespace Qwaitumin.LibreAutoTile.Benchmark;
+namespace LibreAutoTile.Benchmark;
 
 public static class Program
 {

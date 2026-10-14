@@ -1,7 +1,7 @@
-using Qwaitumin.LibreAutoTile.GUI.Models;
-using Qwaitumin.LibreAutoTile.GUI.Views.Presentation;
+using LibreAutoTile.GUI.Models;
+using LibreAutoTile.GUI.Views.Presentation;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Controllers;
+namespace LibreAutoTile.GUI.Controllers;
 
 public static class TileViewMapper
 {

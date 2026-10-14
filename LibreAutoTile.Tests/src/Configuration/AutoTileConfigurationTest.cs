@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.SimpleTest;
+using LibreAutoTile.Configuration;
+using LibreAutoTile.Configuration.Models;
+using SimpleTest;
 
-namespace Qwaitumin.LibreAutoTile.Tests.Configuration;
+namespace LibreAutoTile.Tests.Configuration;
 
 [TestClass]
 public class AutoTileConfigurationTest

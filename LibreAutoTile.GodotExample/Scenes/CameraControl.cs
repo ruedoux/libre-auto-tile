@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GodotExample.Scenes;
+namespace LibreAutoTile.GodotExample.Scenes;
 
 public partial class CameraControl : Camera2D
 {

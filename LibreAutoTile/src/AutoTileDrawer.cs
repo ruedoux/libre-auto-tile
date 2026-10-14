@@ -1,7 +1,7 @@
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Tiling;
 
-namespace Qwaitumin.LibreAutoTile;
+namespace LibreAutoTile;
 
 /// <summary>
 /// Use this interface to implement bindings for drawing tiles. Must be thread safe!

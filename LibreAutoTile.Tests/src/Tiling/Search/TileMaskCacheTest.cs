@@ -1,8 +1,8 @@
-using Qwaitumin.SimpleTest;
-using Qwaitumin.LibreAutoTile.Tiling.Search;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using SimpleTest;
+using LibreAutoTile.Tiling.Search;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tests.Tiling.Search;
+namespace LibreAutoTile.Tests.Tiling.Search;
 
 [TestClass]
 public class TileMaskCacheTest

@@ -1,10 +1,10 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.GodotBindings;
-using Qwaitumin.LibreAutoTile.GUI.Models;
+using LibreAutoTile.Configuration;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.GodotBindings;
+using LibreAutoTile.GUI.Models;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Views;
+namespace LibreAutoTile.GUI.Views;
 
 public partial class PreviewPanel : MarginContainer
 {

@@ -1,6 +1,6 @@
-﻿using Qwaitumin.SimpleTest;
+﻿using SimpleTest;
 
-namespace Qwaitumin.LibreAutoTile.Tests;
+namespace LibreAutoTile.Tests;
 
 public static class Program
 {

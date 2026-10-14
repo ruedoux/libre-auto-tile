@@ -1,7 +1,7 @@
 #!/bin/bash
 
 godot --path=. --headless --import
-dotnet build Qwaitumin.LibreAutoTile.GodotBindings.Tests.csproj
+dotnet build LibreAutoTile.GodotBindings.Tests.csproj
 
 for arg in "$@"; do
   case $arg in

@@ -1,5 +1,5 @@
 using Godot;
-using Qwaitumin.SimpleTest;
+using SimpleTest;
 
 namespace LibreAutoTile.GodotBindings.Tests;
 

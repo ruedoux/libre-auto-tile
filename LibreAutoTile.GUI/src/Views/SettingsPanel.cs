@@ -1,7 +1,7 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Configuration.Models;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Views;
+namespace LibreAutoTile.GUI.Views;
 
 public partial class SettingsPanel : MarginContainer
 {

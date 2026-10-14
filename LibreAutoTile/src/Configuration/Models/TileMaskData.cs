@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using System.Text.Json;
 
-namespace Qwaitumin.LibreAutoTile.Configuration.Models;
+namespace LibreAutoTile.Configuration.Models;
 
 public class TileMaskData(ImmutableArray<int> mask, uint chance)
 {

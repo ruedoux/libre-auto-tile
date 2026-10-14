@@ -1,8 +1,8 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.GUI.Models;
-using TileShape = Qwaitumin.LibreAutoTile.Configuration.Models.TileShape;
+using LibreAutoTile.GUI.Models;
+using TileShape = LibreAutoTile.Configuration.Models.TileShape;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Views;
+namespace LibreAutoTile.GUI.Views;
 
 public partial class GridDrawer : Node2D
 {

@@ -1,10 +1,10 @@
-using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.Tiling;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
-using Qwaitumin.SimpleTest;
+using LibreAutoTile.Configuration;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Tiling;
+using LibreAutoTile.Tiling.Search.Models;
+using SimpleTest;
 
-namespace Qwaitumin.LibreAutoTile.Tests.Tiling;
+namespace LibreAutoTile.Tests.Tiling;
 
 public class TilingStateVerifier(AutoTiler autoTiler, AutoTileConfiguration autoTileConfiguration)
 {

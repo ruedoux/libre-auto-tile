@@ -1,10 +1,10 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.Configuration;
-using Qwaitumin.LibreAutoTile.Configuration.Models;
-using Qwaitumin.LibreAutoTile.GodotBindings;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.Configuration;
+using LibreAutoTile.Configuration.Models;
+using LibreAutoTile.GodotBindings;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Models;
+namespace LibreAutoTile.GUI.Models;
 
 public static class AutoTileConfigurationConverter
 {

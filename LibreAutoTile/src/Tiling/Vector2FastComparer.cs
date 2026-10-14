@@ -1,6 +1,6 @@
-using Qwaitumin.LibreAutoTile.Configuration.Models;
+using LibreAutoTile.Configuration.Models;
 
-namespace Qwaitumin.LibreAutoTile.Tiling;
+namespace LibreAutoTile.Tiling;
 
 /// <summary>
 /// Fast <see cref="IEqualityComparer{T}"/> for <see cref="Vector2"/> that avoids

@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwaitumin.LibreAutoTile.GodotExample", "Qwaitumin.LibreAutoTile.GodotExample.csproj", "{51630051-A78D-4AD0-A42A-56150371D2FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibreAutoTile.GodotExample", "LibreAutoTile.GodotExample.csproj", "{51630051-A78D-4AD0-A42A-56150371D2FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

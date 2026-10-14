@@ -1,0 +1,11 @@
+<Project Sdk="Godot.NET.Sdk/4.7.1">
+  <PropertyGroup>
+    <RootNamespace>LibreAutoTile.GodotBindings.Tests</RootNamespace>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LibreAutoTile.GodotBindings\LibreAutoTile.GodotBindings.csproj" />
+    <ProjectReference Include="..\modules\simple-test\SimpleTest\SimpleTest.csproj" />
+  </ItemGroup>
+</Project>

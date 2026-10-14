@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Views;
+namespace LibreAutoTile.GUI.Views;
 
 
 public static class Settings

@@ -1,8 +1,8 @@
-using Qwaitumin.LibreAutoTile.GUI.Controllers;
-using Qwaitumin.LibreAutoTile.GUI.Models;
-using Qwaitumin.LibreAutoTile.GUI.Views;
+using LibreAutoTile.GUI.Controllers;
+using LibreAutoTile.GUI.Models;
+using LibreAutoTile.GUI.Views;
 
-namespace Qwaitumin.LibreAutoTile.GUI;
+namespace LibreAutoTile.GUI;
 
 public static class App
 {

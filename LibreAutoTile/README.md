@@ -13,12 +13,7 @@ Implementation of an autotile algorithm for tilemaps with JSON configuration, su
 
 ## Installation
 
-1. Link the `.csproj` from this repository (recommended for the most recent version), or
-2. Install from NuGet:
-
-```sh
-dotnet add package Qwaitumin.LibreAutoTile
-```
+Link the `.csproj` from this repository (recommended for the most recent version).
 
 ## Example usage
 

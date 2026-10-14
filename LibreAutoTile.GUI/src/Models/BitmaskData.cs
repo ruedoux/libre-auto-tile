@@ -1,7 +1,7 @@
 using Godot;
-using Qwaitumin.LibreAutoTile.Tiling.Search.Models;
+using LibreAutoTile.Tiling.Search.Models;
 
-namespace Qwaitumin.LibreAutoTile.GUI.Models;
+namespace LibreAutoTile.GUI.Models;
 
 public class BitmaskData
 {
