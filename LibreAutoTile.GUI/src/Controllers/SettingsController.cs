@@ -21,6 +21,7 @@ public class SettingsController
     view.FontSizeSubmitted += OnFontSizeChanged;
     view.ResolutionSelected += OnResolutionChanged;
     view.TileShapeSelected += OnTileShapeChanged;
+    view.ProjectRootSelected += OnProjectRootChanged;
   }
 
   public static void SeedViewFromModel(EditorContext context)
@@ -29,6 +30,7 @@ public class SettingsController
     var view = context.EditorScene.SettingsPanel;
     view.SetTileSizeText(context.EditorData.TileSize.ToString());
     view.SetFontSizeText(appearance.FontSize.ToString());
+    view.SetProjectRootText(context.EditorData.ProjectRoot);
     view.SetGuiColor(appearance.GuiColor);
     view.SetSelectionColor(appearance.SelectionColor);
     view.SetBackgroundColor(appearance.BackgroundColor);
@@ -98,6 +100,12 @@ public class SettingsController
   {
     context.EditorData.TileShape = tileShape;
     RedrawTiles();
+  }
+
+  private void OnProjectRootChanged(string projectRoot)
+  {
+    context.EditorData.ProjectRoot = projectRoot;
+    context.EditorScene.SettingsPanel.SetProjectRootText(projectRoot);
   }
 
   private void RedrawTiles()

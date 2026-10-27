@@ -152,6 +152,28 @@ public class AutoTileMapTest
   }
 
   [TestMethod]
+  public void Clear_RemovesAllTileMapTilesSynchronously_WhenCalledOnMainThread()
+  {
+    // Given
+    var autoTileConfiguration = AutoTileConfiguration.LoadFromFile(CONFIG_PATH);
+    AutoTileMap autoTileMap = GodotAccess.RunOnMainThread(
+      () => new AutoTileMap(1, autoTileConfiguration));
+    GodotAccess.AddNodeToTree(autoTileMap);
+
+    // When
+    var usedCellCount = GodotAccess.RunOnMainThread(() =>
+    {
+      autoTileMap.DrawTiles(0, [(Vector2I.Zero, (int)TILES.GRASS)]);
+      autoTileMap.Clear();
+      return autoTileMap.GetTileMapLayer(0).GetUsedCells().Count;
+    });
+
+    // Then
+    Assertions.AssertEqual(0, usedCellCount);
+    autoTileMap.QueueFree();
+  }
+
+  [TestMethod]
   public void Isometric_ConfiguresTileShapeTileLayoutAndTileSize_WhenConstructed()
   {
     // Given

@@ -7,6 +7,9 @@ public partial class SettingsPanel : MarginContainer
 {
   public readonly LineEdit TileSizeLineEdit;
   public readonly LineEdit FontSizeLineEdit;
+  public readonly LineEdit ProjectRootLineEdit;
+  public readonly Button ProjectRootButton;
+  public readonly FileDialog ProjectRootDialog;
   public readonly OptionButton ResolutionOptionButton;
   public readonly OptionButton TileShapeOptionButton;
   public readonly ColorPickerButton GuiColorPicker;
@@ -24,6 +27,7 @@ public partial class SettingsPanel : MarginContainer
   public event Action<string>? FontSizeSubmitted;
   public event Action<long>? ResolutionSelected;
   public event Action<TileShape>? TileShapeSelected;
+  public event Action<string>? ProjectRootSelected;
 
   public SettingsPanel()
   {
@@ -38,6 +42,19 @@ public partial class SettingsPanel : MarginContainer
     FontSizeLineEdit = vbox.AppendHBox().ExpandHorizontal()
       .AppendLabel("Font size").ExpandHorizontal().ExpandVertical().FitContent().Back()
       .AppendLineEdit().ExpandHorizontal();
+
+    var projectRootRow = vbox.AppendHBox().ExpandHorizontal();
+    projectRootRow.AppendLabel("Project root").ExpandHorizontal().ExpandVertical().FitContent();
+    ProjectRootLineEdit = projectRootRow.AppendLineEdit().ExpandHorizontal();
+    ProjectRootLineEdit.PlaceholderText = "(GUI folder)";
+    ProjectRootButton = projectRootRow.AppendButton("Browse").ExpandHorizontal();
+
+    ProjectRootDialog = new FileDialog();
+    ProjectRootDialog.Title = "Select Project Root";
+    ProjectRootDialog.FileMode = FileDialog.FileModeEnum.OpenDir;
+    ProjectRootDialog.Access = FileDialog.AccessEnum.Filesystem;
+    ProjectRootDialog.WithDefaultTheme();
+    this.AddChild(ProjectRootDialog);
 
     ResolutionOptionButton = vbox.AppendHBox().ExpandHorizontal()
       .AppendLabel("Resolution").ExpandHorizontal().ExpandVertical().FitContent().Back()
@@ -81,6 +98,10 @@ public partial class SettingsPanel : MarginContainer
     ResolutionOptionButton.ItemSelected += index => ResolutionSelected?.Invoke(index);
     TileShapeOptionButton.ItemSelected += index =>
       TileShapeSelected?.Invoke(Enum.GetValues<TileShape>()[(int)index]);
+    ProjectRootButton.Pressed += () =>
+      ProjectRootDialog.PopupCenteredRatio(Settings.DIALOG_SCREEN_RATIO);
+    ProjectRootLineEdit.TextSubmitted += text => ProjectRootSelected?.Invoke(text);
+    ProjectRootDialog.DirSelected += dir => ProjectRootSelected?.Invoke(dir);
   }
 
   public void SetTileSizeText(string text)
@@ -88,6 +109,9 @@ public partial class SettingsPanel : MarginContainer
 
   public void SetFontSizeText(string text)
     => FontSizeLineEdit.Text = text;
+
+  public void SetProjectRootText(string text)
+    => ProjectRootLineEdit.Text = text;
 
   public void SetGuiColor(Color color)
     => GuiColorPicker.Color = color;

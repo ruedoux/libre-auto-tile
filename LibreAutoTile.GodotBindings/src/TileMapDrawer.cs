@@ -8,11 +8,16 @@ internal class TileMapDrawer(TileMapWrapper[] tileMapWrappers) : ITileMapDrawer
 
   public void Clear()
   {
-    Callable.From(() =>
-    {
-      foreach (var tileMapWrapper in tileMapWrappers)
-        tileMapWrapper.TileMapLayer.Clear();
-    }).CallDeferred();
+    if (OS.GetThreadCallerId() == OS.GetMainThreadId())
+      ClearImmediate();
+    else
+      Callable.From(ClearImmediate).CallDeferred();
+  }
+
+  private void ClearImmediate()
+  {
+    foreach (var tileMapWrapper in tileMapWrappers)
+      tileMapWrapper.TileMapLayer.Clear();
   }
 
   public void DrawTiles(

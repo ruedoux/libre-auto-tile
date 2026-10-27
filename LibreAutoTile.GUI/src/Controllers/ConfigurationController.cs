@@ -36,7 +36,7 @@ public class ConfigurationController
   {
     AutoTileConfiguration configuration = AutoTileConfigurationConverter.GetAsAutoTileConfiguration(
       context.EditorData.Tiles.Tiles, context.EditorData.BitmaskDatabase, context.EditorData.TileSize, context.EditorData.TileShape,
-      context.EditorData.WildcardId);
+      context.EditorData.WildcardId, context.EditorData.ProjectRoot);
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
     GodotLogger.LOGGER.Log($"Saved to: {filePath}");
@@ -46,7 +46,7 @@ public class ConfigurationController
   private void LoadConfiguration(string filePath)
   {
     AutoTileConfiguration autoTileConfiguration = AutoTileConfigurationConverter.LoadConfiguration(
-      filePath, context.EditorData.Tiles, context.EditorData.BitmaskDatabase);
+      filePath, context.EditorData.Tiles, context.EditorData.BitmaskDatabase, context.EditorData.ProjectRoot);
 
     context.EditorData.TileSize = (int)autoTileConfiguration.TileSize;
     context.EditorData.TileShape = autoTileConfiguration.TileShape;
@@ -96,18 +96,18 @@ public class ConfigurationController
   }
 
   private void LoadImageFromFile(string path)
-    => LoadImageFromPath(Path.GetRelativePath(".", path));
+    => LoadImageFromPath(Path.GetFullPath(path));
 
-  private void LoadImageFromPath(string relativePath)
+  private void LoadImageFromPath(string imagePath)
   {
-    var image = Image.LoadFromFile(relativePath);
+    var image = Image.LoadFromFile(imagePath);
     image.Resize(
       image.GetWidth() * Settings.IMAGE_SCALING,
       image.GetHeight() * Settings.IMAGE_SCALING,
       Image.Interpolation.Nearest);
 
     var texture = ImageTexture.CreateFromImage(image);
-    context.EditorData.ImagePath = relativePath;
+    context.EditorData.ImagePath = imagePath;
     context.EditorData.ImageSize = new Vector2I(image.GetWidth(), image.GetHeight());
 
     context.EditorScene.SetImage(texture);
@@ -116,7 +116,7 @@ public class ConfigurationController
     context.RedrawProbabilityLabels();
     context.RedrawBitmask();
     context.Probability.ResetSelection();
-    GodotLogger.LOGGER.Log($"Changed image to: {relativePath}");
+    GodotLogger.LOGGER.Log($"Changed image to: {imagePath}");
     context.RefreshImageOptions();
   }
 

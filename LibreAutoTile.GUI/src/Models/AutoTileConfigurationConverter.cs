@@ -9,9 +9,10 @@ namespace LibreAutoTile.GUI.Models;
 public static class AutoTileConfigurationConverter
 {
   public static AutoTileConfiguration GetAsAutoTileConfiguration(
-    IEnumerable<TileModel> createdTiles, BitmaskDatabase tileDatabase, int tileSize, TileShape tileShape, int? wildcardId)
+    IEnumerable<TileModel> createdTiles, BitmaskDatabase tileDatabase, int tileSize, TileShape tileShape, int? wildcardId,
+    string? projectRoot = null)
   {
-    var allMasks = GroupMasksByTileId(tileDatabase);
+    var allMasks = GroupMasksByTileId(tileDatabase, projectRoot);
 
     Dictionary<uint, TileDefinition> tileDefinitions = [];
     foreach (var tile in createdTiles)
@@ -35,7 +36,7 @@ public static class AutoTileConfigurationConverter
   }
 
   public static AutoTileConfiguration LoadConfiguration(
-    string filePath, TileCollection tiles, BitmaskDatabase bitmaskDatabase)
+    string filePath, TileCollection tiles, BitmaskDatabase bitmaskDatabase, string projectRoot = "")
   {
     if (!File.Exists(filePath))
       GodotLogger.LogErrorAndThrow($"File doesnt exist: '{filePath}'");
@@ -90,7 +91,7 @@ public static class AutoTileConfigurationConverter
     foreach (var (imageFileName, mappedTileData) in imageFileNameToMappedBitmaskData)
       foreach (var (position, guiTileData) in mappedTileData)
         bitmaskDatabase.SetPackedTileData(
-          imageFileName, GodotTypeMapper.Map(position.ToVector2()), guiTileData);
+          ToAbsolutePath(projectRoot, imageFileName), GodotTypeMapper.Map(position.ToVector2()), guiTileData);
 
     return autoTileConfiguration;
   }
@@ -98,14 +99,16 @@ public static class AutoTileConfigurationConverter
   private static (
     List<string> ImageFileNames,
     Dictionary<int, Dictionary<string, Dictionary<Configuration.Models.Vector3, List<TileMaskData>>>> ByTileId)
-    GroupMasksByTileId(BitmaskDatabase tileDatabase)
+    GroupMasksByTileId(BitmaskDatabase tileDatabase, string? projectRoot)
   {
     List<string> imageFileNames = [];
     Dictionary<int, Dictionary<string, Dictionary<Configuration.Models.Vector3, List<TileMaskData>>>> byTileId = [];
 
     foreach (var (fileName, positionToBitmaskData) in tileDatabase.GetAll())
     {
-      string relativeFileName = Path.GetRelativePath(".", fileName);
+      string relativeFileName = projectRoot is null
+        ? fileName
+        : Path.GetRelativePath(BaseDir(projectRoot), fileName);
       imageFileNames.Add(relativeFileName);
 
       foreach (var (position, bitmaskData) in positionToBitmaskData)
@@ -144,6 +147,12 @@ public static class AutoTileConfigurationConverter
 
     return (imageFileNames, byTileId);
   }
+
+  private static string BaseDir(string projectRoot)
+    => string.IsNullOrEmpty(projectRoot) ? "." : projectRoot;
+
+  private static string ToAbsolutePath(string projectRoot, string relativePath)
+    => Path.GetFullPath(Path.Combine(BaseDir(projectRoot), relativePath));
 
   private static Dictionary<string, TileMaskDefinition> BuildTileMaskDefinitions(
     (List<string> ImageFileNames,

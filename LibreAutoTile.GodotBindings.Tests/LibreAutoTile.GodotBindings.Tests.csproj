@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk/4.7.1">
+<Project Sdk="Godot.NET.Sdk/4.7.2">
   <PropertyGroup>
     <RootNamespace>LibreAutoTile.GodotBindings.Tests</RootNamespace>
     <TargetFramework>net9.0</TargetFramework>
