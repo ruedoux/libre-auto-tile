@@ -28,7 +28,7 @@ jobs:
   test-godot:
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-4.7.1
+      image: barichello/godot-ci:mono-4.7.2
     steps:
       - uses: actions/checkout@v4
         with:

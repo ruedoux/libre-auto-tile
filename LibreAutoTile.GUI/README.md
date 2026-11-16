@@ -16,7 +16,10 @@ This produces `build/export/linux-gui.tar.gz` and `build/export/windows-gui.tar.
 
 The GUI is written in an MVC style:
 
-- `src/Models/` — application data and configuration conversion.
-- `src/Views/` — Godot scene nodes and drawing.
-- `src/Controllers/` — editors for tiles, bitmasks, probability, settings, and preview.
-- `src/App.cs` — application entry point wiring model and view together.
+- `src/Editor/Model/` — application data and configuration conversion (`EditorModel`, `BitmaskDatabase`).
+- `src/Editor/View/` — Godot scene nodes and drawing (including the `EditorView` component).
+- `src/Editor/Controller/` — thin controllers for tiles, settings, configuration, camera, and input, wired by `EditorController` around an `EditorContext` bundle.
+- `src/Editor/Controller/Tools/` — the editor tools, a state machine (`ToolStateMachine`) that maps each tab to an `IToolState` implementation (`TilesToolController`, `ProbabilityToolController`, `PreviewToolController`).
+- `src/Settings/` — injected `AppSettings` (UI, editor, camera, and world sub-settings).
+- `src/GuiLogger.cs` — injected logger.
+- `Scenes/Editor/EditorScene.cs` — scene root wiring the model, view, controller, settings, and logger together.

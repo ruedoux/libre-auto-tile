@@ -1,0 +1,11 @@
+using Godot;
+
+namespace LibreAutoTile.GUI.Editor.Model;
+
+public class TileModel
+{
+  public int TileId { get; set; }
+  public string TileName { get; set; } = "";
+  public Color Color { get; set; }
+  public uint? ConnectionGroup { get; set; }
+}
