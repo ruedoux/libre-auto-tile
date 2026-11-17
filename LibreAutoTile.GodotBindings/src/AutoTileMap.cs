@@ -72,15 +72,13 @@ public class AutoTileMap : Node2D
 
   private static (Configuration.Models.Vector2 Position, int TileId)[] ConvertPositions(
     IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
-    => positionToTileIds
-      .Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))
-      .ToArray();
+    => [.. positionToTileIds.Select(positionToTileId => (GodotTypeMapper.Map(positionToTileId.Position), positionToTileId.TileId))];
 
   public new void QueueFree()
   {
     if (OS.GetThreadCallerId() != OS.GetMainThreadId())
     {
-      Callable.From(() => QueueFree()).CallDeferred();
+      Callable.From(QueueFree).CallDeferred();
       return;
     }
 

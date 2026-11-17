@@ -47,7 +47,7 @@ public class AutoTiler
   }
 
   public void Clear()
-    => LockAllLayers(0, () => autoTilerData.Clear());
+    => LockAllLayers(0, autoTilerData.Clear);
 
   public int GetLayerCount()
     => autoTilerData.LayerCount;
@@ -71,10 +71,7 @@ public class AutoTiler
   }
 
   /// <summary>
-  /// Places tiles on the given layer and recomputes the affected positions.
-  /// The returned collection is a reusable buffer scoped to this layer; it is only
-  /// valid until the next PlaceTiles or Clear call on the same layer, so it must be
-  /// consumed synchronously (as AutoTileDrawer does).
+  /// Places tiles on the given layer and recomputes the affected positions. Returns affected positions.
   /// </summary>
   public IReadOnlyCollection<Vector2> PlaceTiles(int layer, IEnumerable<(Vector2 Position, int TileId)> tiles)
   {
@@ -102,7 +99,7 @@ public class AutoTiler
       foreach (var position in dirtyPositions)
         RecomputeTileAt(layer, position);
 
-      return dirtyPositions;
+      return [.. dirtyPositions];
     }
   }
 
