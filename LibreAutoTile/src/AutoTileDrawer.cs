@@ -36,7 +36,7 @@ public class AutoTileDrawer(ITileMapDrawer tileMapDrawer, AutoTiler autoTiler)
     UpdateTiles(layer, positions);
   }
 
-  public void UpdateTiles(int tileLayer, IEnumerable<Vector2> positions)
+  private void UpdateTiles(int tileLayer, IEnumerable<Vector2> positions)
   {
     List<(Vector2, TileData)> tileLayerToData = [];
     foreach (var position in positions)

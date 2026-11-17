@@ -70,12 +70,6 @@ public class AutoTileMap : Node2D
   public void DrawTiles(int layer, IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
     => autoTileDrawer.DrawTiles(layer, ConvertPositions(positionToTileIds));
 
-  public void UpdateTiles(int tileLayer, Vector2I[] positions)
-  {
-    var positionsConverted = positions.Select(GodotTypeMapper.Map).ToArray();
-    autoTileDrawer.UpdateTiles(tileLayer, positionsConverted);
-  }
-
   private static (Configuration.Models.Vector2 Position, int TileId)[] ConvertPositions(
     IEnumerable<(Vector2I Position, int TileId)> positionToTileIds)
     => positionToTileIds

@@ -8,10 +8,10 @@ Implementation of an autotile algorithm for tilemaps with JSON configuration, su
 
 - Isometric tile support
 - Tile probability for same bitmask
-- Connection groups and wildcard tile IDs
-- Fully async-compatible
+- Connection groups and wildcard tile Ids
+- Fully async compatible
 - Dedicated GUI for configuration
-- Game engine-agnostic core library
+- Game engine agnostic core library
 - [High performance](LibreAutoTile.Benchmarks/README.md)
 
 ## Usage
