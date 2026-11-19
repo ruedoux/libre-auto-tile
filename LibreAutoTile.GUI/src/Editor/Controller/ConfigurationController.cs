@@ -45,16 +45,21 @@ public class ConfigurationController
 
   private void ShowDialog(FileDialog dialog)
   {
-    if (!string.IsNullOrEmpty(model.ProjectRoot))
-      dialog.CurrentDir = model.ProjectRoot;
+    if (!string.IsNullOrEmpty(model.ImageRootPath))
+      dialog.CurrentDir = model.ImageRootPath;
     dialog.PopupCenteredRatio(settings.UiSettings.DialogScreenRatio);
   }
 
   private void SaveConfiguration(string filePath)
   {
     AutoTileConfiguration configuration = AutoTileConfigurationConverter.GetAsAutoTileConfiguration(
-      model.Tiles.Tiles, model.BitmaskDatabase, model.TileSize, model.TileShape,
-      model.WildcardId, model.ProjectRoot);
+      model.Tiles.Tiles,
+      model.BitmaskDatabase,
+      model.ImageRootPath,
+      model.TileSize,
+      model.TileShape,
+      model.WildcardId,
+      model.ImageRootPath);
     var jsonString = configuration.ToJsonString();
     File.WriteAllText(filePath, jsonString);
     logger.Log($"Saved to: {filePath}");
@@ -67,7 +72,7 @@ public class ConfigurationController
     try
     {
       autoTileConfiguration = AutoTileConfigurationConverter.LoadConfiguration(
-        filePath, model.Tiles, model.BitmaskDatabase, model.ProjectRoot);
+        filePath, model.Tiles, model.BitmaskDatabase, model.ImageRootPath);
     }
     catch (Exception ex)
     {

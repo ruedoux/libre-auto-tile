@@ -9,7 +9,12 @@ namespace LibreAutoTile.GUI.Editor.Model;
 public static class AutoTileConfigurationConverter
 {
   public static AutoTileConfiguration GetAsAutoTileConfiguration(
-    IEnumerable<TileModel> createdTiles, BitmaskDatabase tileDatabase, int tileSize, TileShape tileShape, int? wildcardId,
+    IEnumerable<TileModel> createdTiles,
+    BitmaskDatabase tileDatabase,
+    string imageRootPath,
+    int tileSize,
+    TileShape tileShape,
+    int? wildcardId,
     string? projectRoot = null)
   {
     var allMasks = GroupMasksByTileId(tileDatabase, projectRoot);
@@ -30,7 +35,9 @@ public static class AutoTileConfigurationConverter
     }
 
     return AutoTileConfiguration.Construct(
-      (uint)tileSize, tileDefinitions,
+      imageRootPath,
+      (uint)tileSize,
+      tileDefinitions,
       wildcardId: wildcardId is int id ? (uint)id : null,
       tileShape: tileShape);
   }

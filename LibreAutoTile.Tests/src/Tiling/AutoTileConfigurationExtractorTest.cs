@@ -17,7 +17,7 @@ public class AutoTileConfigurationExtractorTest
       { new Vector3(1, 2, 0), [TileMaskData.Construct([0, 0, 0, 0, 0, 0, 0, 0], 1)] },
       { new Vector3(3, 4, 1), [TileMaskData.Construct([0, 0, 0, 0, 0, 0, 0, 0], 1)] },
     });
-    AutoTileConfiguration config = AutoTileConfiguration.Construct(32, new()
+    AutoTileConfiguration config = AutoTileConfiguration.Construct("", 32, new()
     {
       { 0, TileDefinition.Construct(new() { { "a.png", tileMaskDefinition } }) },
     });
@@ -41,7 +41,7 @@ public class AutoTileConfigurationExtractorTest
       { new Vector3(1, 2, 0), [TileMaskData.Construct([0, 0, 0, 0, 0, 0, 0, 0], 1)] },
       { new Vector3(1, 2, 1), [TileMaskData.Construct([0, 0, 0, 0, 0, 0, 0, 0], 1)] },
     });
-    AutoTileConfiguration config = AutoTileConfiguration.Construct(32, new()
+    AutoTileConfiguration config = AutoTileConfiguration.Construct("", 32, new()
     {
       { 0, TileDefinition.Construct(new() { { "a.png", tileMaskDefinition } }) },
     });

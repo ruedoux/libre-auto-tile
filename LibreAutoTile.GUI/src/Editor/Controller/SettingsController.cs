@@ -44,7 +44,7 @@ public class SettingsController
     var panel = view.ToolsPanel.SettingsPanel;
     panel.SetTileSizeText(model.TileSize.ToString());
     panel.SetFontSizeText(uiSettings.FontSize.ToString());
-    panel.SetProjectRootText(model.ProjectRoot);
+    panel.SetProjectRootText(model.ImageRootPath);
     panel.SetGuiColor(uiSettings.GuiColor);
     panel.SetSelectionColor(editorSettings.SelectionColor);
     panel.SetBackgroundColor(uiSettings.BackgroundColor);
@@ -119,7 +119,7 @@ public class SettingsController
 
   private void OnProjectRootChanged(string projectRoot)
   {
-    model.ProjectRoot = projectRoot;
+    model.ImageRootPath = projectRoot;
     view.ToolsPanel.SettingsPanel.SetProjectRootText(projectRoot);
   }
 

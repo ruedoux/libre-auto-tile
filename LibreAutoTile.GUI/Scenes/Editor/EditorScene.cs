@@ -26,7 +26,4 @@ public partial class EditorScene : Control
     view = this.AppendChild(new EditorView(settings, logger));
     _ = new EditorController(model, view, settings, logger);
   }
-
-  public override void _Ready()
-    => view.ToolsPanel.SettingsPanel.ShowProjectRootDialog();
 }

@@ -11,7 +11,7 @@ public class EditorModel
   public TileShape TileShape { get; set; } = TileShape.Square;
   public int CurrentLayer { get; set; } = 0;
   public int? WildcardId { get; set; } = null;
-  public string ProjectRoot { get; set; } = "";
+  public string ImageRootPath { get; set; } = "";
   public readonly BitmaskDatabase BitmaskDatabase = new();
   public readonly TileCollection Tiles = new();
 }

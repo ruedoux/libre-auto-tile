@@ -7,6 +7,7 @@ namespace LibreAutoTile.Configuration;
 
 public class AutoTileConfiguration
 {
+  public string ImageRootPath { get; private set; }
   public uint? WildcardId { get; private set; }
   public uint TileSize { get; private set; }
   public TileShape TileShape { get; private set; }
@@ -14,11 +15,13 @@ public class AutoTileConfiguration
 
   [JsonConstructor]
   public AutoTileConfiguration(
+    string imageRootPath,
     uint tileSize,
     ImmutableDictionary<uint, TileDefinition> tileDefinitions,
     uint? wildcardId = null,
     TileShape tileShape = TileShape.Square)
   {
+    ImageRootPath = imageRootPath;
     TileSize = tileSize;
     TileDefinitions = tileDefinitions;
     WildcardId = wildcardId;
@@ -30,11 +33,12 @@ public class AutoTileConfiguration
   }
 
   public static AutoTileConfiguration Construct(
+    string imageRootPath,
     uint tileSize,
     Dictionary<uint, TileDefinition> tileDefinitions,
     uint? wildcardId = null,
     TileShape tileShape = TileShape.Square)
-      => new(tileSize, tileDefinitions.ToImmutableDictionary(), wildcardId, tileShape);
+      => new(imageRootPath, tileSize, tileDefinitions.ToImmutableDictionary(), wildcardId, tileShape);
 
   public static AutoTileConfiguration? FromJsonString(string jsonString)
   {
@@ -55,7 +59,7 @@ public class AutoTileConfiguration
   {
     foreach (var (tileId, tileDefinition) in TileDefinitions)
       foreach (var (imageFileName, _) in tileDefinition.ImageFileNameToTileMaskDefinition)
-        if (!File.Exists(Path.Join(imageFileName)))
+        if (!File.Exists(Path.Join(ImageRootPath, imageFileName)))
           throw new DirectoryNotFoundException($"Image does not exist: {imageFileName}");
   }
 

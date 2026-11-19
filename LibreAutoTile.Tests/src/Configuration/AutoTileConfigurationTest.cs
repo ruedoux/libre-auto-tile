@@ -30,19 +30,19 @@ public class AutoTileConfigurationTest
   public void VerifyEquality()
   {
     SimpleEqualsVerifier.Verify(
-      AutoTileConfiguration.Construct(0, []),
-      AutoTileConfiguration.Construct(0, []),
-      AutoTileConfiguration.Construct(1, [])
+      AutoTileConfiguration.Construct("", 0, []),
+      AutoTileConfiguration.Construct("", 0, []),
+      AutoTileConfiguration.Construct("", 1, [])
     );
     SimpleEqualsVerifier.Verify(
-      AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }),
-      AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }),
-      AutoTileConfiguration.Construct(0, new() { { 1, DEFAULT_TILE_DEFINITION } })
+      AutoTileConfiguration.Construct("", 0, new() { { 0, DEFAULT_TILE_DEFINITION } }),
+      AutoTileConfiguration.Construct("", 0, new() { { 0, DEFAULT_TILE_DEFINITION } }),
+      AutoTileConfiguration.Construct("", 0, new() { { 1, DEFAULT_TILE_DEFINITION } })
     );
     SimpleEqualsVerifier.Verify(
-      AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 1),
-      AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 1),
-      AutoTileConfiguration.Construct(0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 2)
+      AutoTileConfiguration.Construct("", 0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 1),
+      AutoTileConfiguration.Construct("", 0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 1),
+      AutoTileConfiguration.Construct("", 0, new() { { 0, DEFAULT_TILE_DEFINITION } }, wildcardId: 2)
     );
   }
 
@@ -65,7 +65,7 @@ public class AutoTileConfigurationTest
   {
     // Given
     AutoTileConfiguration autoTileConfiguration = AutoTileConfiguration.Construct(
-      0, new() { { 0, DEFAULT_TILE_DEFINITION } });
+      "", 0, new() { { 0, DEFAULT_TILE_DEFINITION } });
 
     // When
     var jsonString = autoTileConfiguration.ToJsonString();

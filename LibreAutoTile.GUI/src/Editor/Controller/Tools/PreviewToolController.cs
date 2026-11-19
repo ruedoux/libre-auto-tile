@@ -20,7 +20,12 @@ public class PreviewToolController(EditorContext context) : IToolState
     context.View.Workspace.ShowPreviewHighlight();
 
     AutoTileConfiguration autoTileConfiguration = AutoTileConfigurationConverter.GetAsAutoTileConfiguration(
-      context.Model.Tiles.Tiles, context.Model.BitmaskDatabase, context.Model.TileSize, context.Model.TileShape, context.Model.WildcardId);
+      context.Model.Tiles.Tiles,
+      context.Model.BitmaskDatabase,
+      context.Model.ImageRootPath,
+      context.Model.TileSize,
+      context.Model.TileShape,
+      context.Model.WildcardId);
     context.View.ToolsPanel.PreviewPanel.InitializeTileMap(autoTileConfiguration, context.Model.TileShape);
     context.View.ToolsPanel.PreviewPanel.AddCreatedTiles(
       [.. context.Model.Tiles.Tiles.Select(t => (t.TileId, t.TileName))],
